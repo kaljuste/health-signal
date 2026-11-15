@@ -51,6 +51,10 @@ The Space Apps Participant Terms (version of 7 August 2026, section "Intellectua
 | Data behind the simulation (20 sources) | Per source: NASA and NOAA public domain, CC0, CC BY 4.0, ODC-By 1.0, ODbL 1.0, NHANES terms, SILSO CC BY-NC 4.0 | `THIRD_PARTY_NOTICES.md`; table `source_use` in the database; Data tab |
 | AI services and hosting (OpenRouter, ElevenLabs, Google Veo, Claude Code, Cloudflare) | Their terms of service | `THIRD_PARTY_NOTICES.md` |
 
+## 3b. The public repository
+
+**https://github.com/kaljuste/health-signal** (public, created 2026-11-15). It is not this working folder: `python3 -I tools/export_repo.py` builds a clean copy in `~/Development/Zed/health-signal` from the list in §2 (the presentation layer, the design module, working texts, the knowledge base and all source data stay out), turns links to unpublished files into plain text, writes a short `.env.example` and `.gitignore`, and checks the copy for key-like strings, the private names list and private hostnames. To publish a change: run the script, look at `git status` and `git diff` in that folder, commit there and push. The README's illustrations are the slides of presentation mode (`docs/images/`).
+
 ## 4. Before every public commit
 1. `python3 -I tools/check_docs.py` passes (no forbidden terms, front matter valid).
 2. `git status` shows none of the "never" paths; `.gitignore` covers them.
@@ -71,3 +75,4 @@ The Space Apps Participant Terms (version of 7 August 2026, section "Intellectua
 | 2026-11-14 | `launcher/`, the remote script, the voice and model services; the database download on the Database tab |
 | 2026-11-15 | Internal AI usage and cost report in `.private/ai_usage/` (not public) |
 | 2026-11-15 | Licence decided: Apache-2.0 (D-34); `LICENSE` and `THIRD_PARTY_NOTICES.md`; what goes into the repository agreed with the parent; the open question about the simulated database answered |
+| 2026-11-15 | Public repository created from the export script (§3b) |
