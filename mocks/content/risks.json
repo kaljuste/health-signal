@@ -1,0 +1,1216 @@
+[
+  {
+    "id": "earth_independent_ops",
+    "hrr_id": 175,
+    "official_title": "Risk of Adverse Mission Outcomes Due to Earth Independent Human-Systems Operations",
+    "short_name": "No quick help from Earth",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 1,
+    "status": "active",
+    "hazard": "Distance from Earth",
+    "official_statement": "Given decreasing real-time ground support for execution of Earth independent critical, complex operations during future exploration missions, there is a possibility of adverse performance outcomes, most consequentially that crew are unable to adequately respond to unanticipated critical malfunctions or execute safety-critical procedures.",
+    "explanation": "On the Space Station, mission control watches every system and answers within seconds. On the way to Mars a question takes up to 21.5 minutes to reach Earth, and the answer takes as long to come back. For 12 days in 2038 the Sun blocks the link completely. If a suit, the air system or a crew member fails in those minutes, the crew must notice and act alone. NASA gives this risk its highest in-mission rating for Mars.",
+    "first_signs": "A situation, not a symptom: an alarm or a sick crew member while the reply from Earth is still many minutes away, or while the link is down.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×5",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": null,
+      "approved": "2/2023",
+      "note": "No long-term health rating: NASA tracks the long-term outcomes under other risks.",
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=175",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "We track the delay and the state of the radio link for every day of the mission.",
+    "variables": [
+      "light_time_min",
+      "comm_state",
+      "readiness"
+    ],
+    "app_response": {
+      "arm_unit": "Decides on the wrist in under a second with built-in limits. It never waits for Earth.",
+      "habitat": "Shows the current delay and the radio state, counts down to the blackout and keeps working through it.",
+      "earth": "Receives the full data every day and sends back one instruction for the next day. During the blackout the last instruction stays in force and its age is shown.",
+      "assistant": "Holds Earth's latest instruction and the knowledge base on board, so a spoken question gets an answer at once, with its source and the age of the advice."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Adverse Mission Outcomes Due to Earth Independent Human-Systems Operations",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=175"
+      }
+    ],
+    "kb_refs": [
+      "kb/22 §4 (light delay, blackout)",
+      "kb/16 (on-board AI)",
+      "kb/20 (alarms without ground, store-and-forward)"
+    ]
+  },
+  {
+    "id": "medical_conditions",
+    "hrr_id": 95,
+    "official_title": "Risk of Adverse Health Outcomes and Decrements in Performance Due to Medical Conditions that occur in Mission, as well as Long Term Health Outcomes Due to Mission Exposures",
+    "short_name": "Illness or injury far from a hospital",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 2,
+    "status": "active",
+    "hazard": "Distance from Earth",
+    "official_statement": "Given that medical conditions will occur during human spaceflight missions, there is a possibility of adverse health outcomes & decrements in performance during these missions and for long term health.",
+    "explanation": "People get sick and hurt on any long trip. NASA's medical model gives near-certain odds of rashes, eye scratches, headaches and sleep trouble on a three-year planetary mission, and high odds of infections and back injuries. Near Earth a serious case can fly home within a day. From Mars the way home takes months, the medical kit is small and the doctor is a crewmate. A problem caught early stays small.",
+    "first_signs": "Fever, a fast pulse at rest, fast breathing, low blood oxygen, pain, or a blood value drifting out of the person's usual range.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "5×4",
+        "colour": "red",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "5/2021",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=95",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Vital signs every day and blood values at each lab check. We do not simulate imaging or a diagnosis.",
+    "variables": [
+      "hr_rest_bpm",
+      "resp_rate_bpm",
+      "spo2_pct",
+      "temp_core_c",
+      "bp_sys_mmhg",
+      "bp_dia_mmhg",
+      "crp_mg_l",
+      "wbc_k_ul",
+      "readiness"
+    ],
+    "app_response": {
+      "arm_unit": "Stops a walk when body values go wrong. Illness itself is the Habitat App's job.",
+      "habitat": "Checks vital signs every morning against clinical early-warning limits and the person's own baseline, and asks for a repeat measurement before it raises a warning.",
+      "earth": "Flight surgeons see the same values, decide on treatment and send the plan.",
+      "assistant": "Explains what a flagged value means and reads out the treatment plan from Earth. It does not diagnose."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Adverse Health Outcomes and Decrements in Performance Due to Medical Conditions that occur in Mission, as well as Long Term Health Outcomes Due to Mission Exposures",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=95"
+      },
+      {
+        "title": "NASA: Ranking of Medical Conditions by Probability (iMED v5.0)",
+        "url": "https://www.nasa.gov/wp-content/uploads/2026/08/ranking-of-medical-conditions-by-probability.pdf"
+      },
+      {
+        "title": "NASA-STD-3001 Vol 1, chapter 3: Health and Medical Care",
+        "url": "https://www.nasa.gov/reference/3-0-health-and-medical-care/"
+      }
+    ],
+    "kb_refs": [
+      "kb/19 (NASA condition probabilities, 36-month planetary mission)",
+      "kb/13 (hr_resting, spo2, core_temp, resp_rate)",
+      "kb/18 (NASA-STD-3001 Vol 1 ch. 3)"
+    ]
+  },
+  {
+    "id": "eva_operations",
+    "hrr_id": 84,
+    "official_title": "Risk of Mission Impacting Injury and Compromised Performance and Long-Term Health Effects due to EVA Operations",
+    "short_name": "Hurt or exhausted inside the suit",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 3,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given the high-performance physiological and functional demands of operating in a self-contained EVA or training suit in various gravity fields and system environments, there is a possibility that crew injury and compromised physiological and functional performance may occur.",
+    "explanation": "A Mars walk means hours of hard work inside a pressurised suit that carries its own air, cooling and power. The body heats up and tires, the suit itself can injure, and outside there is nothing to breathe. Help is one crewmate and a walk back to the airlock. NASA rates this risk red for Mars: the mission plans many walks, and each one depends on both the suit and the body holding out.",
+    "first_signs": "Heart rate above 140 beats a minute for two minutes, body temperature 0.6 °C over the starting value, rising CO₂ in the suit, clumsy steps.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "5×2",
+        "colour": "yellow",
+        "disposition": "Accepted with Optimization"
+      },
+      "approved": "12/2023",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=84",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Every second of a walk: suit air, power and cooling, body load, radiation and the way back.",
+    "variables": [
+      "hr_bpm",
+      "core_c",
+      "met_w",
+      "lactate_mmol",
+      "stamina_pct",
+      "balance_score",
+      "faint_risk_pct",
+      "suit_p_kpa",
+      "suit_o2_pct",
+      "suit_co2_mmhg",
+      "suit_temp_c",
+      "battery_pct",
+      "water_pct",
+      "scrubber_pct",
+      "dist_m",
+      "sleep_h",
+      "readiness"
+    ],
+    "app_response": {
+      "arm_unit": "Its main job. Every second it turns suit and body values into one number, the time you can stay, and calls Go, Caution or Return.",
+      "habitat": "Clears or blocks tomorrow's walk from sleep, reaction test and readiness, and keeps a log of every walk.",
+      "earth": "Reviews each walk afterwards and adjusts the plan for the next ones.",
+      "assistant": "Gives the short briefing before the walk and explains afterwards what limited the stay."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Mission Impacting Injury and Compromised Performance and Long-Term Health Effects due to EVA Operations",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=84"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (eva_heat_strain: NASA V2 11011 cues)",
+      "kb/17 (suit pressure, EVA)",
+      "kb/20 §3 (suit limits)",
+      "kb/24 (Arm Unit)"
+    ]
+  },
+  {
+    "id": "dynamic_loads",
+    "hrr_id": 167,
+    "official_title": "Risk of In-Mission Injury and Performance Decrements and Long-term Health Effects due to Dynamic Loads",
+    "short_name": "Injury from launch and landing forces",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 4,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given the exposure to the range of anticipated dynamic loads that might be applied to crew within the hostile closed environment of a spacecraft and/or surface vehicle (suited or unsuited) could result in injury to the crew, resulting in a possibility that mission task performance would be impaired, or tasks could not be performed.",
+    "explanation": "Launch, the landing on Mars and the landing back on Earth press and shake the body hard for a few minutes. After months without weight, muscles, bones and the sense of balance are weaker, so the same jolt can do more harm. A neck, back or limb injury at landing would strike at the worst moment: just when the crew must climb out and set up camp on their own.",
+    "first_signs": "Pain, numbness or weakness right after launch, landing or a hard impact.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "12/2023",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=167",
+      "verified": true
+    },
+    "coverage": "not monitored",
+    "coverage_note": "No sensor in our data measures these forces. Bone and strength values only show how well the body is prepared for landing.",
+    "variables": [],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Not measured. The check on the day before landing shows bone and strength values as context.",
+      "earth": "Sets the landing-day rules.",
+      "assistant": "Can explain the risk. It has no measured value for it."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of In-Mission Injury and Performance Decrements and Long-term Health Effects due to Dynamic Loads",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=167"
+      }
+    ],
+    "kb_refs": [
+      "kb/05 §2",
+      "kb/13 (fracture_risk_index, back_pain_spine_length)"
+    ]
+  },
+  {
+    "id": "decompression_sickness",
+    "hrr_id": 168,
+    "official_title": "Risk of Mission Impacts and Long-Term Health Issues due to Decompression Sickness",
+    "short_name": "The bends",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 5,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given that decompression sickness (DCS) is a potential risk for every spaceflight/mission (e.g., EVA or cabin depressurization) and must be mitigated to acceptable risk levels; limitations in quantitative understanding of DCS will lead to conservative DCS risk mitigation countermeasures with significant operational, engineering, and/or secondary health/performance impacts.",
+    "explanation": "The suit runs at a lower pressure than the habitat. When pressure drops, nitrogen dissolved in the body forms bubbles, like opening a fizzy drink. Bubbles cause joint pain and, rarely, damage to lungs or nerves. Breathing oxygen before a walk washes the nitrogen out. Our habitat uses NASA's exploration air (56.5 kPa, 34 % oxygen), designed to cut that wait from hours to minutes. A leak in a suit or the cabin brings the same danger without warning.",
+    "first_signs": "Joint pain, itching or blotchy skin, tingling, unusual tiredness or breathlessness during or after a walk.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "2×1",
+        "colour": "green",
+        "disposition": "Accepted"
+      },
+      "approved": "7/2023",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=168",
+      "verified": true
+    },
+    "coverage": "partly",
+    "coverage_note": "Pressure is measured; bubbles are not. Symptoms after a walk are reported by the crew.",
+    "variables": [
+      "cabin_pressure_kpa",
+      "suit_p_kpa",
+      "suit_o2_pct"
+    ],
+    "app_response": {
+      "arm_unit": "Alarms on falling suit pressure and shows the way back.",
+      "habitat": "Watches cabin pressure and plans the oxygen pre-breathe into every walk.",
+      "earth": "Sets the pre-breathe protocol.",
+      "assistant": "Asks about symptoms after a walk and explains the protocol."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Mission Impacts and Long-Term Health Issues due to Decompression Sickness",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=168"
+      }
+    ],
+    "kb_refs": [
+      "kb/17 (atmosphere options, pre-breathe; protocol figures not yet re-checked)",
+      "kb/20 §3 (DCS limit V2 6008)"
+    ]
+  },
+  {
+    "id": "hypoxia",
+    "hrr_id": 173,
+    "official_title": "Risk of Reduced Crew Health and Performance Due to Hypoxia",
+    "short_name": "Too little oxygen",
+    "tier": 1,
+    "tier_name": "Survive",
+    "order": 6,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given that future human exploration missions require robust, flexible Extravehicular Activity (EVA) architecture protocols that include the use of a reduced pressure cabin atmosphere enabling staged denitrogenation, there is a possibility that this atmosphere could result in compromised health and performance to the crewmember due to exposure to mild hypobaric hypoxia.",
+    "explanation": "To make spacewalks easier the habitat keeps its air at lower pressure with extra oxygen. The crew then breathes about as much oxygen as on a 1,200 m mountain: safe, but with less margin. If the oxygen share slips, thinking slows and judgement fails before the person notices anything. NASA requires a monitoring plan whenever inspired oxygen is under 127 mmHg, and sets an absolute floor at 122 mmHg.",
+    "first_signs": "Blood oxygen three points under the personal baseline, headache, a slower reaction test, poor judgement that the person does not notice.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "3×3",
+        "colour": "yellow",
+        "disposition": "Accepted with Monitoring"
+      },
+      "long_term": {
+        "lxc": "2×2",
+        "colour": "green",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "11/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=173",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Inspired oxygen in the cabin every hour, blood oxygen every day, suit oxygen every second.",
+    "variables": [
+      "cabin_pio2_mmhg",
+      "cabin_pressure_kpa",
+      "spo2_pct",
+      "suit_o2_pct",
+      "pvt_rt_ms"
+    ],
+    "app_response": {
+      "arm_unit": "Watches suit oxygen and pressure every second.",
+      "habitat": "Alarms at once when inspired oxygen falls under the limit, and tracks blood oxygen against the personal baseline in this air.",
+      "earth": "Reviews the trend. No time-critical role.",
+      "assistant": "Explains why 95 % is normal in this air and when it is not."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Reduced Crew Health and Performance Due to Hypoxia",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=173"
+      }
+    ],
+    "kb_refs": [
+      "kb/17 (8.2 psi / 34 % O₂: 128 mmHg, about 1,190 m)",
+      "kb/20 §3 (O₂ limits V2 6003)",
+      "kb/13 (spo2, cabin_ppo2_pressure)"
+    ]
+  },
+  {
+    "id": "food_nutrition",
+    "hrr_id": 176,
+    "official_title": "Risk of Performance Decrement and Crew Illness Due to Inadequate Food and Nutrition",
+    "short_name": "Not enough of the right food",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 1,
+    "status": "active",
+    "hazard": "Distance from Earth",
+    "official_statement": "Given that there is a constrained ability to supply adequate food in spaceflight missions, there is a possibility that inadequate nutrition will result in performance decrement, crew illness, and long-term health effects.",
+    "explanation": "All food for 923 days is packed years ahead. Vitamins fade in storage, the menu gets boring, and crews eat less than they need: on the Space Station about 80 % of the target. Too little energy and protein costs muscle, bone, mood and the strength to fight infections. Nothing can be resupplied, so a small daily gap adds up over two and a half years. NASA gives this its highest in-mission rating for Mars.",
+    "first_signs": "Energy eaten under 90 % of the need for three days, body mass down by more than 2 %, low vitamin D or iron.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×5",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "7/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=176",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Daily intake, fluids and body mass; vitamin D, iron and blood sugar at each lab check.",
+    "variables": [
+      "energy_pct",
+      "protein_g_kg",
+      "body_mass_kg",
+      "fluid_l",
+      "vitd_ng_ml",
+      "ferritin_ng_ml",
+      "hemoglobin_g_dl",
+      "glucose_mg_dl"
+    ],
+    "app_response": {
+      "arm_unit": "Only the drink reminder during a walk.",
+      "habitat": "Logs meals and body mass daily, flags a three-day shortfall and adds the missing energy to tomorrow's plan.",
+      "earth": "Dietitians adjust the menu and supplements.",
+      "assistant": "Says what to add today and why."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Performance Decrement and Crew Illness Due to Inadequate Food and Nutrition",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=176"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (energy_protein_intake, body_mass, vitamin_d_25oh, iron_ferritin)"
+    ]
+  },
+  {
+    "id": "team",
+    "hrr_id": 101,
+    "official_title": "Risk of In-Mission Performance and Behavioral Health Decrements Due to Inadequate Cooperation, Coordination, Communication, and Psychosocial Adaptation within a Team",
+    "short_name": "A crew that stops working as a team",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 2,
+    "status": "active",
+    "hazard": "Isolation and confinement",
+    "official_statement": "Given that the conditions of space missions may lead to inadequate functioning within a team (inadequate cooperation, coordination, communication and/or psychosocial adaptation), which includes flight crew and ground support, there is a possibility that performance and behavioral health decrements will occur.",
+    "explanation": "Four people share a small space for two and a half years, with no way out and no call home without delay. Small frictions grow. In the 520-day Mars-500 isolation study, conflicts with mission control were reported five times more often than conflicts inside the crew. A crew that stops talking makes mistakes, hides symptoms and skips routines. NASA gives this its highest in-mission rating for Mars.",
+    "first_signs": "Low mood or high stress in several people at once, people spending more time alone, friction with Earth.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×5",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": null,
+      "approved": "4/2024",
+      "note": "No long-term health rating given by NASA.",
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=101",
+      "verified": true
+    },
+    "coverage": "partly",
+    "coverage_note": "We measure each person's mood and stress, not the team. Conflict is not a measured value in our data.",
+    "variables": [
+      "mood_who5",
+      "stress_0_10"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Shows each person their own mood and stress trend. There is no team score.",
+      "earth": "Behavioural-health specialists read the trends and advise the commander.",
+      "assistant": "Listens, and passes on what Earth's specialists recommend. It does not judge crewmates."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of In-Mission Performance and Behavioral Health Decrements Due to Inadequate Cooperation, Coordination, Communication, and Psychosocial Adaptation within a Team",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=101"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (isolation_team_conflict, mood_stress_workload)",
+      "kb/05 §7.4 (analog missions)"
+    ]
+  },
+  {
+    "id": "fitness",
+    "hrr_id": 180,
+    "official_title": "Risk of Mission Performance Decrements and Adverse Health Outcomes Resulting from Reduced Cardiorespiratory and Musculoskeletal Fitness",
+    "short_name": "Losing muscle and stamina",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 3,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given that exposure to a reduced gravity environment causes cardio-respiratory (e.g., maximal oxygen consumption and ventilatory threshold) and musculoskeletal fitness (e.g., strength, power, and endurance) to decline, there is a risk of impaired mission task performance and adverse health outcomes.",
+    "explanation": "Without weight, muscles and the heart have little to do and shrink. Aerobic capacity drops by about 17 % in the first two weeks of weightlessness and recovers only partly, even with daily exercise. After 172 days of travel the crew must land, climb out and work in suits, with no ground team to carry them. NASA requires at least 80 % of pre-flight fitness and strength; below that a person is not fit for a spacewalk.",
+    "first_signs": "Aerobic capacity or leg strength 10 % under the pre-flight value, exercise below 80 % of the plan, a higher pulse for the same work.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "4/2024",
+      "note": "NASA's risk board carries this as two risks (muscle, aerobic) with identical ratings.",
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=180",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Exercise done every day; fitness and strength as daily estimates, checked by a monthly test.",
+    "variables": [
+      "vo2max_pct",
+      "leg_strength_pct",
+      "exercise_min",
+      "body_mass_kg",
+      "hr_rest_bpm",
+      "stamina_pct",
+      "lactate_mmol",
+      "met_w"
+    ],
+    "app_response": {
+      "arm_unit": "Estimates stamina and lactate from heart rate and work rate, and calls a rest before the body runs out.",
+      "habitat": "Tracks exercise done against the plan and projects fitness to landing day.",
+      "earth": "Trainers rewrite the exercise prescription.",
+      "assistant": "Reads out today's session and explains what a missed week costs."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Mission Performance Decrements and Adverse Health Outcomes Resulting from Reduced Cardiorespiratory and Musculoskeletal Fitness",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=180"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (vo2max, muscle_strength_lower_body, exercise_dose)",
+      "kb/20 §3 (V1 4003, V1 4024)"
+    ]
+  },
+  {
+    "id": "sensorimotor",
+    "hrr_id": 88,
+    "official_title": "Risk of Altered Sensorimotor/Vestibular Function Impacting Critical Mission Tasks, Human Health, and Long-Term Health",
+    "short_name": "Balance and motion sickness",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 4,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given that altered gravity leads to changes in sensorimotor/vestibular function that manifest in motion sickness, spatial disorientation, decrements in postural control and locomotion, and manual and fine motor control deficits, there is a possibility that crew will experience performance decrements in manual/vehicle control, extravehicular activities, and egress during and following these transitions and long-term health effects.",
+    "explanation": "The inner ear tells the brain which way is down. In weightlessness that signal stops making sense, and about seven in ten first-time flyers get motion sick in the first days. The brain adapts, then has to re-learn gravity at every landing. Back on Earth after six months, crews managed 61 percentage points fewer correct steps in a heel-to-toe walk. On Mars the crew lands, stands up and works without helpers, so a fall in a suit is a real danger.",
+    "first_signs": "Nausea when moving the head, stumbling in a heel-to-toe walk, dizziness on standing.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×5",
+        "colour": "red",
+        "disposition": "Requires Mitigation/Standard Refinement"
+      },
+      "long_term": {
+        "lxc": "2×2",
+        "colour": "green",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "11/2024",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=88",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Motion-sickness grade and a balance test around every change of gravity; a balance estimate during walks.",
+    "variables": [
+      "sms_grade",
+      "balance_pct",
+      "stand_dhr_bpm",
+      "balance_score",
+      "faint_risk_pct"
+    ],
+    "app_response": {
+      "arm_unit": "Estimates balance from motion sensors and warns before a fall becomes likely.",
+      "habitat": "Runs the balance test after each landing and holds back walks until it recovers.",
+      "earth": "Sets the re-adaptation schedule for the first sols.",
+      "assistant": "Explains why the first days after a landing are restricted."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Altered Sensorimotor/Vestibular Function Impacting Critical Mission Tasks, Human Health, and Long-Term Health",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=88"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (space_motion_sickness, sensorimotor_balance_gait)"
+    ]
+  },
+  {
+    "id": "cardiovascular",
+    "hrr_id": 179,
+    "official_title": "Risk of Cardiovascular Adaptations Contributing to Adverse Mission Performance and Health Outcomes",
+    "short_name": "Heart and blood vessels out of training",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 5,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given exposure to the spaceflight environment can contribute to cardiovascular deconditioning, dysfunction, and remodeling, there is a possibility that crews will experience impaired performance and adverse cardiovascular health outcomes that necessitate intervention during and after spaceflight and planetary operations.",
+    "explanation": "In weightlessness, blood shifts towards the head and the body sheds blood volume. The heart works less, and the reflex that holds blood pressure up on standing weakens. Floating, all is fine. Standing up under gravity, blood sinks to the legs and the person can faint: after six months in space about three in four astronauts cannot finish a ten-minute tilt test on landing day. Blood can also pool and clot in the neck veins.",
+    "first_signs": "Pulse rising by 20 beats or more on standing, lightheadedness, a resting pulse 10 beats above the personal baseline for three days.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation/Standard Refinement"
+      },
+      "long_term": {
+        "lxc": "2×4",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation/Standard Refinement"
+      },
+      "approved": "5/2024",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=179",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Pulse, heart-rate variability and blood pressure every day; a stand test around every landing. Clots in neck veins are not simulated.",
+    "variables": [
+      "hr_rest_bpm",
+      "hrv_rmssd_ms",
+      "bp_sys_mmhg",
+      "bp_dia_mmhg",
+      "stand_dhr_bpm",
+      "hr_bpm",
+      "faint_risk_pct"
+    ],
+    "app_response": {
+      "arm_unit": "Shows a faint-risk estimate during the first walks after landing.",
+      "habitat": "Daily pulse, variability and blood pressure, and a stand test before and after every landing.",
+      "earth": "Sets the fluid and compression-garment rules for landing day.",
+      "assistant": "Explains the stand-test result and the landing-day rules."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Cardiovascular Adaptations Contributing to Adverse Mission Performance and Health Outcomes",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=179"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (hr_resting, hrv_lnrmssd, bp_24h, orthostatic_tolerance, ijv_flow_thrombosis)"
+    ]
+  },
+  {
+    "id": "celestial_dust",
+    "hrr_id": 82,
+    "official_title": "Risk of Adverse In-Mission Health and Performance Effects and Long-Term Health Effects Due to Celestial Dust Exposure",
+    "short_name": "Mars dust in lungs and eyes",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 6,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given the unique properties of lunar and other celestial bodies' dust, there is a possibility that exposure could lead to serious health effects (e.g., respiratory, cardiopulmonary, ocular or dermal harm) or to crew performance impacts during celestial body missions.",
+    "explanation": "Mars dust is very fine and clings to suits. It comes into the habitat with every return through the airlock, and over 546 sols that adds up. Fine dust irritates eyes, skin and airways. Nobody has breathed Mars dust before, so its long-term effect is unknown. NASA limits Mars dust in cabin air to 0.1 mg per cubic metre, averaged over a day.",
+    "first_signs": "Itchy eyes, a cough, a sore throat or a tight chest after coming in from a walk.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Characterization"
+      },
+      "long_term": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "3/2024",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=82",
+      "verified": true
+    },
+    "coverage": "not monitored",
+    "coverage_note": "No dust value in our data: the Curiosity weather record we replay has no dust measurement, and we simulate no cabin particle sensor.",
+    "variables": [],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Not measured. Late signs would show in blood oxygen and breathing rate.",
+      "earth": "No measured value to review.",
+      "assistant": "Can explain the risk and the airlock cleaning routine. It has no measured value for it."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Adverse In-Mission Health and Performance Effects and Long-Term Health Effects Due to Celestial Dust Exposure",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=82"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (dust_particulates: V2 6253)",
+      "kb/23 §8 (limits of the weather record)"
+    ]
+  },
+  {
+    "id": "renal_stone",
+    "hrr_id": 81,
+    "official_title": "Risk of Renal Stone Formation",
+    "short_name": "Kidney stones",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 7,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given changes in urinary biochemistry during spaceflight, there is a possibility that symptomatic renal stones will occur, which could cause renal colic (pain), nausea, vomiting, hematuria, infection, and/or hydronephrosis.",
+    "explanation": "Bones that carry no weight release calcium, and it leaves the body through the urine. Crews also drink less than they should. Concentrated urine rich in calcium forms crystals that grow into stones. A stone on the move causes severe pain, vomiting and sometimes a blocked kidney. On Earth that means a hospital visit. On Mars it can put one of four crew members out of action for days.",
+    "first_signs": "Urine under 2 litres a day, high calcium in the urine sample; later, sharp pain in the side or blood in the urine.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "4/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=81",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Drinking and urine volume every day; urine calcium and kidney function at each lab check.",
+    "variables": [
+      "urine_l",
+      "fluid_l",
+      "urine_ca_mg_day",
+      "creatinine_mg_dl",
+      "bmd_hip_pct"
+    ],
+    "app_response": {
+      "arm_unit": "Only the drink reminder during a walk.",
+      "habitat": "Tracks drinking and urine volume daily and urine calcium at each lab check, and raises tomorrow's fluid target.",
+      "earth": "Decides on preventive treatment.",
+      "assistant": "Reminds the person to drink and explains why the target went up."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Renal Stone Formation",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=81"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (urine_output_stone_risk, fluid_intake_hydration, bone_turnover_urine_ca_markers)"
+    ]
+  },
+  {
+    "id": "bmed",
+    "hrr_id": 99,
+    "official_title": "Risk of Adverse Cognitive or Behavioral Changes and Psychiatric Disorders Leading to In-mission Health and Performance and Long-term Health Effects",
+    "short_name": "Mood, thinking and mental health",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 8,
+    "status": "active",
+    "hazard": "Isolation and confinement",
+    "official_statement": "Given that crews of future exploration missions will be exposed to extended duration of isolation and confinement, greater distances from Earth, as well as increased exposures to radiation and altered gravity, there is a possibility that these singular or combined hazards could lead to (a) adverse cognitive or behavioral changes affecting crew health and performance during the mission; (b) development of psychiatric disorders if adverse behavioral health changes are undetected or inadequately mitigated; and (c) long term health consequences, including late-emerging cognitive and behavioral changes.",
+    "explanation": "Two and a half years of confinement, monotony, danger and distance from everyone at home wear on the mind. Deep-space radiation may add its own effect on the brain. Low mood, anxiety or slower thinking can creep in so gradually that the person does not see it, and a crew of four has nobody to spare. Regular self-checks catch a slide while a talk, a rest day or a change of work can still fix it.",
+    "first_signs": "Wellbeing score under 13 of 25, stress raised for several days, a slower reaction test, poor sleep.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "2×5",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "7/2024",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=99",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "A short wellbeing and stress check and a reaction test every day.",
+    "variables": [
+      "mood_who5",
+      "stress_0_10",
+      "pvt_rt_ms",
+      "sleep_h"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Daily wellbeing and stress check and a reaction test, all against the person's own baseline.",
+      "earth": "Psychologists read the trends and send advice; private talks run with the delay.",
+      "assistant": "A conversation partner on board that knows the data and Earth's advice. Any sign of self-harm goes straight to the crew doctor."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Adverse Cognitive or Behavioral Changes and Psychiatric Disorders Leading to In-mission Health and Performance and Long-term Health Effects",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=99"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (mood_stress_workload, alertness_pvt_b, cognition_battery)",
+      "kb/05 §7 (scales and escalation)"
+    ]
+  },
+  {
+    "id": "medications",
+    "hrr_id": 177,
+    "official_title": "Risk of Ineffective or Toxic Medications During Long-Duration Exploration Spaceflight",
+    "short_name": "Medicines that lose their strength",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 9,
+    "status": "active",
+    "hazard": "Distance from Earth",
+    "official_statement": "Given that there is no current method to sufficiently characterize medication use, drug quality and performance, clinical outcomes, and the impact of a hostile space environment on pharmaceutical stability and potency during long-duration exploration missions, there is a possibility that provision of a safe and effective drug treatment will be significantly limited, impacting crew health and performance.",
+    "explanation": "Most medicines keep for one or two years. A Mars mission lasts 730 to 1,224 days, and there is no pharmacy on the way. In one NASA study only 27 % of stored solid medicines still met their strength requirement after 880 days. Radiation, and the way a body handles drugs in space, add more doubt. A painkiller or antibiotic that has lost strength fails exactly when it is needed.",
+    "first_signs": "A medicine that works less well than expected.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "5×3",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "12/2021",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=177",
+      "verified": true
+    },
+    "coverage": "not monitored",
+    "coverage_note": "We simulate no medicine stock and no drug log. A pharmacy gauge is on our list for the real app.",
+    "variables": [],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Not measured.",
+      "earth": "No measured value to review.",
+      "assistant": "Can explain the risk. It has no stock or expiry data."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Ineffective or Toxic Medications During Long-Duration Exploration Spaceflight",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=177"
+      }
+    ],
+    "kb_refs": [
+      "kb/20 (medication use, pharmacy: 27 % after 880 days; design items 8 and 9)"
+    ]
+  },
+  {
+    "id": "immune",
+    "hrr_id": 85,
+    "official_title": "Risk of In Mission Impacts, Adverse Health Events or Long-Term Health Impacts due to Altered Immune Response",
+    "short_name": "An immune system out of balance",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 10,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given that exposure to orbital spaceflight results in persistent dysregulation of the immune system, which leads to reactivation of latent herpesviruses and likely to an increased clinical incidence, including rashes and hypersensitivity reactions, there is a possibility that crewmembers will be susceptible to certain diseases during exploration class missions or long term health impacts.",
+    "explanation": "Stress, poor sleep, radiation and weightlessness throw the immune system off balance. Viruses that sleep in almost everyone, such as the chickenpox virus, wake up: in one study 22 of 23 astronauts shed at least one of them. Rashes and allergies are common, about one skin rash per person per year in orbit. Usually this is mild. On a long mission a weakened defence meets a closed cabin where germs keep circulating.",
+    "first_signs": "A new rash, a cold sore, skin that heals slowly, a white blood cell count drifting from the person's baseline.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×3",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×2",
+        "colour": "yellow",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "11/2023",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=85",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Blood count and an inflammation marker at each lab check, read together with sleep and stress.",
+    "variables": [
+      "wbc_k_ul",
+      "lymph_k_ul",
+      "crp_mg_l",
+      "temp_core_c",
+      "stress_0_10",
+      "sleep_h"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Blood count and inflammation marker at each lab check, linked with the sleep and stress trends.",
+      "earth": "Reviews lab trends and advises treatment.",
+      "assistant": "Explains the lab values in plain words."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of In Mission Impacts, Adverse Health Events or Long-Term Health Impacts due to Altered Immune Response",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=85"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (immune_leukocytes, latent_virus_reactivation, skin_rash, inflammation_crp_il6)"
+    ]
+  },
+  {
+    "id": "host_microorganism",
+    "hrr_id": 80,
+    "official_title": "Risk of Adverse In-Mission and Long-Term Health Effects and Performance Effects Due to Host-Microorganism Interactions",
+    "short_name": "Germs that change in space",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 11,
+    "status": "active",
+    "hazard": "Environment",
+    "official_statement": "Given that evidence collected during space flight indicates alterations in microbial virulence and astronaut immune function, there is a possibility that infectious disease will have increased prevalence and/or will be more severe during spaceflight missions.",
+    "explanation": "A spacecraft is a sealed box that carries its microbes along: on skin, on surfaces and in the water. Evidence from spaceflight shows that some microbes become more aggressive while the crew's defences get weaker, so an ordinary infection can hit harder and reach all four people. No window can be opened, and the same air and water are recycled for years.",
+    "first_signs": "Fever, a raised inflammation marker, or two crew members sick with the same thing.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×3",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×3",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "12/2024",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=80",
+      "verified": true
+    },
+    "coverage": "partly",
+    "coverage_note": "We see the body's reaction to an infection, not the microbes. Air, surface and water samples are not in our data.",
+    "variables": [
+      "temp_core_c",
+      "crp_mg_l",
+      "wbc_k_ul"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Flags fever and inflammation, and shows when several crew members are affected at once.",
+      "earth": "Reviews the cases and advises treatment.",
+      "assistant": "Explains the flagged values. It has no microbe counts."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Adverse In-Mission and Long-Term Health Effects and Performance Effects Due to Host-Microorganism Interactions",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=80"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (microbial_load, immune_leukocytes)"
+    ]
+  },
+  {
+    "id": "sleep",
+    "hrr_id": 100,
+    "official_title": "Risk of Performance Decrements and Adverse Health Outcomes Resulting from Sleep Loss, Circadian Desynchronization, and Work Overload",
+    "short_name": "Too little sleep, too much work",
+    "tier": 2,
+    "tier_name": "Work",
+    "order": 12,
+    "status": "active",
+    "hazard": "Isolation and confinement",
+    "official_statement": "Given that astronauts experience sleep loss, circadian desynchronization, and work overload, there is a possibility that performance decrements and adverse health outcomes will occur.",
+    "explanation": "Astronauts on the Space Station sleep about 6.1 hours a night although 8.5 are scheduled. Noise, light, workload and excitement all cut into it, and a Mars day is 39 minutes longer than an Earth day. Short sleep slows reactions and judgement while the person still feels fine. Before a landing or a walk outside, that gap between feeling and performance is dangerous.",
+    "first_signs": "A seven-night average one hour under the personal baseline, a slower reaction test, rising stress.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "5×2",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×2",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "3/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=100",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Sleep and a three-minute reaction test every day.",
+    "variables": [
+      "sleep_h",
+      "sleep_eff_pct",
+      "pvt_rt_ms",
+      "stress_0_10",
+      "hrv_rmssd_ms",
+      "readiness"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Sleep and a three-minute reaction test every day. Fewer than four hours of sleep before a landing or a walk blocks the task.",
+      "earth": "Adjusts the schedule and the light plan.",
+      "assistant": "Says plainly when the reaction test, not the feeling, should decide."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Performance Decrements and Adverse Health Outcomes Resulting from Sleep Loss, Circadian Desynchronization, and Work Overload",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=100"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (sleep_duration_efficiency, alertness_pvt_b, circadian_misalignment)",
+      "kb/05 §7.2 (sleep numbers)"
+    ]
+  },
+  {
+    "id": "sans",
+    "hrr_id": 105,
+    "official_title": "Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)",
+    "short_name": "Eyes and brain under pressure",
+    "tier": 3,
+    "tier_name": "Come home healthy",
+    "order": 1,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given that ocular and brain structural changes develop during spaceflight, there is a possibility that these changes could lead to short-term or long-term vision alterations, cognitive effects, or other deleterious health effects.",
+    "explanation": "Without gravity, fluid that normally sits in the legs moves to the head and stays there. Over months it presses on the back of the eye: the optic nerve swells, the eyeball flattens and vision shifts. About 70 % of long-duration astronauts show at least one sign, and 18 % have a clinically concerning form. Some changes remain after return, and nobody knows what 923 days will do. Its long-term rating for Mars is among NASA's highest.",
+    "first_signs": "Needing stronger reading glasses, blurred near vision, optic-nerve swelling of more than 19.4 µm on the eye scan.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "long_term": {
+        "lxc": "4×5",
+        "colour": "red",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": "7/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=105",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "The swelling at the optic nerve: measured at scheduled eye scans, estimated in between.",
+    "variables": [
+      "sans_trt_um",
+      "gravity_g"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Eye scans on a fixed schedule; between scans it estimates the swelling (labelled MODEL) and warns when it nears NASA's thresholds.",
+      "earth": "Eye specialists read the scans and decide on countermeasures.",
+      "assistant": "Explains the scan result and what the next threshold means."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=105"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (sans_vision: OCHMO-MTB-001 thresholds)",
+      "kb/20 §3 (SANS)"
+    ]
+  },
+  {
+    "id": "radiation",
+    "hrr_id": 96,
+    "official_title": "Risk of Radiation Carcinogenesis",
+    "short_name": "Cancer from space radiation",
+    "tier": 3,
+    "tier_name": "Come home healthy",
+    "order": 2,
+    "status": "active",
+    "hazard": "Radiation",
+    "official_statement": "Given crew is exposed to radiation from the space environment, there is the possibility for increased cancer morbidity or mortality.",
+    "explanation": "Outside Earth's magnetic field, fast particles from exploding stars pass through the ship and the body every second, and solar storms add bursts. Each hit can damage DNA, which raises the chance of cancer years later. Nobody feels it. NASA allows 600 mSv in a whole career; our planned mission adds up to about 790 mSv and passes the limit on the way home. The crew cannot avoid the dose, only reduce it: shelter during storms and watch the running total.",
+    "first_signs": "None that can be felt. The only signs are the dose counter and a storm warning.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "1×1",
+        "colour": "green",
+        "disposition": "Accepted"
+      },
+      "long_term": {
+        "lxc": "3×3",
+        "colour": "yellow",
+        "disposition": "Requires Mitigation"
+      },
+      "approved": null,
+      "note": "Rated on NASA's earlier 3×4 matrix; NASA states the rating may change when it is re-approved on the current 5×5 matrix.",
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=96",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "Dose rate, dose per day, the running total for each person, and the storm level.",
+    "variables": [
+      "dose_rate_usv_h",
+      "dose_day_msv",
+      "dose_cum_msv",
+      "storm_level",
+      "eva_dose_usv"
+    ],
+    "app_response": {
+      "arm_unit": "Shows the dose rate and the dose of this walk. A storm warning ends the walk.",
+      "habitat": "Keeps the running total against the 600 mSv limit, projects the day it will be passed, and sends the crew to the shelter in a storm.",
+      "earth": "Forecasts solar storms; the warning arrives with the delay.",
+      "assistant": "Answers “how much have I had, and what does it mean” with the numbers and the limit."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Radiation Carcinogenesis",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=96"
+      }
+    ],
+    "kb_refs": [
+      "kb/22 §5–6 (solar cycle, radiation budget)",
+      "kb/13 (rad_dose_rate, rad_cumulative_dose, rad_spe_event)",
+      "kb/05 §5"
+    ]
+  },
+  {
+    "id": "bone_fracture",
+    "hrr_id": 77,
+    "official_title": "Risk of Bone Fracture due to Spaceflight-induced Changes to Bone",
+    "short_name": "Weaker bones",
+    "tier": 3,
+    "tier_name": "Come home healthy",
+    "order": 3,
+    "status": "active",
+    "hazard": "Gravity",
+    "official_statement": "Given the skeletal changes that occur during spaceflight, there is a possibility that the bones of crewmembers during and after spaceflight are not as strong as they were before spaceflight and a fracture may occur postflight for activities otherwise unlikely to induce fracture prior to space flight.",
+    "explanation": "Bone is rebuilt all the time and keeps only the strength it is asked for. Without weight, hips and spine lose about 1 to 1.5 % of their mineral each month if nothing is done, roughly what an older person loses in a year. Hard resistance exercise cuts the loss to about half a percent a month. But 923 days is far longer than any flight so far, and back on Earth half of the lost bone takes three to nine months to return. Some may never.",
+    "first_signs": "None that can be felt. The hip-density estimate heading under 95 % of the pre-flight value, high calcium in the urine, missed resistance sessions.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": {
+        "lxc": "4×4",
+        "colour": "red",
+        "disposition": "Requires Characterization"
+      },
+      "long_term": {
+        "lxc": "5×2",
+        "colour": "yellow",
+        "disposition": "Requires Characterization"
+      },
+      "approved": "5/2022",
+      "note": null,
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=77",
+      "verified": true
+    },
+    "coverage": "direct",
+    "coverage_note": "A daily estimate of hip density, driven by exercise and gravity; urine calcium and vitamin D at each lab check.",
+    "variables": [
+      "bmd_hip_pct",
+      "urine_ca_mg_day",
+      "vitd_ng_ml",
+      "exercise_min",
+      "leg_strength_pct",
+      "energy_pct"
+    ],
+    "app_response": {
+      "arm_unit": "On a walk it matters only as the cost of a fall.",
+      "habitat": "Estimates hip density every day (labelled MODEL), projects it to the return to Earth and compares it with NASA's 95 % limit.",
+      "earth": "Adjusts exercise loads, vitamin D and calcium.",
+      "assistant": "Explains why a skipped resistance session matters more than it feels."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Risk of Bone Fracture due to Spaceflight-induced Changes to Bone",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=77"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (bmd_hip_spine_fn_est, bone_turnover_urine_ca_markers, fracture_risk_index)",
+      "kb/20 §3 (V1 4027)"
+    ]
+  },
+  {
+    "id": "disc_damage",
+    "hrr_id": 78,
+    "official_title": "Concern of Intervertebral Disc Damage upon and immediately after re-exposure to Gravity",
+    "short_name": "Slipped discs after the return to gravity",
+    "tier": 3,
+    "tier_name": "Come home healthy",
+    "order": 4,
+    "status": "inactive",
+    "hazard": "Gravity",
+    "official_statement": "Given the morphological and possible biochemical changes in the IVD (intervertebral disc) during mechanical unloading in space, there is the possibility of IVD damage upon and immediately after re-exposure to gravity (1/6, 3/8 or 1G).",
+    "explanation": "In weightlessness the spine stretches by a few centimetres and the discs between the vertebrae swell. Back pain in the first days of flight is almost universal. When weight returns, the swollen discs are loaded again, and astronauts have had more slipped discs than comparable people after their flights. NASA lists this as a concern, not a rated risk, and no research on it is running now.",
+    "first_signs": "Back pain that lasts beyond the first 12 days of flight, or pain that shoots into an arm or leg with numbness.",
+    "nasa_rating": {
+      "drm": "Mars Planetary (730–1224 days)",
+      "operations": null,
+      "long_term": null,
+      "approved": "1/2015",
+      "note": "A concern, not a risk: NASA states that concerns lack the evidence for a rating. Inactive, no current research.",
+      "source_url": "https://humanresearchroadmap.nasa.gov/Risks/?i=78",
+      "verified": true
+    },
+    "coverage": "partly",
+    "coverage_note": "We track back pain as a daily score. The discs themselves are not measured.",
+    "variables": [
+      "back_pain_0_10"
+    ],
+    "app_response": {
+      "arm_unit": "Not covered.",
+      "habitat": "Daily back-pain score; pain that lasts or spreads is flagged.",
+      "earth": "Reviews lasting pain and advises.",
+      "assistant": "Explains which kind of back pain is expected and which is a warning sign."
+    },
+    "sources": [
+      {
+        "title": "NASA Human Research Roadmap: Concern of Intervertebral Disc Damage upon and immediately after re-exposure to Gravity",
+        "url": "https://humanresearchroadmap.nasa.gov/Risks/?i=78"
+      }
+    ],
+    "kb_refs": [
+      "kb/13 (back_pain_spine_length)"
+    ]
+  }
+]

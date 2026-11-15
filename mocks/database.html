@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Database · Health Signal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* The simulated mission as one SQLite file, open to explore. Tokens and base classes come from assets/site.css. */
+.page{max-width:1480px;padding-top:var(--space-12)}
+[hidden]{display:none!important}
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-8);align-items:end}
+.top .lead{max-width:70ch;margin:0}
+.dl{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 18px;border-radius:var(--radius-md);background:var(--color-action-primary);color:var(--color-action-on-primary)!important;font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.dl:hover{background:var(--color-action-primary-hover)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-6);margin:var(--space-8) 0 var(--space-4)}
+.facts div{border-left:3px solid var(--color-border-default);padding-left:var(--space-4)}
+.facts b{display:block;font:300 39px/1 "Manrope",sans-serif;color:var(--color-text-display);letter-spacing:-.6px}
+.facts span{font:var(--type-body-small);color:var(--color-text-muted)}
+.sep{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-4);margin:var(--space-8) 0 0}
+.sep div{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6)}
+.sep b{display:block;font:var(--type-body-default);font-weight:600;color:var(--color-text-display);margin-bottom:2px}
+.sep span{font:var(--type-body-small);color:var(--color-text-muted)}
+.sep .here{border-top:3px solid var(--color-border-accent)}
+.howmuch{margin:var(--space-8) 0 0}
+.howmuch h2{margin:0 0 4px;font:var(--type-heading-3);color:var(--color-text-display)}
+.howmuch p{margin:0 0 var(--space-4);max-width:96ch;font:var(--type-body-small);color:var(--color-text-muted)}
+.hm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-6)}
+.hm table{width:100%;border-collapse:collapse}
+.hm caption{text-align:left;font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);padding-bottom:6px}
+.hm th{font:var(--type-body-small);font-weight:400;color:var(--color-text-muted);text-align:right;padding:5px 0 5px 14px;border-bottom:1px solid var(--color-border-strong)}
+.hm th:first-child{text-align:left;padding-left:0}
+.hm td{padding:7px 0 7px 14px;border-bottom:1px solid var(--color-border-default);font:var(--type-mono-default);color:var(--color-text-default);text-align:right;white-space:nowrap;vertical-align:top}
+.hm td:first-child{font:var(--type-body-small);color:var(--color-text-default);text-align:left;padding-left:0;white-space:normal}
+.hm td:first-child small{display:block;color:var(--color-text-muted)}
+.hm td b{font-weight:500;color:var(--color-text-display)}
+.work{display:grid;grid-template-columns:330px minmax(0,1fr);gap:var(--space-6);margin-top:var(--space-8);align-items:start}
+.tables{position:sticky;top:calc(var(--x-nav-h) + 12px);max-height:calc(100vh - var(--x-nav-h) - 24px);overflow:auto;scrollbar-width:thin;padding-right:4px}
+.tables h3{font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);margin:var(--space-4) 0 6px}
+.tables h3:first-child{margin-top:0}
+.tables button{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:var(--radius-md);padding:7px 10px;cursor:pointer;color:inherit;font:inherit}
+.tables button:hover{background:var(--color-surface-raised)}
+.tables button[aria-pressed="true"]{background:var(--color-surface-raised);border-color:var(--color-border-strong)}
+.tables button b{font:var(--type-mono-default);color:var(--color-text-display)}
+.tables button i{font:var(--type-mono-default);font-style:normal;color:var(--color-text-muted)}
+.tables button span{grid-column:1 / -1;font:var(--type-body-small);color:var(--color-text-muted)}
+.view{min-width:0}
+.view h2{margin:0;font:var(--type-heading-2);letter-spacing:-.62px}
+.view h2 code{font:500 26px/1.2 "Azeret Mono",monospace;color:var(--color-text-display)}
+.view .what{margin:6px 0 var(--space-4);max-width:80ch;color:var(--color-text-default)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:var(--space-4) 0 10px}
+.bar label{font:var(--type-body-small);color:var(--color-text-muted);display:inline-flex;align-items:center;gap:6px}
+.bar input[type=number]{width:92px;font:var(--type-mono-default);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:7px 10px}
+.bar .count{margin-left:auto;font:var(--type-mono-default);color:var(--color-text-muted)}
+.btn{font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:8px 12px;cursor:pointer}
+.btn:hover{background:var(--color-surface-input-hover)}
+.btn[disabled]{opacity:.4;cursor:default}
+.scroll{overflow:auto;border:1px solid var(--color-border-default);border-radius:var(--radius-md);max-height:62vh;background:var(--color-surface-default)}
+table.rows{border-collapse:collapse;font:var(--type-mono-default);width:max-content;min-width:100%}
+table.rows th{position:sticky;top:0;background:var(--color-surface-raised);font:var(--type-label);letter-spacing:.6px;color:var(--color-text-muted);text-align:left;padding:9px 12px;border-bottom:1px solid var(--color-border-strong);white-space:nowrap;cursor:pointer}
+table.rows th:hover{color:var(--color-text-default)}
+table.rows th.sorted{color:var(--color-text-accent-soft)}
+table.rows td{padding:6px 12px;border-bottom:1px solid var(--color-border-default);white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis;color:var(--color-text-default)}
+table.rows td.n{text-align:right}
+table.rows td.null{color:var(--color-text-muted)}
+table.rows tr:hover td{background:var(--color-surface-raised)}
+details.cols{margin:0 0 var(--space-2)}
+details.cols summary{cursor:pointer;font:var(--type-body-small);color:var(--color-text-accent-soft)}
+details.cols table{margin-top:10px}
+details.cols td:first-child{font:var(--type-mono-default);color:var(--color-text-display);white-space:nowrap}
+details.cols td:nth-child(2){font:var(--type-mono-default);color:var(--color-text-muted);white-space:nowrap}
+.sql{margin-top:var(--space-12)}
+.sql textarea{width:100%;min-height:84px;font:var(--type-mono-default);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:12px;resize:vertical}
+.sql .ex{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.sql .ex button{font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-default);border-radius:var(--radius-pill);padding:5px 12px;cursor:pointer}
+.sql .ex button:hover{border-color:var(--color-border-strong)}
+.err{color:var(--color-text-status-danger);font:var(--type-body-small);margin:8px 0}
+@media (max-width:1000px){.work{grid-template-columns:1fr}.tables{position:static;max-height:none}.facts{grid-template-columns:1fr 1fr}.sep{grid-template-columns:1fr}.hm{grid-template-columns:1fr}.top{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="top">
+    <div>
+      <h1>The simulation database</h1>
+      <p class="lead">Everything the two apps and the assistant show is read from one file. It holds only the simulated mission. Pick a table to see what it is for and what is in it.</p>
+    </div>
+    <a class="dl" href="db/mission_sim.sqlite" download="mission_sim.sqlite">Download the file</a>
+  </div>
+  <div class="facts" id="facts"></div>
+
+  <div class="sep" aria-label="Where this file sits">
+    <div><b>Real data</b><span>Recorded measurements from NASA and open studies. They stay outside this file: the simulation learned from them.</span></div>
+    <div class="here"><b>This file: the simulated mission</b><span>SQLite, one file, 22 tables. Written by one run of the generator. Nothing else is stored here.</span></div>
+    <div><b>Apps and assistant</b><span>Read this file and nothing else. No value on a screen comes from anywhere else.</span></div>
+  </div>
+
+  <section class="howmuch" aria-labelledby="hmH">
+    <h2 id="hmH">How much data is this?</h2>
+    <p>The data is simulated, and it is all there. A record is one row: one day, one hour or one second. A value is one filled field in a record, not counting the keys (day, crew member, time). The numbers below are counted in the file as you open this page.</p>
+    <div class="hm">
+      <table id="hmA"><caption>The 999 days · Habitat App</caption></table>
+      <table id="hmB"><caption>The four Mars walks · Arm Unit, one record a second</caption></table>
+    </div>
+  </section>
+
+  <div class="work">
+    <aside class="tables" id="tables" aria-label="Tables"></aside>
+    <section class="view" aria-live="polite">
+      <h2><code id="tName"></code></h2>
+      <p class="what" id="tNote"></p>
+      <details class="cols" id="colsBox"><summary id="colsSum">Columns and what they mean</summary><table class="grid" id="cols"></table></details>
+      <div class="bar">
+        <label id="fCrewL" hidden>Crew <select id="fCrew"></select></label>
+        <label id="fDayL" hidden>Day from <input type="number" id="fDay0"> to <input type="number" id="fDay1"></label>
+        <label id="fScL" hidden>Walk <select id="fSc"></select></label>
+        <button class="btn" type="button" id="bPrev">Previous</button>
+        <button class="btn" type="button" id="bNext">Next</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="scroll"><table class="rows" id="rows"></table></div>
+
+      <div class="sql">
+        <h2>Ask the database yourself</h2>
+        <p class="muted">Plain SQL, read only. The file is open in your browser: nothing is sent anywhere, and nothing you type can change it.</p>
+        <div class="ex" id="ex"></div>
+        <textarea id="q" spellcheck="false" aria-label="SQL query"></textarea>
+        <div class="bar"><button class="btn" type="button" id="run">Run the query</button><span class="count" id="qCount"></span></div>
+        <div class="err" id="qErr" hidden></div>
+        <div class="scroll" id="qScroll" hidden><table class="rows" id="qRows"></table></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const PAGE = 50;
+const ST = { schema: null, table: "body_day", off: 0, sort: null, desc: false, total: 0 };
+const EXAMPLES = [
+  ["Bone density of all four, every 100 days", "select day, crew_id, round(bmd_hip_pct, 1) as hip_bone_pct\nfrom body_day where day % 100 = 0 and day >= 0 order by day, crew_id"],
+  ["The ten highest radiation days", "select d.day, d.date_utc, d.phase, round(e.dose_day_msv, 2) as dose_msv, e.storm_level, e.shelter_h\nfrom env_day e join day d on d.day = e.day order by e.dose_day_msv desc limit 10"],
+  ["What cost readiness points on day 356", "select c.call_sign, r.item, r.points\nfrom readiness_cost r join crew c on c.crew_id = r.crew_id where r.day = 356 order by c.call_sign, r.points desc"],
+  ["Which real dataset feeds which value", "select title, how, feeds from source_use where how != 'not used' order by how, title"],
+  ["Warnings per value over the whole mission", "select v.label, a.status, count(*) as days\nfrom assessment a join variable v on v.var_id = a.var_id group by v.label, a.status order by days desc limit 20"],
+];
+
+function grid(table, cols, rows, onSort) {
+  table.textContent = "";
+  const head = el("tr");
+  cols.forEach(c => { const th = el("th", ST.sort === c && onSort ? "sorted" : null, c + (ST.sort === c && onSort ? (ST.desc ? " ↓" : " ↑") : "")); if (onSort) th.addEventListener("click", () => onSort(c)); else th.style.cursor = "default"; head.append(th); });
+  const th = el("thead"); th.append(head); table.append(th);
+  const tb = el("tbody");
+  rows.forEach(r => { const tr = el("tr"); cols.forEach(c => { const v = r[c], td = el("td", v === null ? "null" : typeof v === "number" ? "n" : null, v === null ? "empty" : typeof v === "number" && !Number.isInteger(v) ? String(Math.round(v * 1000) / 1000) : String(v)); if (typeof v === "string" && v.length > 40) td.title = v; tr.append(td); }); tb.append(tr); });
+  table.append(tb);
+}
+function where() {
+  const t = ST.schema.tables[ST.table], names = t.columns.map(c => c.name), w = [], p = [];
+  if (names.includes("crew_id") && $("fCrew").value) { w.push("crew_id = ?"); p.push($("fCrew").value); }
+  if (names.includes("scenario_id") && $("fSc").value) { w.push("scenario_id = ?"); p.push($("fSc").value); }
+  const dc = names.includes("day") ? "day" : names.includes("day_start") ? "day_start" : null;
+  if (dc && $("fDay0").value !== "") { w.push(dc + " >= ?"); p.push(+$("fDay0").value); }
+  if (dc && $("fDay1").value !== "") { w.push(dc + " <= ?"); p.push(+$("fDay1").value); }
+  return [w.length ? " where " + w.join(" and ") : "", p];
+}
+function load() {
+  const [w, p] = where();
+  ST.total = SimDB.one(`select count(*) n from "${ST.table}"${w}`, p).n;
+  const order = ST.sort ? ` order by "${ST.sort}" ${ST.desc ? "desc" : "asc"}` : "";
+  const rows = SimDB.q(`select * from "${ST.table}"${w}${order} limit ${PAGE} offset ${ST.off}`, p);
+  grid($("rows"), ST.schema.tables[ST.table].columns.map(c => c.name), rows, c => { if (ST.sort === c) ST.desc = !ST.desc; else { ST.sort = c; ST.desc = false; } ST.off = 0; load(); });
+  $("count").textContent = ST.total ? `rows ${(ST.off + 1).toLocaleString("en")} to ${Math.min(ST.off + PAGE, ST.total).toLocaleString("en")} of ${ST.total.toLocaleString("en")}` : "no rows";
+  $("bPrev").disabled = ST.off === 0; $("bNext").disabled = ST.off + PAGE >= ST.total;
+}
+function pick(name) {
+  ST.table = name; ST.off = 0; ST.sort = null; ST.desc = false;
+  const t = ST.schema.tables[name], names = t.columns.map(c => c.name);
+  document.querySelectorAll("#tables button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === name)));
+  $("tName").textContent = name; $("tNote").textContent = t.note;
+  $("colsSum").textContent = `${t.columns.length} columns and what they mean`;
+  const c = $("cols"); c.textContent = "";
+  t.columns.forEach(col => { const tr = el("tr"); tr.append(el("td", null, col.name + (col.key ? " (key)" : "")), el("td", null, col.type || ""), el("td", null, col.meaning || "")); c.append(tr); });
+  $("fCrewL").hidden = !names.includes("crew_id"); $("fScL").hidden = !names.includes("scenario_id");
+  $("fDayL").hidden = !(names.includes("day") || names.includes("day_start"));
+  $("fDay0").value = ""; $("fDay1").value = "";
+  history.replaceState(null, "", "?table=" + name);
+  load();
+}
+function runQuery() {
+  const sql = $("q").value.trim().replace(/;+\s*$/, "");
+  $("qErr").hidden = true; $("qScroll").hidden = true; $("qCount").textContent = "";
+  if (!sql) return;
+  if (!/^(select|with)\b/i.test(sql) || /;/.test(sql)) { $("qErr").textContent = "Only one SELECT statement at a time: this view reads, it never changes the data."; $("qErr").hidden = false; return; }
+  try {
+    const rows = SimDB.q(`select * from (${sql}) limit 500`);
+    if (!rows.length) { $("qCount").textContent = "no rows"; return; }
+    grid($("qRows"), Object.keys(rows[0]), rows, null);
+    $("qScroll").hidden = false; $("qCount").textContent = rows.length + (rows.length === 500 ? " rows (first 500 shown)" : rows.length === 1 ? " row" : " rows");
+  } catch (e) { $("qErr").textContent = "The database answered: " + (e && e.message || e); $("qErr").hidden = false; }
+}
+
+/* "How much data is this?": records and values, counted in the file. A value is a filled field that is not a key. */
+function howMuch(schema, total) {
+  const N = n => Math.round(n).toLocaleString("en");
+  const count = (t, where, args) => { const cols = schema.tables[t].columns.filter(c => !c.key).map(c => `count("${c.name}")`);
+    const r = SimDB.one(`select count(*) r, ${cols.join("+")} v from "${t}"` + (where ? " where " + where : ""), args || []); return { r: r.r, v: r.v || 0, f: cols.length }; };
+  const bd = count("body_day"), bh = count("body_hour"), lab = count("lab"), ed = count("env_day"), eh = count("env_hour"), ev = count("eva_sample");
+  const crew = Object.keys(SimDB.crew).length, days = SimDB.one("select count(*) n from day").n;
+  const body = bd.v + bh.v + lab.v, env = ed.v + eh.v, all = body + env + ev.v;
+  const row = (tb, cells) => { const tr = el("tr"); cells.forEach((c, i) => { const td = el("td"); if (i === 0) { td.append(c[0]); if (c[1]) td.append(el("small", null, c[1])); } else if (c && c.b) td.append(el("b", null, c.b)); else td.textContent = c == null ? "" : c; tr.append(td); }); tb.append(tr); };
+  const head = (tb, cols) => { const tr = el("tr"); cols.forEach(c => tr.append(el("th", null, c))); tb.append(tr); };
+  const A = $("hmA"); head(A, ["", "Records", "Values"]);
+  row(A, [["Whole file", `all ${Object.keys(schema.tables).length} tables, with the rule results, plans and Earth's instructions`], N(total), ""]);
+  row(A, [["Measured values, whole mission", "the body, the cabin and outside, and the four Mars walks"], N(bd.r + bh.r + lab.r + ed.r + eh.r + ev.r), { b: N(all) }]);
+  row(A, [["One astronaut, " + days + " days", `${bd.f} daily fields, ${bh.f} values every hour, a blood and urine panel every 28 days`], N((bd.r + bh.r + lab.r) / crew), { b: N(body / crew) }]);
+  row(A, [["One astronaut, one day", "average over the mission"], N((bd.r + bh.r) / crew / days), { b: N(body / crew / days) }]);
+  row(A, [["Cabin and outside, one day", "cabin air, radiation, Mars weather"], N((ed.r + eh.r) / days), { b: N(env / days) }]);
+  row(A, [["One mission day, all together", crew + " astronauts plus cabin and outside"], N((bd.r + bh.r + ed.r + eh.r) / days), { b: N((body + env) / days) }]);
+  const B = $("hmB"); head(B, ["", "Length", "Records", "Values"]);
+  SimDB.q("select scenario_id, title, day, sol, duration_s from eva_scenario order by sort").forEach(s => {
+    const c = count("eva_sample", "scenario_id=?", [s.scenario_id]), m = Math.round(s.duration_s / 60);
+    row(B, [[s.title, `mission day ${s.day}, sol ${s.sol}`], `${Math.floor(m / 60)} h ${m % 60} min`, N(c.r), { b: N(c.v) }]);
+  });
+  row(B, [["All four walks", `up to ${ev.f} values in each record`], "", N(ev.r), { b: N(ev.v) }]);
+}
+
+Promise.all([SimDB.ready, fetch("content/schema.json").then(r => r.json())]).then(([, schema]) => {
+  ST.schema = schema;
+  const counts = {}; Object.keys(schema.tables).forEach(t => { counts[t] = SimDB.one(`select count(*) n from "${t}"`).n; });
+  const total = Object.values(counts).reduce((a, b) => a + b, 0), ncol = Object.values(schema.tables).reduce((a, t) => a + t.columns.length, 0);
+  [[Object.keys(schema.tables).length, "tables"], [ncol, "columns, each with its meaning"], [total.toLocaleString("en"), "rows in all"], ["999", "mission days, four crew members"]]
+    .forEach(([n, t]) => { const d = el("div"); d.append(el("b", null, n), el("span", null, t)); $("facts").append(d); });
+  howMuch(schema, total);
+  schema.groups.forEach(g => {
+    const names = Object.keys(schema.tables).filter(t => schema.tables[t].group === g); if (!names.length) return;
+    $("tables").append(el("h3", null, g));
+    names.forEach(t => { const b = el("button"); b.type = "button"; b.dataset.t = t; b.append(el("b", null, t), el("i", null, counts[t].toLocaleString("en")), el("span", null, schema.tables[t].note)); b.addEventListener("click", () => pick(t)); $("tables").append(b); });
+  });
+  const any = el("option", null, "all"); any.value = ""; $("fCrew").append(any);
+  Object.values(SimDB.crew).forEach(c => { const o = el("option", null, c.call_sign); o.value = c.crew_id; $("fCrew").append(o); });
+  const env = el("option", null, "cabin and outside"); env.value = "ENV"; $("fCrew").append(env);
+  const anyS = el("option", null, "all"); anyS.value = ""; $("fSc").append(anyS);
+  SimDB.q("select scenario_id, title from eva_scenario order by sort").forEach(s => { const o = el("option", null, s.title); o.value = s.scenario_id; $("fSc").append(o); });
+  ["fCrew", "fSc", "fDay0", "fDay1"].forEach(id => $(id).addEventListener("change", () => { ST.off = 0; load(); }));
+  $("bPrev").addEventListener("click", () => { ST.off = Math.max(0, ST.off - PAGE); load(); });
+  $("bNext").addEventListener("click", () => { ST.off += PAGE; load(); });
+  EXAMPLES.forEach(([label, sql]) => { const b = el("button", null, label); b.type = "button"; b.addEventListener("click", () => { $("q").value = sql; runQuery(); }); $("ex").append(b); });
+  $("run").addEventListener("click", runQuery);
+  $("q").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); runQuery(); } });
+  $("q").value = EXAMPLES[0][1];
+  const want = new URLSearchParams(location.search).get("table");
+  pick(schema.tables[want] ? want : "body_day");
+});
+</script>
+</body>
+</html>

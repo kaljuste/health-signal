@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health Signal · Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/hs/components.css">
+<script src="assets/nav.js" defer></script>
+<style>
+/* Page-specific styles. Tokens and base classes come from assets/site.css. */
+.page{padding-top:var(--space-12)}
+
+/* Hero: who we are, our mission and our vision, the message, and the 30-second film beside them */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:var(--space-12);align-items:center}
+.team{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 var(--space-8);max-width:none;font:var(--type-body-small);color:var(--color-text-muted)}
+.team b{font:var(--type-eyebrow);letter-spacing:var(--type-eyebrow-letter-spacing);text-transform:uppercase;color:var(--color-text-display)}
+.hero .k{display:block;font:var(--type-label);letter-spacing:1.6px;text-transform:uppercase;color:var(--color-text-accent);margin-bottom:8px}
+.hero h1,.hero .statement{font:300 42px/1.1 "Manrope",sans-serif;letter-spacing:-.7px;max-width:none;margin:0;color:var(--color-text-display)}
+.hero h1 em,.hero .statement em{font-style:normal;color:var(--color-text-status-danger)}
+.hero .statement em{color:var(--color-text-earth)}
+.hero .k.earth{color:var(--color-text-earth)}
+.hero .pair{display:grid;gap:var(--space-6);margin:0 0 var(--space-8)}
+.hero .pair > div + div{padding-top:var(--space-6);border-top:var(--border-width-hairline) solid var(--color-border-default)}
+.hero .lead{max-width:none;margin:0}
+.hero .more{margin:var(--space-4) 0 0;max-width:none}
+.film{margin:0}
+.film .frame{position:relative;aspect-ratio:16/9;border:1px solid var(--color-border-strong);border-radius:var(--radius-lg);overflow:hidden;background:#0a0a0a}
+.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.film .soon{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:var(--space-6)}
+.film .soon[hidden],.film video[hidden]{display:none}
+.film .soon img{width:min(72%,430px);height:auto}
+.film .soon b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display)}
+.film .soon span{font:var(--type-body-small);color:var(--color-text-muted);max-width:40ch}
+.film figcaption{margin-top:10px;font:var(--type-body-small);color:var(--color-text-muted)}
+
+/* What we built: the two apps, shown as apps (icon, screen, one button) */
+.made{margin-top:var(--space-16)}
+.page .made h2,.page .link h2{margin-top:var(--space-2)}
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-top:var(--space-8)}
+.appcard{display:flex;flex-direction:column;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);overflow:hidden;color:inherit;text-decoration:none;transition:border-color var(--duration-fast)}
+.appcard:hover{border-color:var(--color-border-accent);color:inherit}
+.appcard .shot{display:block;aspect-ratio:16/10;background:#0a0a0a;border-bottom:1px solid var(--color-border-default);overflow:hidden}
+.appcard .shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
+.appcard .head{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-6) var(--space-6) 0}
+.appcard .head img{flex:none;border-radius:13px;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.appcard .t{display:block;min-width:0;margin-right:auto}
+.appcard b{display:block;font:var(--type-heading-2);font-weight:400;letter-spacing:-.62px;color:var(--color-text-display)}
+.appcard .when{display:block;font:var(--type-mono-default);color:var(--color-text-muted)}
+.appcard p{margin:var(--space-4) var(--space-6) var(--space-6);color:var(--color-text-default);max-width:none}
+.appwrap{display:flex;flex-direction:column;gap:var(--space-2)}
+.appwrap .appcard{flex:1 1 auto}
+.appwrap .man{align-self:flex-end;margin-right:var(--space-2);font:var(--type-body-small)}
+
+/* The problem. The delay line is the one moving element on the page */
+.link{margin-top:var(--space-16)}
+.link .ends{margin-top:var(--space-8)}
+.ends{display:flex;justify-content:space-between;align-items:baseline;font:var(--type-body-small);color:var(--color-text-muted)}
+.ends b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display);margin-right:10px}
+.ends span:last-child b{margin:0 0 0 10px}
+.track{position:relative;height:56px;margin:6px 9px 0}
+.track .rail{position:absolute;left:0;right:0;top:27px;height:2px;background:var(--color-border-strong);border-radius:1px}
+.track .done{position:absolute;top:27px;height:2px;background:#e5522c;border-radius:1px}
+.track .tick{position:absolute;top:21px;width:1px;height:14px;background:var(--color-border-strong)}
+.track .tick.m5{top:17px;height:22px}
+.track .tl{position:absolute;top:42px;transform:translateX(-50%);font:var(--type-mono-default);color:var(--color-text-muted)}
+.track .planet{position:absolute;top:19px;width:18px;height:18px;border-radius:50%;margin-left:-9px}
+.track .mars{left:0;background:#e5522c}
+.track .earth{left:100%;background:var(--x-void);border:2px solid var(--color-text-default)}
+.track .pulse{position:absolute;top:22px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--color-text-default);box-shadow:0 0 0 4px rgba(232,228,216,.14)}
+.say{display:flex;align-items:center;gap:var(--space-4);min-height:44px;margin-top:var(--space-4)}
+.say p{margin:0;max-width:none;font:var(--type-lead);color:var(--color-text-default)}
+.say p .num{font:500 18px/1.4 "Azeret Mono",monospace;color:var(--color-text-display)}
+.say button{margin-left:auto;font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:9px 14px;cursor:pointer}
+.say button:hover{background:var(--color-surface-input-hover)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin:var(--space-8) 0 0;padding:0}
+.facts div{border-left:3px solid var(--color-border-default);padding-left:var(--space-4)}
+.facts dt{font:300 49px/1.05 "Manrope",sans-serif;letter-spacing:-.49px;color:var(--color-text-display)}
+.facts dt small{font:var(--type-lead);color:var(--color-text-muted);margin-left:6px}
+.facts dd{margin:6px 0 0;font:var(--type-body-default);color:var(--color-text-muted);max-width:30ch}
+
+/* Four steps: a real sequence, so they are numbered */
+.steps{list-style:none;margin:var(--space-8) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-border-strong)}
+.steps li{padding:var(--space-6) var(--space-6) 0 0;position:relative}
+.steps li + li{padding-left:var(--space-6);border-left:1px solid var(--color-border-default)}
+.steps .n{font:var(--type-mono-default);color:var(--color-text-accent)}
+.steps h3{margin:var(--space-2) 0 var(--space-2);font:var(--type-heading-3)}
+.steps p{font:var(--type-body-default);color:var(--color-text-default);margin:0}
+.steps .who{display:block;margin-top:var(--space-4);font:var(--type-body-small);color:var(--color-text-muted)}
+
+/* What the assistant knows */
+.knows{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);align-items:stretch;margin-top:var(--space-8)}
+.inputs{display:grid;gap:var(--space-2)}
+.inputs div{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6)}
+.inputs b{display:flex;align-items:center;gap:10px;font:400 20px/1.3 "Manrope",sans-serif;color:var(--color-text-display)}
+.inputs p{margin:4px 0 0;font:var(--type-body-small);color:var(--color-text-muted);max-width:none}
+.join{position:relative}
+.join svg{position:absolute;inset:0;width:100%;height:100%}
+.talk{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-top:3px solid var(--color-border-accent);border-radius:var(--radius-lg);padding:var(--space-6) var(--space-8) var(--space-8);display:flex;flex-direction:column;justify-content:center}
+.talk .who{font:var(--type-body-small);color:var(--color-text-muted);margin:0 0 4px}
+.talk .q{font:var(--type-lead);color:var(--color-text-display);margin:0 0 var(--space-6)}
+.talk .a{font:var(--type-lead);color:var(--color-text-default);margin:0}
+.talk .ill{margin:var(--space-6) 0 0;font:var(--type-body-small);color:var(--color-text-muted)}
+.page .rule{margin:var(--space-6) 0 0;font:var(--type-body-default);color:var(--color-text-muted);max-width:78ch}
+.page .rule b{color:var(--color-text-default);font-weight:600}
+
+/* Mission bar */
+.bar{display:flex;gap:2px;margin-top:var(--space-6);height:44px}
+.bar div{display:flex;align-items:center;padding:0 12px;font:var(--type-body-small);color:var(--color-text-default);white-space:nowrap;overflow:hidden;background:var(--color-surface-input);border-radius:4px}
+.bar .surf{background:var(--color-surface-accent-tint);box-shadow:inset 0 0 0 1px #5a2a1c}
+.dates{display:flex;margin-top:8px;font:var(--type-mono-default);color:var(--color-text-muted)}
+.dates span{white-space:nowrap}
+.dates b{display:block;font:var(--type-body-small);font-weight:400;color:var(--color-text-default)}
+
+/* Built from: rows, not cards */
+.built{list-style:none;margin:var(--space-8) 0 0;padding:0;border-top:1px solid var(--color-border-strong)}
+.built li{border-bottom:1px solid var(--color-border-default)}
+.built a{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) auto;column-gap:var(--space-8);align-items:baseline;padding:var(--space-6) 12px;color:inherit;text-decoration:none;transition:background var(--duration-fast)}
+.built a:hover{background:var(--color-surface-default);color:inherit}
+.built b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display)}
+.built span{color:var(--color-text-default);max-width:64ch}
+.built em{font:var(--type-body-small);font-style:normal;color:var(--color-text-accent-soft);white-space:nowrap}
+
+/* Honesty */
+.labels{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px var(--space-6);margin:var(--space-6) 0 0;max-width:860px;align-items:baseline}
+.labels dt{justify-self:start}
+.labels dd{margin:0;color:var(--color-text-default)}
+.notes{margin:var(--space-8) 0 0;padding:0;list-style:none;max-width:78ch}
+.notes li{padding:12px 0;border-top:1px solid var(--color-border-default);color:var(--color-text-default)}
+.notes b{color:var(--color-text-display);font-weight:600}
+.page .foot{margin:var(--space-12) 0 0;max-width:none;padding-top:var(--space-4);border-top:1px solid var(--color-border-default);font:var(--type-body-small);color:var(--color-text-muted)}
+
+/* From Mars to Earth: a vision, not built. Earth is blue (design/README.md); tokens and hs- classes only */
+section.earth{margin-top:var(--space-16);padding-top:var(--space-8);border-top:var(--border-width-hairline) solid var(--color-border-earth)}
+.page .earth h2{margin-top:var(--space-2)}
+.earth-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin:var(--space-8) 0 0;padding:0}
+.earth-facts div{border-left:var(--border-width-accent) solid var(--color-border-earth);padding-left:var(--space-4)}
+.earth-facts dt{font:var(--type-display-2);letter-spacing:var(--type-display-2-letter-spacing);color:var(--color-text-display)}
+.earth-facts dt small{font:var(--type-lead);color:var(--color-text-muted);margin-left:6px}
+.earth-facts dt small:first-child{margin:0 6px 0 0}
+.earth-facts dd{margin:6px 0 0;font:var(--type-body-default);color:var(--color-text-muted);max-width:34ch}
+.earth-map{margin-top:var(--space-8)}
+.earth-map thead .m{color:var(--color-text-accent)}
+.earth-map thead .e{color:var(--color-text-earth)}
+.earth-map tbody th{width:22%;font:var(--type-body-default);font-weight:600;letter-spacing:0;text-transform:none;white-space:normal;color:var(--color-text-display);border-bottom-color:var(--color-border-default);vertical-align:top}
+.earth-map td{font:var(--type-body-default);color:var(--color-text-muted)}
+.earth-map td.e{color:var(--color-text-default);background:var(--color-surface-earth-tint)}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:var(--space-8)}
+  .hero h1,.hero .statement{font-size:32px;letter-spacing:-.5px}
+  .appcard b{font:var(--type-heading-3);font-weight:400}
+  .appcard .head img{width:44px;height:44px}
+  .appcard .head{padding:var(--space-4) var(--space-4) 0}
+  .appcard p{margin:var(--space-4)}
+  .facts,.steps,.apps{grid-template-columns:1fr}
+  .steps li,.steps li + li{padding:var(--space-4) 0;border-left:0;border-top:1px solid var(--color-border-default)}
+  .steps li:first-child{border-top:0}
+  .knows{grid-template-columns:1fr}
+  .join{display:none}
+  .talk{margin-top:var(--space-4)}
+  .built a{grid-template-columns:1fr;row-gap:6px}
+  .bar div{padding:0 6px}
+  .track .tl{display:none}
+  .earth-facts{grid-template-columns:1fr}
+  .earth-map thead{display:none}
+  .earth-map tr{display:block;padding:var(--space-4) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-default)}
+  .earth-map tbody th,.earth-map td{display:block;width:auto;border:0;padding:4px 0}
+  .earth-map td.e{padding:4px var(--space-2)}
+  .earth-map td::before{content:attr(data-k);display:block;font:var(--type-label);letter-spacing:var(--type-label-letter-spacing);text-transform:uppercase;color:var(--color-text-muted)}
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div>
+      <p class="team"><img src="assets/hs/mark.svg" alt="" width="28" height="28"><b>Team Health Signal</b><span>NASA Space Apps Challenge 2026 · Lucerne</span></p>
+      <div class="pair">
+        <div><span class="k">Our mission</span>
+        <h1>Bring the astronauts back from Mars alive, <em>in as good health as possible.</em></h1></div>
+        <div><span class="k earth">Our vision</span>
+        <p class="statement">Share what we learn <em>to improve life on Earth.</em></p></div>
+      </div>
+      <p class="lead">On Mars, a question to the doctor can take 43 minutes, and for twelve days no answer comes at all. Health Signal watches the crew's health around the clock, warns on the spot, and answers the moment an astronaut asks.</p>
+      <p class="more"><a class="hs-link" href="system.html">See how it works, as blocks →</a></p>
+    </div>
+    <figure class="film">
+      <div class="frame">
+        <div class="soon" id="filmSoon"><img src="assets/hs/signal-trace.svg" alt=""><b>Our pitch in 30 seconds</b><span>The film will play here.</span></div>
+        <video id="film" controls playsinline preload="metadata" hidden></video>
+      </div>
+      <figcaption>Our pitch in 30 seconds</figcaption>
+    </figure>
+  </header>
+
+  <section class="made" aria-labelledby="made-h">
+    <p class="hs-eyebrow">What we built</p>
+    <h2 id="made-h">Two working apps on one simulated mission.</h2>
+    <div class="apps">
+      <div class="appwrap"><a class="appcard" href="habitat.html">
+        <span class="shot"><img src="screens/app_habitat.jpg" width="1140" height="742" alt="Screen of the Habitat App: a body figure with twelve regions, readiness, Earth's instruction and the assistant" loading="lazy"></span>
+        <span class="head"><img src="assets/hs/app-habitat.svg" alt="" width="56" height="56"><span class="t"><b>Habitat App</b><span class="when">every day, launch to landing</span></span><span class="hs-btn primary">Open</span></span>
+        <p>The body at a glance, today against your own trend, and the plan for tomorrow. Drag the timeline to any day of the mission; the assistant always answers from that day, by voice or in writing.</p>
+      </a><a class="man" href="manuals/health_signal_habitat_app_manual.pdf" download="health_signal_habitat_app_manual.pdf" title="User manual of the Habitat App (PDF, to download)">Manual (PDF)</a></div>
+      <div class="appwrap"><a class="appcard" href="arm_unit.html">
+        <span class="shot"><img src="screens/app_arm.jpg" width="1576" height="983" alt="Screen of the Arm Unit: state GO, time to stay 1 hour 58 minutes, time left by resource, body and suit values" loading="lazy"></span>
+        <span class="head"><img src="assets/hs/app-arm.svg" alt="" width="56" height="56"><span class="t"><b>Arm Unit</b><span class="when">every second of a Mars walk</span></span><span class="hs-btn primary">Open</span></span>
+        <p>A screen on the suit forearm that turns air, power, body load and radiation into one number: the time you can stay. Four walks play from airlock to airlock; ask it by voice.</p>
+      </a><a class="man" href="manuals/health_signal_arm_unit_manual.pdf" download="health_signal_arm_unit_manual.pdf" title="User manual of the Arm Unit (PDF, to download)">Manual (PDF)</a></div>
+    </div>
+  </section>
+
+  <section class="link" aria-labelledby="why-h">
+    <p class="hs-eyebrow">The problem</p>
+    <h2 id="why-h">A question to the doctor can take 43 minutes.</h2>
+    <p class="lead">At its farthest, Mars is 21 and a half light-minutes from Earth. A crew cannot wait that long for advice, and for twelve days it gets none at all.</p>
+    <div class="ends"><span><b>Mars</b>the crew asks</span><span>the doctors answer<b>Earth</b></span></div>
+    <div class="track" id="track" aria-hidden="true">
+      <div class="rail"></div><div class="done" id="done"></div>
+      <div class="planet mars"></div><div class="planet earth"></div><div class="pulse" id="pulse"></div>
+    </div>
+    <div class="say">
+      <p id="say" aria-live="off"></p>
+      <button type="button" id="toggle" aria-pressed="false">Pause</button>
+    </div>
+    <dl class="facts">
+      <div><dt class="num">21<small>min</small> 33<small>s</small></dt><dd>longest one-way delay of the mission, on 5 October 2038</dd></div>
+      <div><dt class="num">43<small>min</small></dt><dd>until the answer to a question can be back on Mars</dd></div>
+      <div><dt class="num">12<small>days</small></dt><dd>with no link at all: the Sun stands between Mars and Earth, 27 October to 7 November 2038</dd></div>
+    </dl>
+  </section>
+
+  <h2>What changes</h2>
+  <p>Earth still sees everything and still gives the advice. Only the conversation moves on board.</p>
+  <ol class="steps">
+    <li><span class="n">1</span><h3>Measure all the time</h3>
+      <p>Suit, cabin and body are measured around the clock: every second on a Mars walk, every hour and every day in the habitat. Routines such as the morning check and the reaction test take minutes.</p>
+      <span class="who">Sensors and short self-tests</span></li>
+    <li><span class="n">2</span><h3>Warn on the spot</h3>
+      <p>Limits from NASA's standards and from clinical practice are built in. When a value crosses one, the Arm Unit or the habitat says so at once and names the next action. Nothing waits for Earth.</p>
+      <span class="who">Fixed rules on board, no AI</span></li>
+    <li><span class="n">3</span><h3>Earth thinks it through</h3>
+      <p>The same data reaches Earth minutes later. Doctors, trainers and specialists study it from every angle, with the time and the computing power a crew lacks, and send back one detailed instruction for the next day.</p>
+      <span class="who">People on Earth, with large AI models</span></li>
+    <li><span class="n">4</span><h3>Just ask</h3>
+      <p>Astronauts do not want to be managed minute by minute, and after a working day nobody reads pages of analysis. So they talk. The assistant on board answers in plain words, right away.</p>
+      <span class="who">A voice assistant running on board</span></li>
+  </ol>
+
+  <h2>What the assistant knows when you ask</h2>
+  <div class="knows">
+    <div class="inputs">
+      <div><b>The values right now <span class="badge" title="Simulated mission data">SIM</span></b><p>Body, cabin, suit and radiation at the moment you stop the timeline, with the trend of the last days.</p></div>
+      <div><b>A knowledge base with sources</b><p>NASA's 22 crew-health risks and the 76 values that watch them: what each value means, its limit and where it comes from, and what to do.</p></div>
+      <div><b>Today's instruction from Earth</b><p>Written by the ground team from yesterday's data. It shows its age. During the blackout the last one stays in force.</p></div>
+    </div>
+    <div class="join" aria-hidden="true">
+      <svg viewBox="0 0 72 300" preserveAspectRatio="none" fill="none" stroke="#706e68" stroke-width="1.5" vector-effect="non-scaling-stroke">
+        <path d="M0 48 C36 48 36 150 72 150" vector-effect="non-scaling-stroke"/><path d="M0 150 H72" vector-effect="non-scaling-stroke"/><path d="M0 252 C36 252 36 150 72 150" vector-effect="non-scaling-stroke"/>
+      </svg>
+    </div>
+    <div class="talk">
+      <p class="who">The astronaut asks</p>
+      <p class="q">“Why is my readiness down today?”</p>
+      <p class="who">The assistant answers</p>
+      <p class="a">“Mostly sleep. You averaged 5.3 hours this week, and your reaction test is slower than usual. Earth's instruction for today moves the rover drive to 10:30 and keeps the next three sols free of walks outside.”</p>
+      <p class="ill">An example from sol 180 of the simulated mission. In the Habitat App the answer is built from the day you have selected.</p>
+    </div>
+  </div>
+  <p class="rule"><b>Rules decide, the assistant explains.</b> It never raises or clears an alarm, and it does not diagnose. It says where each statement comes from: a measured value, the knowledge base, or Earth.</p>
+
+  <h2>How we built it</h2>
+  <p>Nobody has flown to Mars, so there is no data from such a mission. We planned one, learned from what has been measured so far, and simulated the rest.</p>
+
+  <div class="bar" role="img" aria-label="Mission timeline: 172 days outbound, 561 days on Mars, 190 days back">
+    <div style="flex:172 1 0">Out, 172 days</div>
+    <div class="surf" style="flex:561 1 0">On Mars at Gale crater, 561 days (546 sols)</div>
+    <div style="flex:190 1 0">Back, 190 days</div>
+  </div>
+  <div class="dates" aria-hidden="true">
+    <span style="flex:172 1 0"><b>Launch</b>3 Sep 2037</span>
+    <span style="flex:561 1 0"><b>Landing on Mars</b>22 Feb 2038</span>
+    <span style="flex:120 1 0"><b>Leaving Mars</b>6 Sep 2039</span>
+    <span style="flex:70 1 0;text-align:right"><b>Home</b>14 Mar 2040</span>
+  </div>
+
+  <ol class="built">
+    <li><a href="mission.html"><b>A real mission plan</b><span>923 days, computed from NASA's planetary positions: the best launch window between 2031 and 2048, the signal delay for every day, the radio blackout and the radiation budget.</span><em>Open the mission</em></a></li>
+    <li><a href="sources.html"><b>Real data, chosen with care</b><span>20 open datasets: radiation measured in deep space and on Mars, Mars weather, Space Station cabin air, and body data from astronauts and from studies on Earth. For each one: why we chose it and what we took from it.</span><em>See the data we used</em></a></li>
+    <li><a href="simulation.html"><b>One simulated mission, in one file</b><span>Six steps turn that data into every day from launch to the landing back on Earth, and four Mars walks second by second. The result is one database, open to explore on the Database tab.</span><em>See how it was made</em></a></li>
+    <li><a href="risks.html"><b>NASA's risks, and the values that watch them</b><span>22 health risks in three tiers: survive, work, come home healthy. 76 values watch them, each with a limit and a source, listed on the Measures tab.</span><em>Read the health risks</em></a></li>
+  </ol>
+
+  <h2>How to read the numbers</h2>
+  <dl class="labels">
+    <dt><span class="badge">REAL</span></dt><dd>Measured, or computed from astronomy: the light delay, Mars seasons, radiation and weather replayed from real instruments.</dd>
+    <dt><span class="badge">SIM</span></dt><dd>Stands in for a sensor the crew would have, such as heart rate or cabin CO₂. Generated to behave like the real thing.</dd>
+    <dt><span class="badge">MODEL</span></dt><dd>An estimate that no sensor measures directly, such as stamina left or bone density between scans.</dd>
+  </dl>
+  <ul class="notes">
+    <li><b>Not a medical device.</b> A preview with simulated data, built to show what such a system could do.</li>
+    <li><b>Every limit has a source.</b> NASA's spaceflight standards, clinical practice or published research; where we had to infer one, it says so.</li>
+    <li><b>Nobody has lived at Mars gravity.</b> Every body value on the surface is a model between two known ends, weightlessness and Earth.</li>
+  </ul>
+
+  <section class="earth" aria-labelledby="earth-h">
+    <p class="hs-eyebrow earth">From Mars to Earth · a vision, not built</p>
+    <h2 id="earth-h">On Earth, many people are far from a doctor too.</h2>
+    <p class="lead">Crews on polar stations, ships and offshore sites. People who live alone. Patients between two doctor visits. Villages with few doctors. They have more health and sensor data than ever, and often nobody at hand to read it with them. The approach we built for Mars carries over, block by block.</p>
+
+    <dl class="earth-facts">
+      <div><dt class="num">4.6<small>billion</small></dt><dd>people not fully covered by essential health services in 2023. <a class="hs-link" href="https://www.who.int/news-room/fact-sheets/detail/universal-health-coverage-%28uhc%29" target="_blank" rel="noopener">WHO</a></dd></div>
+      <div><dt class="num">11<small>million</small></dt><dd>health workers short worldwide by 2030, as WHO projects. <a class="hs-link" href="https://www.who.int/health-topics/health-workforce" target="_blank" rel="noopener">WHO</a></dd></div>
+      <div><dt class="num"><small>up to</small>1 in 3</dt><dd>older adults affected by social isolation. <a class="hs-link" href="https://www.who.int/news/item/30-06-2025-social-connection-linked-to-improved-heath-and-reduced-risk-of-early-death" target="_blank" rel="noopener">WHO, 2025</a></dd></div>
+    </dl>
+
+    <table class="hs-table earth-map">
+      <thead><tr><th scope="col">Building block</th><th scope="col" class="m">On Mars · our design</th><th scope="col" class="e">On Earth · the vision</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">One picture</th><td data-k="On Mars">Suit, cabin and body sensors, plus what the astronaut measures</td><td class="e" data-k="On Earth">Watch, home devices and workplace sensors, plus what the person measures</td></tr>
+        <tr><th scope="row">Your own normal</th><td data-k="On Mars">Each value against the astronaut's own baseline</td><td class="e" data-k="On Earth">Each value against the person's own baseline</td></tr>
+        <tr><th scope="row">Limits with a source</th><td data-k="On Mars">NASA's crew health standard and published research</td><td class="e" data-k="On Earth">Clinical guidelines and occupational exposure limits</td></tr>
+        <tr><th scope="row">Rules act on the spot</th><td data-k="On Mars">A warning and the next action, no AI</td><td class="e" data-k="On Earth">The same, up to “call your clinic” or emergency services</td></tr>
+        <tr><th scope="row">Expert advice, later</th><td data-k="On Mars">Earth's flight surgeons, one instruction a day</td><td class="e" data-k="On Earth">A clinician or coach reviews the data later, at their own pace</td></tr>
+        <tr><th scope="row">An assistant that explains</th><td data-k="On Mars">Plain words, names its source, never decides</td><td class="e" data-k="On Earth">The same</td></tr>
+        <tr><th scope="row">Learning from outcomes</th><td data-k="On Mars">Not built</td><td class="e" data-k="On Earth">Outcomes tracked, rules tuned toward better health; a person approves every change</td></tr>
+      </tbody>
+    </table>
+    <p class="rule"><b>A vision, not a product.</b> On Earth it would be decision support and self-care guidance that escalates to clinicians, offered through operators of remote sites, care providers and insurers, or as a personal service for healthy ageing. Real medical use needs clearance as a medical device (EU MDR, FDA); this preview is not one.</p>
+  </section>
+
+  <p class="foot">Mission dates and delays: computed from NASA JPL Horizons (see Mission). All crew members and their values are fictional. Simulated data throughout; the three WHO figures under From Mars to Earth are real and linked to their source.</p>
+</main>
+
+<script>
+"use strict";
+(function () {
+  const ONE_WAY = 21.543;                       // minutes, longest one-way light time of the mission (5 Oct 2038)
+  const track = document.getElementById("track"), pulse = document.getElementById("pulse"), done = document.getElementById("done"),
+        say = document.getElementById("say"), btn = document.getElementById("toggle");
+  for (let m = 0; m <= 21; m++) {
+    const t = document.createElement("div"); t.className = "tick" + (m % 5 === 0 ? " m5" : ""); t.style.left = (m / ONE_WAY * 100) + "%"; track.insertBefore(t, pulse);
+    if (m % 5 === 0 && m > 0) { const l = document.createElement("div"); l.className = "tl"; l.style.left = (m / ONE_WAY * 100) + "%"; l.textContent = m + " min"; track.append(l); }
+  }
+  const fmt = min => { const s = Math.round(min * 60); return Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") + " s"; };
+  const line = (text, min) => { say.textContent = text + " "; const n = document.createElement("span"); n.className = "num"; n.textContent = fmt(min); say.append(n); };
+  /* One loop: 7 s out, 1.2 s hold, 7 s back, 3 s hold. */
+  const OUT = 7000, HOLD1 = 1200, BACK = 7000, HOLD2 = 3000, TOTAL = OUT + HOLD1 + BACK + HOLD2;
+  function draw(ms) {
+    let x, min, text;
+    if (ms < OUT) { x = ms / OUT; min = x * ONE_WAY; text = "The question is on its way."; done.style.left = "0"; done.style.width = (x * 100) + "%"; }
+    else if (ms < OUT + HOLD1) { x = 1; min = ONE_WAY; text = "Earth hears the question."; done.style.left = "0"; done.style.width = "100%"; }
+    else if (ms < OUT + HOLD1 + BACK) { const k = (ms - OUT - HOLD1) / BACK; x = 1 - k; min = ONE_WAY * (1 + k); text = "The answer is on its way."; done.style.left = (x * 100) + "%"; done.style.width = ((1 - x) * 100) + "%"; }
+    else { x = 0; min = 2 * ONE_WAY; text = "The answer arrives on Mars."; done.style.left = "0"; done.style.width = "100%"; }
+    pulse.style.left = (x * 100) + "%";
+    line(text + " Time since the question:", min);
+  }
+  let running = !matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now(), at = 0;
+  const still = () => draw(TOTAL - 1);
+  function frame(now) { if (!running) return; at = (now - t0) % TOTAL; draw(at); requestAnimationFrame(frame); }
+  function set(run) {
+    running = run; btn.textContent = run ? "Pause" : "Play"; btn.setAttribute("aria-pressed", String(!run));
+    if (run) { t0 = performance.now() - at; requestAnimationFrame(frame); }
+  }
+  btn.addEventListener("click", () => set(!running));
+  if (running) set(true); else { set(false); still(); }
+  /* The 30-second pitch film plays here as soon as the file exists: mocks/media/pitch.mp4 (optional poster: media/pitch.jpg).
+     The server says whether it is there (api/health); on plain static hosting the file is asked for directly. */
+  const film = () => { const v = document.getElementById("film"); v.src = "media/pitch.mp4"; v.hidden = false; document.getElementById("filmSoon").hidden = true;
+    fetch("media/pitch.jpg").then(p => { if (p.ok) v.poster = "media/pitch.jpg"; }).catch(() => {}); };
+  fetch("api/health", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject()).then(h => { if (h.film) film(); })
+    .catch(() => fetch("media/pitch.mp4", { headers: { Range: "bytes=0-0" } }).then(r => { if (r.ok) film(); }).catch(() => {}));
+  const q = new URLSearchParams(location.search).get("at");      // ?at=0.35 freezes the loop (for screenshots)
+  if (q != null) { set(false); at = Math.max(0, Math.min(1, +q)) * TOTAL; draw(at); }
+})();
+</script>
+</body>
+</html>

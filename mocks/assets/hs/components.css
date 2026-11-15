@@ -1,0 +1,100 @@
+/* HealthSignal components, v0.1 (2026-11-13).
+   Reads only the variables in tokens.css: no hex values and no font names below this line.
+   Every class starts with hs- so it can sit next to older page CSS without clashes. */
+
+/* ---------- Base ---------- */
+.hs-page{margin:0;background:var(--color-surface-void);color:var(--color-text-default);font:var(--type-body-default);
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.hs-page *,.hs-page *::before,.hs-page *::after{box-sizing:border-box}
+.hs-page :focus-visible{outline:var(--border-width-focus) solid var(--color-border-focus);outline-offset:var(--border-width-focus)}
+.hs-page p{max-width:70ch}
+@media (prefers-reduced-motion: reduce){.hs-page *{transition:none!important;animation:none!important}}
+
+/* ---------- Type roles ---------- */
+.hs-eyebrow{font:var(--type-eyebrow);letter-spacing:var(--type-eyebrow-letter-spacing);text-transform:uppercase;color:var(--color-text-accent);margin:0}
+.hs-eyebrow.earth{color:var(--color-text-earth)}
+.hs-display-1{font:var(--type-display-1);letter-spacing:var(--type-display-1-letter-spacing);color:var(--color-text-display);margin:0}
+.hs-emphasis{font:var(--type-display-emphasis);color:var(--color-text-accent-large);margin:0}
+.hs-display-2{font:var(--type-display-2);letter-spacing:var(--type-display-2-letter-spacing);color:var(--color-text-display);margin:0}
+.hs-h1{font:var(--type-heading-1);letter-spacing:var(--type-heading-1-letter-spacing);color:var(--color-text-display);margin:0}
+.hs-h2{font:var(--type-heading-2);letter-spacing:var(--type-heading-2-letter-spacing);color:var(--color-text-display);margin:0}
+.hs-h3{font:var(--type-heading-3);color:var(--color-text-display);margin:0}
+.hs-lead{font:var(--type-lead);color:var(--color-text-default);margin:0}
+.hs-small{font:var(--type-body-small);color:var(--color-text-muted)}
+.hs-label{font:var(--type-label);letter-spacing:var(--type-label-letter-spacing);text-transform:uppercase;color:var(--color-text-muted)}
+.hs-mono{font:var(--type-mono-default);font-variant-numeric:tabular-nums}
+.hs-readout{font:var(--type-readout-1);letter-spacing:var(--type-readout-1-letter-spacing);color:var(--color-text-display);font-variant-numeric:tabular-nums}
+.hs-readout-2{font:var(--type-readout-2);letter-spacing:var(--type-readout-2-letter-spacing);color:var(--color-text-display);font-variant-numeric:tabular-nums}
+.hs-unit{font:var(--type-mono-default);color:var(--color-text-muted);margin-left:.35em}
+@media (max-width:600px){.hs-display-1,.hs-emphasis{font:var(--type-display-mobile);letter-spacing:var(--type-display-mobile-letter-spacing)}}
+
+/* ---------- Surfaces ---------- */
+.hs-card{background:var(--color-surface-raised);border:var(--border-width-hairline) solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-6)}
+.hs-card.accent-left{border-left:var(--border-width-accent) solid var(--color-border-accent)}
+.hs-card.accent-top{border-top:var(--border-width-accent) solid var(--color-border-accent)}
+.hs-card.earth{border-left:var(--border-width-accent) solid var(--color-border-earth);background:linear-gradient(var(--color-surface-earth-tint),var(--color-surface-earth-tint)),var(--color-surface-raised)}
+.hs-sheet{background:var(--color-surface-default);border:var(--border-width-hairline) solid var(--color-border-default);border-radius:var(--radius-lg);padding:var(--space-8)}
+.hs-rule{height:0;border:0;border-top:var(--border-width-hairline) solid var(--color-border-default);margin:var(--space-8) 0}
+
+/* ---------- Actions ---------- */
+.hs-btn{font:var(--type-button);letter-spacing:var(--type-button-letter-spacing);text-transform:uppercase;display:inline-flex;align-items:center;gap:var(--space-2);
+  padding:var(--space-4) var(--space-6);border:var(--border-width-hairline) solid transparent;border-radius:var(--radius-md);cursor:pointer;text-decoration:none;
+  transition:background-color var(--duration-fast),border-color var(--duration-fast)}
+.hs-btn.primary{background:var(--color-action-primary);color:var(--color-action-on-primary)}
+.hs-btn.primary:hover{background:var(--color-action-primary-hover)}
+.hs-btn.primary:active{background:var(--color-action-primary-pressed)}
+.hs-btn.secondary{background:var(--color-surface-input);color:var(--color-text-accent-soft);border-color:var(--color-border-strong)}
+.hs-btn.secondary:hover{background:var(--color-surface-input-hover)}
+.hs-link{color:var(--color-text-accent);transition:color var(--duration-fast)}
+.hs-link:hover{color:var(--color-text-accent-hover)}
+
+/* ---------- Severity: how serious a health value is. Fill weight grows with severity; critical is the only solid fill. ---------- */
+.hs-sev{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--radius-sm);
+  font:var(--type-label);letter-spacing:var(--type-label-letter-spacing);text-transform:uppercase;white-space:nowrap}
+.hs-sev::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.hs-sev.ok{background:var(--color-surface-status-success);color:var(--color-text-status-success)}
+.hs-sev.watch{background:var(--color-surface-status-warning);color:var(--color-text-status-warning)}
+.hs-sev.warning{background:var(--color-surface-status-danger);color:var(--color-text-status-danger)}
+.hs-sev.critical{background:var(--color-surface-signal);color:var(--color-text-on-signal)}
+.hs-sev.critical::before{animation:hs-blink var(--duration-alarm) steps(2,start) infinite}
+.hs-sev.earth{background:var(--color-surface-status-live);color:var(--color-text-status-live)}
+@keyframes hs-blink{to{visibility:hidden}}
+
+/* ---------- Provenance: where a value, text or picture comes from. Always outline, never colour-coded, so it never competes with severity. ---------- */
+.hs-prov{display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 6px;border:var(--border-width-hairline) solid var(--color-border-strong);border-radius:var(--radius-sm);
+  font:var(--type-micro);letter-spacing:var(--type-micro-letter-spacing);text-transform:uppercase;color:var(--color-text-muted);white-space:nowrap;vertical-align:middle}
+.hs-prov.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--color-status-live)}
+.hs-prov.ai{border-style:dashed}
+
+/* AI-generated watermark: on every AI-made image or video frame, bottom-right, readable on any picture */
+.hs-ai-mark{position:absolute;right:var(--space-4);bottom:var(--space-4);display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:var(--radius-sm);
+  background:var(--color-overlay-scrim);color:var(--color-overlay-text);font:var(--type-micro);letter-spacing:var(--type-micro-letter-spacing);text-transform:uppercase}
+
+/* ---------- Brand ---------- */
+.hs-wordmark{display:inline-flex;align-items:center;gap:10px;color:var(--color-text-display);text-decoration:none;white-space:nowrap}
+.hs-wordmark svg{width:1.6em;height:1.6em;flex:none}
+.hs-wordmark b{font:300 1em/1 var(--font-family-display);letter-spacing:-.01em}
+.hs-wordmark b span{font-weight:600}
+.hs-strip{display:flex;align-items:center;gap:var(--space-6);padding:0 var(--space-6);height:48px;background:var(--color-surface-signal);color:var(--color-text-on-signal);
+  font:var(--type-button);letter-spacing:var(--type-button-letter-spacing);text-transform:uppercase}
+
+/* Background for covers and title cards only: hairline orbits around a far point, very faint */
+.hs-orbits{background:
+  radial-gradient(circle at 82% 40%, transparent 0 179px, var(--color-orbit-1) 180px, transparent 181px),
+  radial-gradient(circle at 82% 40%, transparent 0 329px, var(--color-orbit-2) 330px, transparent 331px),
+  radial-gradient(circle at 82% 40%, transparent 0 529px, var(--color-orbit-3) 530px, transparent 531px),
+  radial-gradient(ellipse 60% 70% at 82% 40%, var(--color-surface-glow), transparent 70%),
+  var(--color-surface-void)}
+
+/* ---------- Icons: 24 px grid, 1.5 px stroke, colour from the text ---------- */
+.hs-icon{width:24px;height:24px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.hs-icon.lg{width:32px;height:32px}
+.hs-icon-tile{display:inline-grid;place-items:center;width:48px;height:48px;border-radius:var(--radius-md);background:var(--color-surface-accent-tint);color:var(--color-text-accent)}
+.hs-icon-tile.earth{background:var(--color-surface-earth-tint);color:var(--color-text-earth)}
+
+/* ---------- Data tables ---------- */
+.hs-table{width:100%;border-collapse:collapse;font:var(--type-body-small);color:var(--color-text-default)}
+.hs-table th{font:var(--type-label);letter-spacing:var(--type-label-letter-spacing);text-transform:uppercase;color:var(--color-text-muted);text-align:left;
+  padding:10px 12px;border-bottom:var(--border-width-hairline) solid var(--color-border-strong);white-space:nowrap}
+.hs-table td{padding:10px 12px;border-bottom:var(--border-width-hairline) solid var(--color-border-default);vertical-align:top}
+.hs-table td.num{font:var(--type-mono-default);text-align:right;white-space:nowrap}

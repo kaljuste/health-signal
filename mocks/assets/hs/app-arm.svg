@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><title>Arm Unit icon: the forearm screen of the suit with the time you can stay</title>
+<defs><linearGradient id="ab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262321"/><stop offset="1" stop-color="#121212"/></linearGradient></defs>
+<rect x="1" y="1" width="62" height="62" rx="15" fill="url(#ab)" stroke="#4a4640" stroke-width="1.5"/>
+<path d="M23 12V7M41 12V7M23 52v5M41 52v5" fill="none" stroke="#706e68" stroke-width="3" stroke-linecap="round"/>
+<rect x="17" y="12" width="30" height="40" rx="8" fill="#e5522c" fill-opacity=".13" stroke="#ddd6c5" stroke-width="3"/>
+<circle cx="32" cy="28" r="8.5" fill="none" stroke="#5a554d" stroke-width="3"/>
+<path d="M32 19.5a8.5 8.5 0 1 1-8.5 8.5" fill="none" stroke="#e5522c" stroke-width="3" stroke-linecap="round"/>
+<path d="M25 43h14" fill="none" stroke="#ddd6c5" stroke-width="3" stroke-linecap="round"/></svg>

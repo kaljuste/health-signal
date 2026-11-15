@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What we measure · Health Signal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:var(--space-12);align-items:end}
+@media (max-width:1000px){.hero{grid-template-columns:1fr}}
+.tests{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-default)}
+.tests li{display:grid;grid-template-columns:150px 1fr;gap:var(--space-4);padding:12px 0;border-bottom:1px solid var(--color-border-default);font:var(--type-body-small)}
+.tests b{font:var(--type-body-default);color:var(--color-text-display);font-weight:400}
+.counts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-6);margin:var(--space-8) 0 0}
+@media (max-width:1000px){.counts{grid-template-columns:1fr 1fr}}
+.counts div{border-left:3px solid var(--color-border-default);padding-left:var(--space-4)}
+.counts b{display:block;font:300 39px/1 "Manrope",sans-serif;color:var(--color-text-display);letter-spacing:-.6px}
+.counts span{font:var(--type-body-small);color:var(--color-text-muted)}
+.bar{position:sticky;top:var(--x-nav-h);z-index:5;background:var(--x-void);display:flex;flex-wrap:wrap;gap:var(--space-2);align-items:center;padding:var(--space-4) 0;margin-top:var(--space-12);border-bottom:1px solid var(--color-border-default)}
+.chip{font:var(--type-body-small);color:var(--color-text-muted);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:7px 12px;cursor:pointer}
+.chip:hover{background:var(--color-surface-input-hover);color:var(--color-text-default)}
+.chip[aria-pressed="true"]{background:var(--color-surface-accent-tint);border-color:var(--color-border-accent);color:var(--color-text-accent-soft)}
+.chip .n{font:var(--type-mono-default);margin-left:6px;opacity:.8}
+.bar input[type=search]{flex:1;min-width:220px}
+.bar label{font:var(--type-body-small);color:var(--color-text-muted);display:flex;gap:8px;align-items:center}
+.group h2{display:flex;align-items:baseline;gap:var(--space-4)}
+.group h2 small{font:var(--type-body-small);color:var(--color-text-muted);letter-spacing:0}
+.v{border-bottom:1px solid var(--color-border-default)}
+.v > button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.5fr) 110px 150px minmax(0,1.3fr) 86px 24px;gap:var(--space-4);align-items:center;width:100%;padding:13px 8px;cursor:pointer}
+.v > button:hover{background:var(--color-surface-raised)}
+.v > button:focus-visible{outline:2px solid var(--color-border-focus);outline-offset:-2px}
+.v .name{font:var(--type-body-default);color:var(--color-text-display)}
+.v .unit,.v .cad,.v .sensor{font:var(--type-body-small);color:var(--color-text-muted)}
+.v .unit{font:var(--type-mono-default);color:var(--color-text-muted)}
+.v svg.chev{width:16px;height:16px;color:var(--color-text-muted);transition:transform var(--duration-base)}
+.v.open svg.chev{transform:rotate(180deg)}
+.v.open > button{background:var(--color-surface-raised)}
+.badge.MODEL{border-color:var(--color-status-warning);color:var(--color-text-status-warning)}
+.badge.REPLAY{border-color:var(--color-status-live);color:var(--color-text-status-live)}
+.badge.COMPUTED{border-color:var(--color-status-success);color:var(--color-text-status-success)}
+.detail{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:var(--space-8);padding:var(--space-4) 8px var(--space-8);background:var(--color-surface-raised);border-left:3px solid var(--color-border-accent)}
+.v.open .detail{display:grid}
+@media (max-width:1000px){.detail{grid-template-columns:1fr}.v > button{grid-template-columns:minmax(0,1fr) 86px 24px}.v .unit,.v .cad,.v .sensor{display:none}}
+.detail dl{margin:0;display:grid;grid-template-columns:132px 1fr;gap:10px var(--space-4);font:var(--type-body-small)}
+.detail dt{font:var(--type-label);letter-spacing:1.2px;text-transform:uppercase;color:var(--color-text-muted);padding-top:2px}
+.detail dd{margin:0;color:var(--color-text-default);max-width:62ch}
+.detail dd .tagline{color:var(--color-text-muted)}
+.chart h4{margin:0 0 6px;font:var(--type-body-small);color:var(--color-text-muted);font-weight:400}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .tip{font:var(--type-mono-default);color:var(--color-text-default);min-height:20px;margin-top:4px}
+.legend{display:flex;gap:var(--space-4);flex-wrap:wrap;font:var(--type-body-small);color:var(--color-text-muted);margin-top:6px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid #e8e4d8;vertical-align:middle;margin-right:6px}
+.legend i.ref{border-top:1px dashed #f2c14e}.legend i.crit{border-top:1px dashed #ff7a59}
+.key{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-6);margin-top:var(--space-6)}
+@media (max-width:1000px){.key{grid-template-columns:1fr 1fr}}
+.key p{font:var(--type-body-small);color:var(--color-text-muted);margin:8px 0 0}
+.empty{padding:var(--space-8) 0;color:var(--color-text-muted)}
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="hero">
+    <div>
+      <h1>What we measure,<br>and why these</h1>
+      <p class="lead">A value earns its place only if the assistant can explain it and the crew can act on it. Each of the <span id="nAll">76</span> values below passed four tests.</p>
+    </div>
+    <ul class="tests">
+      <li><b>It can be measured</b><span>A sensor that flies today, a short self-test, or an estimate that is labelled as one.</span></li>
+      <li><b>It has a sourced limit</b><span>A NASA standard, a clinical guideline or a published study. Our own assumptions are marked INF.</span></li>
+      <li><b>Its course is known</b><span>What it does in weightlessness, and what is expected at Mars gravity, from flight data or the best analog.</span></li>
+      <li><b>Something follows</b><span>A warning, an action for the crew, or an instruction from Earth.</span></li>
+    </ul>
+  </section>
+  <div class="counts" id="counts"></div>
+  <div class="key">
+    <div><span class="badge REPLAY">Replay</span><p>A real measurement, replayed on the matching day of the last solar cycle or season.</p></div>
+    <div><span class="badge">Sim</span><p>Stands for a sensor. Simulated with sizes and speeds from published flight data.</p></div>
+    <div><span class="badge MODEL">Model</span><p>An estimate. No direct sensor exists, in this simulation or on a real mission.</p></div>
+    <div><span class="badge COMPUTED">Computed</span><p>Astronomy. Exact for the planned mission dates.</p></div>
+  </div>
+
+  <div class="bar" role="group" aria-label="Filter the values">
+    <span id="chips"></span>
+    <input type="search" id="q" placeholder="Search values, limits, risks" aria-label="Search">
+    <label>Chart for <select id="crew" aria-label="Crew member for the charts"></select></label>
+  </div>
+  <div id="list"><p class="empty">Loading the simulated mission…</p></div>
+</main>
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const svg = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const SCOPES = [["all", "All"], ["env", "Environment"], ["body", "Body, every day"], ["lab", "Blood and urine"], ["eva", "Arm Unit, every second"]];
+const KIND = { REPLAY: "Replay", SIM: "Sim", MODEL: "Model", COMPUTED: "Computed" };
+const PHASE = { prelaunch: "Before launch", outbound: "Outbound", surface: "On Mars", return: "Homebound", recovery: "Back on Earth" };
+let scope = "all", vars = [], days = [], ids = {};
+const safe = s => /^[a-z0-9_]+$/.test(s);
+
+function anchor(v) {                       // element id used by links from other pages
+  if (v.scope !== "eva") return v.var_id;
+  const bare = v.var_id.replace(/^eva\./, "");
+  return vars.some(x => x.var_id === bare) ? v.var_id : bare;
+}
+function series(v, crew) {
+  if (!safe(v.column_name) || !safe(v.table_name)) return null;
+  if (v.table_name === "lab") return { x: "day", pts: SimDB.q("select day x, value y from lab where crew_id=? and var_id=? order by day", [crew, v.var_id]), dots: true };
+  if (v.table_name === "eva_sample") return { x: "sec", pts: SimDB.q(`select t_s x, ${v.column_name} y from eva_sample where scenario_id='nominal' and t_s % 20 = 0 order by t_s`) };
+  if (v.column_name === "comm") return null;
+  if (v.table_name === "body_day") return { x: "day", pts: SimDB.q(`select day x, ${v.column_name} y from body_day where crew_id=? order by day`, [crew]) };
+  if (v.table_name === "env_hour") return { x: "day", pts: SimDB.q(`select day x, ${v.column_name} y from env_day order by day`) };
+  return { x: "day", pts: SimDB.q(`select day x, ${v.column_name} y from ${v.table_name} order by day`) };
+}
+function chart(host, v, crew) {
+  host.textContent = "";
+  const s = series(v, crew);
+  if (!s || !s.pts.some(p => p.y !== null)) { host.append(el("p", "muted small", "No chart for this value.")); return; }
+  const pts = s.pts.filter(p => p.y !== null);
+  const W = 640, H = 230, L = 46, R = 12, T = 22, B = 30;
+  const xs = s.pts.map(p => p.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const refs = s.x === "day" ? [["watch_low", "ref"], ["watch_high", "ref"], ["warn_low", "ref"], ["warn_high", "ref"], ["crit_low", "crit"], ["crit_high", "crit"]].filter(r => v[r[0]] !== null && v[r[0]] !== undefined) : [];
+  let lo = Math.min(...pts.map(p => p.y)), hi = Math.max(...pts.map(p => p.y));
+  refs.forEach(r => { const y = v[r[0]]; if (y > lo - (hi - lo) * 1.2 && y < hi + (hi - lo) * 1.2) { lo = Math.min(lo, y); hi = Math.max(hi, y); } });
+  if (hi === lo) { hi += 1; lo -= 1; }
+  const pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+  const X = x => L + (W - L - R) * (x - x0) / (x1 - x0), Y = y => T + (H - T - B) * (1 - (y - lo) / (hi - lo));
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${v.label} over the ${s.x === "day" ? "mission" : "normal Mars walk"}` });
+  if (s.x === "day") {                      // mission phases as quiet bands
+    let start = 0;
+    for (let i = 1; i <= days.length; i++) if (i === days.length || days[i].phase !== days[start].phase) {
+      const a = X(days[start].day), b = X(days[i - 1].day), ph = days[start].phase;
+      g.append(svg("rect", { x: a, y: T, width: Math.max(0, b - a), height: H - T - B, fill: ph === "surface" ? "#1a1210" : ph === "outbound" || ph === "return" ? "#101010" : "#0b0b0b" }));
+      if (b - a > 60) g.append(svg("text", { x: a + 6, y: T - 7, fill: "#9a968c", "font-size": 11, "font-family": "Manrope" }, PHASE[ph]));
+      start = i;
+    }
+  }
+  [0, .5, 1].forEach(f => { const y = lo + (hi - lo) * (pad / (hi - lo) + f * (1 - 2 * pad / (hi - lo))); g.append(svg("line", { x1: L, x2: W - R, y1: Y(y), y2: Y(y), stroke: "#2b2b2b" })); g.append(svg("text", { x: L - 8, y: Y(y) + 4, fill: "#9a968c", "font-size": 11, "text-anchor": "end", "font-family": "Azeret Mono" }, Number(y).toFixed(Math.max(v.decimals, hi - lo < 3 ? 1 : 0)))); });
+  refs.forEach(([k, cls]) => { const y = v[k]; if (y < lo || y > hi) return; g.append(svg("line", { x1: L, x2: W - R, y1: Y(y), y2: Y(y), stroke: cls === "crit" ? "#ff7a59" : "#f2c14e", "stroke-dasharray": "4 4", "stroke-width": 1 }));
+    g.append(svg("text", { x: W - R - 4, y: Y(y) - 4, fill: cls === "crit" ? "#ff7a59" : "#f2c14e", "font-size": 11, "text-anchor": "end", "font-family": "Manrope" }, (k.startsWith("watch") ? "watch " : k.startsWith("warn") ? "warning " : "critical ") + y)); });
+  if (s.dots) pts.forEach(p => g.append(svg("circle", { cx: X(p.x), cy: Y(p.y), r: 3.5, fill: "#e8e4d8", stroke: "#171717", "stroke-width": 1.5 })));
+  else { let d = "", pen = false; s.pts.forEach(p => { if (p.y === null) { pen = false; return; } d += (pen ? "L" : "M") + X(p.x).toFixed(1) + " " + Y(p.y).toFixed(1); pen = true; }); g.append(svg("path", { d, fill: "none", stroke: "#e8e4d8", "stroke-width": 1.5, "stroke-linejoin": "round" })); }
+  const ticks = s.x === "day" ? [0, 172, 356, 734, 923] : [0, 3600, 7200, 10800];
+  ticks.forEach(t => { if (t < x0 || t > x1) return; g.append(svg("text", { x: X(t), y: H - 10, fill: "#9a968c", "font-size": 11, "text-anchor": "middle", "font-family": "Azeret Mono" }, s.x === "day" ? "day " + t : (t / 3600) + " h")); });
+  const cross = svg("line", { y1: T, y2: H - B, stroke: "#706e68", visibility: "hidden" }), dot = svg("circle", { r: 4, fill: "#e5522c", stroke: "#171717", "stroke-width": 1.5, visibility: "hidden" });
+  const hit = svg("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" });
+  g.append(cross, dot, hit);
+  const tip = el("div", "tip", " ");
+  hit.addEventListener("pointermove", ev => {
+    const box = g.getBoundingClientRect(), x = x0 + (x1 - x0) * ((ev.clientX - box.left) / box.width * W - L) / (W - L - R);
+    const p = pts.reduce((a, b) => Math.abs(b.x - x) < Math.abs(a.x - x) ? b : a);
+    cross.setAttribute("x1", X(p.x)); cross.setAttribute("x2", X(p.x)); cross.setAttribute("visibility", "visible");
+    dot.setAttribute("cx", X(p.x)); dot.setAttribute("cy", Y(p.y)); dot.setAttribute("visibility", "visible");
+    tip.textContent = (s.x === "day" ? SimDB.dayLabel(p.x).text : `${Math.floor(p.x / 3600)}:${String(Math.floor(p.x % 3600 / 60)).padStart(2, "0")} into the walk`) + "  ·  " + SimDB.fmt(v.var_id, p.y) + " " + v.unit;
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); tip.textContent = " "; });
+  const who = v.table_name === "body_day" || v.table_name === "lab" ? SimDB.crew[crew].call_sign + ", whole mission" : s.x === "sec" ? "the normal Mars walk, second by second" : "whole mission";
+  host.append(el("h4", null, `Simulated course: ${who}`), g, tip);
+  const lg = el("div", "legend"); const a = el("span"); a.append(el("i"), s.dots ? "one point per blood or urine panel" : "simulated value"); lg.append(a);
+  if (refs.length) { const b = el("span"); b.append(el("i", "ref"), "watch or warning level"); lg.append(b); }
+  host.append(lg);
+}
+function row(v) {
+  const wrap = el("div", "v"); wrap.id = anchor(v); wrap.dataset.scope = v.scope;
+  wrap.dataset.text = [v.label, v.unit, v.rule_text, v.why, v.hrp_risk, v.sensor, v.var_id, v.kind].join(" ").toLowerCase();
+  const b = el("button"); b.type = "button"; b.setAttribute("aria-expanded", "false");
+  const chev = svg("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", class: "chev" }); chev.append(svg("path", { d: "m6 9 6 6 6-6" }));
+  const bd = el("span"); bd.append(el("span", "badge " + v.kind, KIND[v.kind] || v.kind));
+  b.append(el("span", "name", v.label), el("span", "unit", v.unit || "–"), el("span", "cad", v.cadence), el("span", "sensor", v.sensor), bd, chev);
+  const d = el("div", "detail"), dl = el("dl"), ch = el("div", "chart");
+  const add = (k, val, extra) => { if (!val) return; const dd = el("dd", null, val); if (extra) dd.append(el("div", "tagline", extra)); dl.append(el("dt", null, k), dd); };
+  add("Why it matters", v.why);
+  add("Rule", v.rule_text, v.rule_tag ? "Source: " + v.rule_tag : "");
+  add("What to do", v.action);
+  add("How it is made", v.how_simulated, v.learned_from ? "Learned from: " + v.learned_from : "");
+  if (v.hrp_risk) { const dd = el("dd"); const a = el("a", null, v.hrp_risk); a.href = "risks.html?q=" + encodeURIComponent(v.hrp_risk.split(/[;(]/)[0].trim()); dd.append(a); dl.append(el("dt", null, "NASA risk"), dd); }
+  add("In the data", `${v.table_name}.${v.column_name}` + (v.catalog_id ? ` · catalog row ${v.catalog_id}` : ""));
+  d.append(dl, ch); wrap.append(b, d);
+  b.onclick = () => { const open = wrap.classList.toggle("open"); b.setAttribute("aria-expanded", open); if (open) chart(ch, v, $("crew").value); };
+  wrap._v = v; wrap._chart = ch;
+  return wrap;
+}
+function filter() {
+  const q = $("q").value.trim().toLowerCase(); let n = 0;
+  document.querySelectorAll(".group").forEach(g => {
+    let k = 0;
+    g.querySelectorAll(".v").forEach(r => { const ok = (scope === "all" || r.dataset.scope === scope) && (!q || r.dataset.text.includes(q)); r.hidden = !ok; if (ok) k++; });
+    g.hidden = !k; n += k; g.querySelector("h2 small").textContent = k + (k === 1 ? " value" : " values");
+  });
+  $("none").hidden = n > 0;
+}
+SimDB.ready.then(() => {
+  vars = Object.values(SimDB.vars); days = SimDB.q("select day, phase from day order by day");
+  $("nAll").textContent = vars.length;
+  const kinds = {}; vars.forEach(v => kinds[v.kind] = (kinds[v.kind] || 0) + 1);
+  [[vars.filter(v => v.scope === "env").length, "environment values: air, radiation, weather, link"], [vars.filter(v => v.scope === "body").length, "body values every day"],
+   [vars.filter(v => v.scope === "lab").length, "blood and urine values every 28 days"], [vars.filter(v => v.scope === "eva").length, "arm-unit values every second of a Mars walk"],
+   [kinds.MODEL || 0, "of all are estimates, labelled Model"]].forEach(([n, t]) => { const d = el("div"); d.append(el("b", null, n), el("span", null, t)); $("counts").append(d); });
+  SCOPES.forEach(([k, t]) => { const c = el("button", "chip", t); c.type = "button"; c.setAttribute("aria-pressed", k === scope); c.append(el("span", "n", k === "all" ? vars.length : vars.filter(v => v.scope === k).length));
+    c.onclick = () => { scope = k; document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === c)); filter(); }; $("chips").append(c, " "); });
+  Object.values(SimDB.crew).forEach(c => { const o = el("option", null, c.call_sign); o.value = c.crew_id; $("crew").append(o); });
+  $("crew").value = SimDB.meta.focus_crew;
+  $("crew").onchange = () => document.querySelectorAll(".v.open").forEach(r => chart(r._chart, r._v, $("crew").value));
+  const list = $("list"); list.textContent = "";
+  const groups = []; vars.forEach(v => { let g = groups.find(x => x[0] === v.grp); if (!g) groups.push(g = [v.grp, []]); g[1].push(v); });
+  groups.forEach(([name, vs]) => { const g = el("section", "group"), h = el("h2", null, name); h.append(el("small")); g.append(h); vs.forEach(v => g.append(row(v))); list.append(g); });
+  const none = el("p", "empty", "No value matches. Clear the search or pick another group."); none.id = "none"; none.hidden = true; list.append(none);
+  $("q").oninput = filter; filter();
+  const open = () => { const id = decodeURIComponent(location.hash.slice(1)); const t = id && document.getElementById(id); if (t && t.classList.contains("v")) { if (!t.classList.contains("open")) t.querySelector("button").click(); t.scrollIntoView({ block: "center" }); } };
+  open(); addEventListener("hashchange", open);
+});
+</script>
+</body>
+</html>

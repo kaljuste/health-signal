@@ -1,0 +1,48 @@
+/* Shared shell for the preview site (content pages). Tokens come from design/ (see design/README.md). No logo. */
+@import url("hs/tokens.css");   /* colours, type, spacing: generated from design/tokens.json (python3 -I design/build.py) */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(var(--x-nav-h) + 16px)}
+body{margin:0;background:var(--x-void);color:var(--color-text-default);font:var(--type-body-default);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--color-border-focus);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.num{font-variant-numeric:tabular-nums}
+.mono{font:var(--type-mono-default)}
+
+/* Site navigation, injected by nav.js. Pages only need: <script src="assets/nav.js" defer></script> */
+body.has-sitenav{padding-top:var(--x-nav-h)}
+.sitenav{position:fixed;inset:0 0 auto 0;height:var(--x-nav-h);z-index:50;display:flex;align-items:stretch;gap:var(--space-6);
+  padding:0 var(--space-6);background:rgba(6,6,6,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--color-border-default)}
+.sitenav .name{display:flex;align-items:center;font:var(--type-label);letter-spacing:1.56px;text-transform:uppercase;color:var(--color-text-display);text-decoration:none;white-space:nowrap}
+.sitenav nav{display:flex;align-items:stretch;gap:var(--space-1);overflow-x:auto;scrollbar-width:none}
+.sitenav nav a{display:flex;align-items:center;padding:3px 12px 0;font:var(--type-body-small);color:var(--color-text-muted);text-decoration:none;
+  border-bottom:3px solid transparent;white-space:nowrap;transition:color var(--duration-fast)}
+.sitenav nav a:hover{color:var(--color-text-default)}
+.sitenav nav a[aria-current="page"]{color:var(--color-text-display);border-bottom-color:var(--color-border-accent)}
+.sitenav .sep{width:1px;background:var(--color-border-default);margin:10px 4px}
+.sitenav .note{margin-left:auto;display:flex;align-items:center;font:var(--x-type-micro);letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);white-space:nowrap}
+
+/* Content pages */
+.page{max-width:1280px;margin:0 auto;padding:var(--space-12) var(--space-6) var(--space-16)}
+.page h1{font:var(--type-display-2);letter-spacing:-.49px;color:var(--color-text-display);margin:0 0 var(--space-4)}
+.page h2{font:var(--type-heading-2);letter-spacing:-.62px;color:var(--color-text-display);margin:var(--space-12) 0 var(--space-4)}
+.page h3{font:var(--type-heading-3);color:var(--color-text-display);margin:var(--space-8) 0 var(--space-2)}
+.page p{margin:0 0 var(--space-4);max-width:70ch}
+.page .lead{font:var(--type-lead);max-width:62ch}
+.page a{color:var(--color-text-accent-soft)}
+.page a:hover{color:var(--color-text-status-danger)}
+.muted{color:var(--color-text-muted)}
+.small{font:var(--type-body-small)}
+.card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-6)}
+.badge{display:inline-flex;align-items:center;height:18px;padding:0 6px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);
+  font:var(--x-type-micro);letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);white-space:nowrap}
+.tag{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--radius-sm);font:var(--type-label);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.tag.ok{background:var(--color-surface-status-success);color:var(--color-text-status-success)}
+.tag.watch{background:var(--color-surface-status-warning);color:var(--color-text-status-warning)}
+.tag.warning,.tag.critical{background:var(--color-surface-status-danger);color:var(--color-text-status-danger)}
+.tag.info{background:var(--color-surface-status-live);color:var(--color-text-status-live)}
+.tag svg{width:14px;height:14px}
+table.grid{width:100%;border-collapse:collapse;font:var(--type-body-small)}
+table.grid th{font:var(--type-label);letter-spacing:1.2px;text-transform:uppercase;color:var(--color-text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--color-border-strong);white-space:nowrap}
+table.grid td{padding:10px 12px;border-bottom:1px solid var(--color-border-default);vertical-align:top;color:var(--color-text-default)}
+table.grid tr:hover td{background:var(--color-surface-raised)}
+input[type=search],select{font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:8px 12px}

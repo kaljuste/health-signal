@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habitat App · Health Signal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<style>
+/* Design tokens of Health Signal (dark theme). */
+:root{
+  --color-surface-default:#0e0e0e; --color-surface-raised:#171717; --color-surface-input:#1f1f1f; --color-surface-input-hover:#2b2b2b;
+  --color-surface-accent-tint:#231713; --color-surface-glow:#1a1210; --color-surface-signal:#e5522c; --color-surface-inverse:#e8e4d8;
+  --color-surface-status-danger:rgba(229,82,44,0.15); --color-surface-status-live:rgba(62,143,198,0.1);
+  --color-surface-status-warning:rgba(242,193,78,0.14); --color-surface-status-success:rgba(111,191,115,0.15);
+  --color-border-default:#2b2b2b; --color-border-strong:#706e68; --color-border-accent:#e5522c; --color-border-focus:#f2c14e;
+  --color-text-default:#e8e4d8; --color-text-display:#ddd6c5; --color-text-muted:#9a968c; --color-text-accent:#e5522c;
+  --color-text-accent-soft:#ffb39e; --color-text-on-signal:#0e0e0e; --color-text-on-inverse:#0e0e0e;
+  --color-text-status-danger:#ff7a59; --color-text-status-live:#3e8fc6; --color-text-status-warning:#f2c14e; --color-text-status-success:#6fbf73;
+  --color-action-primary:#e5522c; --color-action-primary-hover:#ff7a59; --color-action-primary-pressed:#de4c24; --color-action-on-primary:#0e0e0e;
+  --color-status-live:#3e8fc6; --color-status-success:#6fbf73; --color-status-warning:#f2c14e; --color-status-danger:#ff7a59;
+  --viz-highlight-focus:#e5522c; --viz-highlight-muted:#706e68; --viz-chrome-grid:#2b2b2b; --viz-chrome-axis:#4d4c49;
+  --viz-chrome-label:#9a968c; --viz-chrome-annotation:#e8e4d8; --viz-sequential-neutral-1:#33302a; --viz-sequential-neutral-2:#4a4740;
+  --type-display-1:300 76px/1.0 "Manrope",sans-serif; --type-heading-2:400 31px/1.2 "Manrope",sans-serif; --type-heading-3:400 25px/1.2 "Manrope",sans-serif;
+  --type-lead:400 20px/1.5 "Manrope",sans-serif; --type-body-default:400 16px/1.5 "Manrope",sans-serif;
+  --type-body-small:400 13px/1.4 "Manrope",sans-serif; --type-label:600 13px/1.2 "Chakra Petch",sans-serif;
+  --type-button:600 13px/1.2 "Chakra Petch",sans-serif; --type-mono-default:500 13px/1.4 "Azeret Mono",monospace;
+  --space-1:4px; --space-2:8px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --radius-sm:6px; --radius-md:12px; --radius-lg:20px; --radius-pill:999px;
+  --duration-fast:150ms; --duration-base:200ms;
+  --x-void:#060606;                                    /* page backdrop, one step below surface.default */
+  --x-type-micro:600 11px/1 "Chakra Petch",sans-serif; /* provenance badge */
+  --navoff:44px; --railh:760px; --dockh:104px; --beat:1s; --breath:4.3s;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--x-void);color:var(--color-text-default);font:var(--type-body-default);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--color-border-focus);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+
+.app{width:1392px;margin:0 auto;padding:0 0 calc(var(--dockh) + 24px)}
+body.fitbody{overflow:hidden}
+body.fitbody .app{padding-bottom:0}
+#loading{padding:120px 0;text-align:center;color:var(--color-text-muted)}
+
+/* ---------- Top bar ---------- */
+.topbar{display:flex;align-items:stretch;gap:var(--space-6);height:60px;border-bottom:1px solid var(--color-border-default);margin-bottom:12px;position:sticky;top:var(--navoff);z-index:8;background:var(--x-void)}
+.brand{display:flex;flex-direction:column;justify-content:center;white-space:nowrap}
+.brand b{font:var(--type-body-default);font-weight:600;color:var(--color-text-display);line-height:1.2}
+.brand span{font:var(--type-body-small);color:var(--color-text-muted)}
+.crewsw{display:flex;align-items:center;gap:6px}
+.crewsw button{background:var(--color-surface-input);border:1px solid var(--color-border-default);border-radius:var(--radius-pill);padding:6px 12px;font:var(--type-label);letter-spacing:1.2px;color:var(--color-text-muted);cursor:pointer;display:flex;align-items:center;gap:6px}
+.crewsw button:hover{background:var(--color-surface-input-hover);color:var(--color-text-default)}
+.crewsw button[aria-pressed="true"]{border-color:var(--color-border-accent);color:var(--color-text-display);background:var(--color-surface-accent-tint)}
+.crewsw i{width:8px;height:8px;border-radius:50%;background:#706e68;display:inline-block}
+.crewsw i.watch{background:var(--color-status-warning)} .crewsw i.warning,.crewsw i.critical{background:var(--color-status-danger)}
+.tabs{display:flex;gap:var(--space-2);align-items:stretch}
+.tabs button{font:var(--type-body-default);color:var(--color-text-muted);background:none;border:0;border-bottom:3px solid transparent;padding:3px var(--space-4) 0;cursor:pointer;transition:color var(--duration-fast)}
+.tabs button:hover{color:var(--color-text-default)}
+.tabs button[aria-selected="true"]{color:var(--color-text-display);border-bottom-color:var(--color-border-accent)}
+.clock{margin-left:auto;display:flex;align-items:center;gap:var(--space-6)}
+.clock div{display:flex;flex-direction:column;align-items:flex-end}
+.clock span{font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap}
+.clock b{font:var(--type-mono-default);color:var(--color-text-default);white-space:nowrap}
+
+.panel{background:var(--color-surface-default);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4)}
+.ptitle{font:var(--type-body-small);font-weight:600;color:var(--color-text-display);display:flex;align-items:center;gap:var(--space-2)}
+.ptitle span.sub{font-weight:400;color:var(--color-text-muted)}
+.badge{font:var(--x-type-micro);letter-spacing:1px;color:var(--color-text-muted);border:1px solid var(--color-border-strong);border-radius:4px;padding:2px 4px 1px;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;gap:5px;font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;padding:var(--space-1) var(--space-2) var(--space-1) 6px;border-radius:var(--radius-sm);white-space:nowrap}
+.tag svg{width:14px;height:14px;flex:none}
+.tag.ok{background:var(--color-surface-status-success);color:var(--color-text-status-success)}
+.tag.watch{background:var(--color-surface-status-warning);color:var(--color-text-status-warning)}
+.tag.warning{background:var(--color-surface-status-danger);color:var(--color-text-status-danger)}
+.tag.critical{background:var(--color-surface-signal);color:var(--color-text-on-signal)}
+.tag.info{background:var(--color-surface-status-live);color:var(--color-text-status-live)}
+.trend{display:inline-flex;align-items:center;gap:4px;font:var(--type-body-small);color:var(--color-text-muted)}
+.trend svg{width:14px;height:14px;color:var(--color-text-default)}
+.fine{font:var(--type-body-small);color:var(--color-text-muted)}
+a.lnk{color:var(--color-text-accent-soft);text-decoration:underline;text-underline-offset:3px}
+a.lnk:hover{color:var(--color-text-status-danger)}
+
+.layout{display:grid;grid-template-columns:952px 420px;gap:20px;align-items:start}
+
+/* ---------- Body board ---------- */
+.board{position:relative;display:grid;grid-template-columns:276px 1fr 276px;gap:0 20px;height:800px}
+.col{display:flex;flex-direction:column;gap:9px;z-index:2;min-width:0}
+.figwrap{position:relative;display:flex;align-items:center;justify-content:center}
+#fig{height:792px;width:auto;display:block;overflow:visible}
+#leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#leaders path{transition:opacity var(--duration-fast)}
+.board.has-focus #leaders g{opacity:.18}
+.board.has-focus #leaders g.is-focus{opacity:1}
+
+.callout{flex:1 1 0;min-height:0;display:flex;flex-direction:column;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:8px 12px 8px;cursor:pointer;transition:opacity var(--duration-fast),border-color var(--duration-fast),background-color var(--duration-fast);overflow:hidden}
+.callout .h{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);min-height:23px}
+.callout .h b{font:var(--type-body-small);font-weight:600;color:var(--color-text-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.callout .v{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.callout .v .n{font:300 28px/1.15 "Manrope",sans-serif;letter-spacing:-.5px;color:var(--color-text-display)}
+.callout .v .u{font:var(--type-body-small);color:var(--color-text-muted)}
+.callout .v .badge{position:relative;top:-2px}
+.callout .t{margin-top:-1px;min-height:18px}
+.callout .d{font:var(--type-body-small);color:var(--color-text-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.callout .d.flag{color:var(--color-text-default)}
+.callout.left.watch,.callout.left.warning,.callout.left.critical{border-right-width:3px}
+.callout.right.watch,.callout.right.warning,.callout.right.critical{border-left-width:3px}
+.callout.left.watch{border-right-color:var(--color-status-warning)} .callout.left.warning,.callout.left.critical{border-right-color:var(--color-status-danger)}
+.callout.right.watch{border-left-color:var(--color-status-warning)} .callout.right.warning,.callout.right.critical{border-left-color:var(--color-status-danger)}
+.callout:hover,.callout.is-focus{background:var(--color-surface-input)}
+.board.has-focus .callout{opacity:.32}
+.board.has-focus .callout.is-focus{opacity:1;border-color:var(--color-border-strong)}
+
+/* figure */
+.body-line{fill:none;stroke:#77746d;stroke-width:2.4;stroke-linejoin:round;transition:stroke var(--duration-fast)}
+.body-fill{fill:#141414}
+.organ{fill:none;stroke:#4a4844;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.rg{color:#cfcbc0;transition:opacity var(--duration-fast)}
+.rg .glyph{fill:none;stroke:#6a6761;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--duration-fast),stroke-width var(--duration-fast)}
+.rg .wash{fill:currentColor;stroke:none;opacity:0;transition:opacity var(--duration-fast)}
+.rg.watch{color:#f2c14e} .rg.warning,.rg.critical{color:#ff7a59}
+.rg.watch .glyph,.rg.warning .glyph,.rg.critical .glyph{stroke:currentColor}
+.rg.watch .wash{opacity:.13} .rg.warning .wash{opacity:.2} .rg.critical .wash{opacity:.3}
+.rg.warning .wash,.rg.critical .wash{animation:attn 3.2s ease-in-out infinite}
+@keyframes attn{0%,100%{opacity:.12}50%{opacity:.34}}
+#fig.has-focus .rg{opacity:.22}
+#fig.has-focus .rg.is-focus{opacity:1}
+#fig.has-focus .organ{opacity:.4}
+.rg.is-focus .glyph{stroke:currentColor;stroke-width:1.9;filter:drop-shadow(0 0 5px currentColor)}
+.rg.is-focus .wash{opacity:.3;animation:none}
+#fig.focus-skin .body-line{stroke:#cfcbc0;filter:drop-shadow(0 0 6px #cfcbc0)}
+#fig.focus-skin.skin-watch .body-line{stroke:#f2c14e;filter:drop-shadow(0 0 6px #f2c14e)}
+#fig.focus-skin.skin-warning .body-line,#fig.focus-skin.skin-critical .body-line{stroke:#ff7a59;filter:drop-shadow(0 0 6px #ff7a59)}
+.hit{fill:transparent;stroke:none;cursor:pointer;pointer-events:all;outline-offset:1px}
+.beat{fill:#ff7a59;transform-box:fill-box;transform-origin:center;animation:beat var(--beat) ease-out infinite}
+@keyframes beat{0%{transform:scale(1);opacity:.95}18%{transform:scale(1.9);opacity:1}40%{transform:scale(1);opacity:.8}100%{transform:scale(1);opacity:.8}}
+.breath{transform-box:fill-box;transform-origin:50% 40%;animation:breathe calc(var(--breath) / 2) ease-in-out infinite alternate}
+@keyframes breathe{from{transform:scale(1)}to{transform:scale(1.045)}}
+.anchor{transition:r var(--duration-fast)}
+.figcap{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font:var(--type-body-small);color:var(--color-text-muted);pointer-events:none}
+
+/* detail card (hover or pinned) */
+.detail{position:absolute;top:0;width:330px;max-height:800px;overflow:auto;z-index:6;background:var(--color-surface-raised);border:1px solid var(--color-border-strong);border-top:3px solid var(--color-border-accent);border-radius:var(--radius-md);padding:14px 16px 14px}
+.detail.onL{left:0} .detail.onR{right:0}
+.detail .dh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.detail .dh b{font:var(--type-body-default);font-weight:600;color:var(--color-text-display)}
+.detail .big{display:flex;align-items:baseline;gap:8px;margin-top:6px;flex-wrap:wrap}
+.detail .big .n{font:300 39px/1.1 "Manrope",sans-serif;letter-spacing:-.78px;color:var(--color-text-display)}
+.detail .big .u{font:var(--type-body-small);color:var(--color-text-muted)}
+.detail .why{font:var(--type-body-small);color:var(--color-text-default);margin-top:4px}
+.detail h4{font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);margin:12px 0 3px}
+.detail p{font:var(--type-body-small);color:var(--color-text-default)}
+.detail p.m{color:var(--color-text-muted)}
+.detail svg text{font:var(--type-body-small);fill:var(--viz-chrome-label)}
+.detail table{width:100%;border-collapse:collapse;margin-top:2px}
+.detail td{font:var(--type-body-small);padding:3px 0;border-top:1px solid var(--color-border-default);vertical-align:middle}
+.detail td.r{text-align:right;font:var(--type-mono-default);white-space:nowrap;padding-left:8px}
+.detail td.s{width:22px;text-align:right}
+.detail td.s svg{width:14px;height:14px;vertical-align:-2px}
+.detail .pin{font:var(--type-body-small);color:var(--color-text-muted);margin-top:10px}
+.sico.ok{color:#6fbf73}.sico.watch{color:#f2c14e}.sico.warning,.sico.critical{color:#ff7a59}
+
+.legendrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:10px;font:var(--type-body-small);color:var(--color-text-muted)}
+.legendrow span.g{display:inline-flex;align-items:center;gap:6px}
+
+/* ---------- Rail: readiness + assistant ---------- */
+.rail{position:sticky;top:calc(var(--navoff) + 72px);height:var(--railh);display:flex;flex-direction:column;gap:10px;min-height:480px}
+.ready{display:flex;align-items:flex-end;gap:12px;margin-top:2px}
+.ready .n{font:300 61px/1 "Manrope",sans-serif;color:var(--color-text-display);letter-spacing:-.6px}
+.ready .o{font:var(--type-body-small);color:var(--color-text-muted);padding-bottom:8px}
+.ready .tag{margin:0 0 9px auto}
+.rgrid{display:grid;grid-template-columns:180px 1fr;gap:4px 14px;margin-top:6px}
+.minih{font:var(--type-body-small);color:var(--color-text-muted);margin:0 0 2px}
+#rd14 text,#cost text{font:var(--type-body-small);fill:var(--viz-chrome-label)}
+#cost text.v,#rd14 text.v{font:var(--type-mono-default);fill:var(--viz-chrome-annotation)}
+#cost text.nm{fill:var(--color-text-default)}
+
+.asst{flex:1 1 0;min-height:0;display:flex;flex-direction:column;padding:0;overflow:hidden;border-color:var(--color-border-strong)}
+.asst .ah{padding:12px 16px 10px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;gap:8px}
+.asst .ah b{font:var(--type-body-small);font-weight:600;color:var(--color-text-display)}
+.asst .ah .ai{margin-left:auto;font:var(--type-body-small);color:var(--color-text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}
+.asst .ah .ai i{width:8px;height:8px;border-radius:50%;background:#706e68;flex:none}
+.asst .ah .ai.on i{background:var(--color-status-success)}
+.stream{flex:1 1 0;min-height:0;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:#4d4c49 transparent}
+.msg{border-radius:var(--radius-md);padding:10px 12px;font:var(--type-body-small);color:var(--color-text-default)}
+.msg .who{font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.msg .who svg{width:14px;height:14px}
+.msg.earth{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-left:3px solid var(--color-status-live)}
+.msg.earth.none{border-left-color:var(--color-border-strong)}
+.msg.earth .meta{color:var(--color-text-muted);margin-bottom:6px}
+.msg.earth .head{font:var(--type-body-default);line-height:1.35;color:var(--color-text-display);margin-bottom:6px}
+.msg.earth ul,.msg.rules ul{list-style:none;margin:0;padding:0}
+.msg.earth li{padding:6px 0;border-top:1px solid var(--color-border-default)}
+.msg.earth li b{font-weight:600;color:var(--color-text-display)}
+.msg.earth li span{display:block;color:var(--color-text-muted);margin-top:1px}
+.msg.earth details{margin-top:4px;border-top:1px solid var(--color-border-default);padding-top:6px}
+.msg.earth summary{cursor:pointer;color:var(--color-text-accent-soft);font-weight:600}
+.msg.earth details p{margin-top:6px;color:var(--color-text-default);line-height:1.5}
+.msg.rules{background:var(--color-surface-raised);border:1px solid var(--color-border-default)}
+.msg.rules li{display:grid;grid-template-columns:20px 1fr;gap:6px;padding:5px 0;border-top:1px solid var(--color-border-default);cursor:pointer}
+.msg.rules li:first-child,.msg.earth li:first-child{border-top:0}
+.msg.rules li:hover b{text-decoration:underline;text-underline-offset:3px}
+.msg.rules li svg{width:16px;height:16px;margin-top:1px}
+.msg.rules li b{font-weight:600;color:var(--color-text-default)}
+.msg.rules li span{color:var(--color-text-muted)}
+.msg .more{background:none;border:0;padding:4px 0 0;color:var(--color-text-accent-soft);font:var(--type-body-small);cursor:pointer}
+.msg .more:hover{color:var(--color-text-status-danger)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-pill);padding:6px 12px;font:var(--type-body-small);color:var(--color-text-default);cursor:pointer;text-align:left}
+.chips button:hover{background:var(--color-surface-input-hover)}
+.msg.me{align-self:flex-end;max-width:88%;background:var(--color-surface-input);border:1px solid var(--color-border-default)}
+.msg.bot{align-self:flex-start;max-width:96%;background:var(--color-surface-accent-tint);border:1px solid #3a2a24;white-space:pre-wrap}
+.msg.bot .src{margin-top:6px;color:var(--color-text-muted);display:flex;align-items:flex-end;justify-content:space-between;gap:10px;white-space:normal}
+.msg.bot .src button{background:none;border:0;padding:0;color:var(--color-text-accent-soft);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font:var(--type-body-small);white-space:nowrap;flex:none}
+.msg.bot .src button svg{width:14px;height:14px}
+.msg.bot.wait{color:var(--color-text-muted)}
+.ask{border-top:1px solid var(--color-border-default);padding:10px 12px 10px;display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;background:var(--color-surface-default)}
+.ask input{width:100%;font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:11px 12px}
+.ask input::placeholder{color:var(--color-text-muted)}
+.mic{width:40px;height:40px;border-radius:50%;border:0;background:var(--color-action-primary);color:var(--color-action-on-primary);display:grid;place-items:center;cursor:pointer;position:relative}
+.mic:hover{background:var(--color-action-primary-hover)}
+.mic svg{width:20px;height:20px}
+.mic[disabled]{background:var(--color-surface-input);color:var(--color-text-muted);cursor:not-allowed}
+.mic.live::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--color-status-live);animation:ring 1.2s ease-out infinite}
+@keyframes ring{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.25)}}
+.send{height:40px;padding:0 14px;border-radius:var(--radius-md);border:1px solid var(--color-border-strong);background:var(--color-surface-input);color:var(--color-text-accent-soft);font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;cursor:pointer}
+.send:hover{background:var(--color-surface-input-hover)}
+/* Voice answers on or off (the same switch as on the Arm Unit) */
+.spk{width:40px;height:40px;border-radius:var(--radius-md);border:1px solid var(--color-border-strong);background:var(--color-surface-input);color:var(--color-text-accent-soft);display:grid;place-items:center;cursor:pointer;position:relative}
+.spk:hover{background:var(--color-surface-input-hover)}
+.spk svg{width:20px;height:20px}
+.spk[aria-pressed=false]{color:var(--color-text-muted)}
+.spk[aria-pressed=false]::after{content:"";position:absolute;left:8px;right:8px;top:50%;height:2px;background:currentColor;transform:rotate(-45deg)}
+.afoot{padding:0 12px 10px;font:var(--type-body-small);color:var(--color-text-muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;background:var(--color-surface-default)}
+.afoot .man{margin-left:auto}
+
+/* ---------- Today ---------- */
+.today{display:flex;flex-direction:column;gap:12px}
+.now{display:grid;grid-template-columns:minmax(0,1fr) 250px 236px;gap:12px}
+.gauges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;margin-top:var(--space-2)}
+.gauge .l{font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap}
+.gauge .v{font:var(--type-heading-3);color:var(--color-text-display);white-space:nowrap}
+.gauge .v small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:3px}
+.gauge svg{display:block;margin:4px 0 3px}
+.gauge .c{font:var(--type-body-small);color:var(--color-text-muted)}
+.gauge .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gauge .v{display:flex;align-items:baseline}
+.gauge .v .badge{margin-left:8px;position:relative;top:-3px}
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:var(--space-2)}
+.kv .l{font:var(--type-body-small);color:var(--color-text-muted)}
+.kv .v{font:var(--type-body-default);line-height:1.35;color:var(--color-text-display);white-space:nowrap}
+.kv .v small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:3px}
+.kv.wide{grid-column:1 / -1}
+.kv.wide .v{white-space:normal;font:var(--type-body-small);color:var(--color-text-default)}
+.rad .big{display:flex;align-items:baseline;gap:var(--space-2);margin-top:var(--space-2)}
+.rad .big .n{font:var(--type-heading-2);font-weight:300;color:var(--color-text-display)}
+.rad .big .u{font:var(--type-body-small);color:var(--color-text-muted)}
+#radbar text{font:var(--type-body-small);fill:var(--viz-chrome-label)}
+.rad p{font:var(--type-body-small);color:var(--color-text-muted);margin-top:4px}
+.rad p b{color:var(--color-text-default);font-weight:400}
+
+.note{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.note .snap h3{font:var(--type-heading-3);color:var(--color-text-display);margin:6px 0 4px}
+.note .snap .why{font:var(--type-body-default);color:var(--color-text-default);max-width:64ch}
+.note .snap .an{font:var(--type-body-small);color:var(--color-text-muted);margin-top:8px;max-width:78ch}
+.evl{list-style:none;margin:8px 0 0;padding:0}
+.evl li{display:grid;grid-template-columns:20px 1fr;gap:6px;padding:6px 0;border-top:1px solid var(--color-border-default);font:var(--type-body-small)}
+.evl li:first-child{border-top:0;padding-top:0}
+.evl li svg{width:16px;height:16px;margin-top:1px}
+.evl b{display:block;font-weight:600;color:var(--color-text-default)}
+.evl span{color:var(--color-text-muted)}
+
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4) var(--space-6);margin-top:var(--space-2)}
+.chart{position:relative}
+.chart .ch{display:flex;justify-content:space-between;align-items:baseline;font:var(--type-body-small)}
+.chart .ch b{font-weight:400;color:var(--color-text-default)}
+.chart .ch span{color:var(--color-text-muted)}
+.chart .ch span b{font:var(--type-mono-default);color:var(--color-text-default)}
+.chart svg{display:block;margin-top:2px}
+.chart svg text{font:var(--type-body-small);fill:var(--viz-chrome-label)}
+.legend{margin-left:auto;display:flex;gap:var(--space-4);font:var(--type-body-small);font-weight:400;color:var(--color-text-muted)}
+.legend i{display:inline-block;vertical-align:middle;margin-right:6px}
+.legend .ln{width:18px;height:2px;background:var(--viz-highlight-focus)}
+.legend .bd{width:18px;height:10px;background:var(--viz-sequential-neutral-1);border-radius:2px}
+.legend .rf{width:18px;height:0;border-top:1px dashed var(--color-text-muted)}
+.ctip{position:absolute;pointer-events:none;top:22px;background:var(--color-surface-inverse);color:var(--color-text-on-inverse);font:var(--type-body-small);padding:4px 8px;border-radius:var(--radius-sm);white-space:nowrap;opacity:0;z-index:3}
+.ctip.on{opacity:1}
+
+.lower{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:12px;align-items:start}
+.plan{list-style:none;margin:var(--space-2) 0 0;padding:0}
+.plan li{display:grid;grid-template-columns:24px 1fr;gap:var(--space-2) 12px;align-items:start;padding:8px 0;border-top:1px solid var(--color-border-default)}
+.plan li:first-child{border-top:0}
+.plan svg.ic{width:20px;height:20px;color:var(--color-text-muted);margin-top:2px}
+.plan .k{font:var(--type-body-small);color:var(--color-text-muted)}
+.plan b{display:block;font:var(--type-body-small);font-weight:600;color:var(--color-text-display)}
+.plan p{font:var(--type-body-small);color:var(--color-text-muted);margin-top:2px}
+
+table.trendt{width:100%;border-collapse:collapse;margin-top:var(--space-2);table-layout:fixed}
+.trendt th{font:var(--type-body-small);font-weight:400;color:var(--color-text-muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--color-border-default);white-space:nowrap}
+.trendt th:first-child,.trendt td:first-child{text-align:left;padding-left:0}
+.trendt td{font:var(--type-mono-default);color:var(--color-text-default);text-align:right;padding:6px 8px;border-bottom:1px solid var(--color-border-default);white-space:nowrap}
+.trendt td:first-child{font:var(--type-body-small);color:var(--color-text-default)}
+.trendt td small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:3px}
+.trendt td.tdy{color:var(--color-text-display)}
+.trendt tr:last-child td{border-bottom:0}
+.trendt td:last-child,.trendt th:last-child{text-align:left;padding-right:0}
+.trendt td.sp{padding-top:3px;padding-bottom:3px}
+.trendt td:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- Timeline dock ---------- */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--x-void);border-top:1px solid var(--color-border-strong)}
+.dockin{width:min(1392px,calc(100% - 32px));margin:0 auto;padding:10px 0 8px}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl .tb{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--radius-md);border:1px solid var(--color-border-strong);background:var(--color-surface-input);color:var(--color-text-default);cursor:pointer}
+.ctl .tb:hover{background:var(--color-surface-input-hover)}
+.ctl .tb svg{width:18px;height:18px}
+.ctl .tb.play{width:44px;background:var(--color-action-primary);border-color:transparent;color:var(--color-action-on-primary)}
+.ctl .tb.play:hover{background:var(--color-action-primary-hover)}
+.seg{display:flex;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);overflow:hidden;margin-left:8px}
+.seg button{background:var(--color-surface-input);border:0;border-left:1px solid var(--color-border-default);padding:0 12px;height:34px;font:var(--type-body-small);color:var(--color-text-muted);cursor:pointer;white-space:nowrap}
+.seg button:first-child{border-left:0}
+.seg button:hover{color:var(--color-text-default)}
+.seg button[aria-pressed="true"]{background:var(--color-surface-accent-tint);color:var(--color-text-display)}
+.readout{margin-left:16px;display:flex;align-items:baseline;gap:12px;min-width:0;flex:1}
+.readout b{font:var(--type-lead);line-height:1.2;color:var(--color-text-display);white-space:nowrap}
+.readout span{font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap}
+.readout em{font:var(--type-body-small);font-style:normal;color:var(--color-text-accent-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl select{font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:8px 10px;width:176px}
+.bandwrap{position:relative;margin-top:8px}
+#band{display:block;width:100%;height:50px;cursor:pointer;touch-action:none}
+#band text{font:var(--type-body-small);fill:#9a968c;pointer-events:none}
+#band text.k{font:var(--x-type-micro);letter-spacing:.6px;fill:#9a968c}
+.btip{position:absolute;bottom:54px;transform:translateX(-50%);background:var(--color-surface-inverse);color:var(--color-text-on-inverse);font:var(--type-body-small);padding:5px 9px;border-radius:var(--radius-sm);white-space:nowrap;pointer-events:none;opacity:0;z-index:3}
+.btip.on{opacity:1}
+.btip b{font-weight:600}
+</style>
+<script src="assets/bodyfig.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <div id="loading">Loading the simulated mission…</div>
+  <div id="ui" hidden>
+  <header class="topbar">
+    <div class="brand"><b>Crew health console</b><span id="who"></span></div>
+    <div class="crewsw" id="crewsw" role="group" aria-label="Crew member"></div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button role="tab" id="tab-body" aria-selected="true" aria-controls="view-body">Body board</button>
+      <button role="tab" id="tab-today" aria-selected="false" aria-controls="view-today">Today</button>
+    </nav>
+    <div class="clock">
+      <div><span id="ck-wl">Where</span><b id="ck-where"></b></div>
+      <div><span>Earth, one way</span><b id="ck-light"></b></div>
+      <div><span>Link to Earth</span><span id="ck-link"></span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div id="main">
+      <!-- ================= Body board ================= -->
+      <main id="view-body" role="tabpanel" aria-labelledby="tab-body">
+        <div class="board" id="board">
+          <svg id="leaders" aria-hidden="true"></svg>
+          <div class="col" id="colL"></div>
+          <div class="figwrap">
+            <!-- the figure is one shared drawing: assets/bodyfig.js (also used on the presenter's slides) -->
+            <script>document.currentScript.parentNode.insertAdjacentHTML("beforeend", HS_BODY.svg({ id: "fig", live: true, label: "Body figure. Each region opens its measurements." }));</script>
+
+          </div>
+          <div class="col" id="colR"></div>
+          <aside class="detail" id="detail" hidden></aside>
+        </div>
+        <div class="legendrow" id="legendrow"></div>
+      </main>
+
+      <!-- ================= Today ================= -->
+      <main id="view-today" role="tabpanel" aria-labelledby="tab-today" hidden>
+        <div class="today">
+          <div class="now">
+            <section class="panel">
+              <div class="ptitle"><span id="airT">Cabin air</span> <span class="sub" id="airS"></span></div>
+              <div class="gauges" id="gauges"></div>
+            </section>
+            <section class="panel">
+              <div class="ptitle"><span id="outT">Outside</span> <span class="sub" id="outS"></span></div>
+              <div class="kvs" id="out"></div>
+            </section>
+            <section class="panel rad">
+              <div class="ptitle">Mission dose <span class="badge" title="Sum of daily doses: NASA effective-dose rates, day-to-day change replayed from real instruments">MODEL</span></div>
+              <div class="big"><span class="n num" id="radN"></span><span class="u">mSv</span><span id="radTag" style="margin-left:auto"></span></div>
+              <svg id="radbar" width="204" height="38" viewBox="0 0 204 38" role="img"></svg>
+              <p id="radP"></p>
+            </section>
+          </div>
+
+          <div class="note">
+            <section class="panel snap" id="snap"></section>
+            <section class="panel">
+              <div class="ptitle">Logged today</div>
+              <ul class="evl" id="evl"></ul>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="ptitle">Through the day <span class="sub" id="chS"></span>
+              <span class="legend"><span><i class="ln"></i>today</span><span><i class="bd"></i>usual range, previous 30 days</span><span><i class="rf"></i>limit</span></span>
+            </div>
+            <div class="charts" id="charts"></div>
+          </section>
+
+          <div class="lower">
+            <section class="panel">
+              <div class="ptitle">Against your own trend</div>
+              <table class="trendt" id="trendt"></table>
+            </section>
+            <section class="panel">
+              <div class="ptitle">Tomorrow <span class="sub">by the rules on board</span></div>
+              <ul class="plan" id="plan"></ul>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ================= Rail: readiness + assistant ================= -->
+    <aside class="rail" id="rail">
+      <section class="panel" id="readyP">
+        <div class="ptitle">Readiness <span class="badge" title="Rule-based score: 100 minus what costs points today">MODEL</span></div>
+        <div class="ready"><span class="n num" id="rd-n"></span><span class="o">of 100</span><span id="rd-tag"></span></div>
+        <div class="rgrid">
+          <div><div class="minih">Last 14 days</div><svg id="rd14" width="180" height="64" viewBox="0 0 180 64" role="img"></svg></div>
+          <div><div class="minih">What costs points today</div><svg id="cost" width="192" height="64" viewBox="0 0 192 64" role="img"></svg></div>
+        </div>
+      </section>
+      <section class="panel asst" aria-label="Health assistant">
+        <div class="ah"><b>Health assistant</b><span class="badge" title="On the mission this assistant runs on the habitat computer. In this demo an AI model in the cloud stands in for it. It sees today's values, the rule results and Earth's instruction.">DEMO</span><span class="ai" id="aiState"><i></i><span>checking…</span></span></div>
+        <div class="stream" id="stream" aria-live="polite"></div>
+        <form class="ask" id="askForm" autocomplete="off">
+          <button class="mic" type="button" id="mic" aria-label="Ask by voice"></button>
+          <input id="askIn" type="text" placeholder="Ask about today, or press the microphone" aria-label="Question for the health assistant">
+          <button class="spk" type="button" id="spk" aria-pressed="true"></button>
+          <button class="send" type="submit">Ask</button>
+        </form>
+        <div class="afoot"><span id="afootL">Answers use this day's data only.</span><a class="lnk" id="ctxLink" href="context.html" target="_blank" rel="noopener">What the assistant knows</a><a class="lnk man" href="manuals/health_signal_habitat_app_manual.pdf" download="health_signal_habitat_app_manual.pdf" title="User manual of the Habitat App (PDF, to download)">Manual (PDF)</a></div>
+      </section>
+    </aside>
+  </div>
+  </div>
+</div>
+
+<!-- ================= Timeline ================= -->
+<div class="dock" id="dock" hidden>
+  <div class="dockin">
+    <div class="ctl">
+      <button class="tb" id="bKeyPrev" type="button" title="Previous key day (Shift + left arrow)" aria-label="Previous key day"></button>
+      <button class="tb" id="bPrev" type="button" title="One day back (left arrow)" aria-label="One day back"></button>
+      <button class="tb play" id="bPlay" type="button" title="Play or pause (space)" aria-label="Play"></button>
+      <button class="tb" id="bNext" type="button" title="One day forward (right arrow)" aria-label="One day forward"></button>
+      <button class="tb" id="bKeyNext" type="button" title="Next key day (Shift + right arrow)" aria-label="Next key day"></button>
+      <div class="seg" id="speed" role="group" aria-label="Playback speed"></div>
+      <div class="readout"><b id="roDay" class="num"></b><span id="roWhere"></span><em id="roKey"></em></div>
+      <select id="keySel" aria-label="Jump to a key day"></select>
+    </div>
+    <div class="bandwrap">
+      <svg id="band" role="slider" tabindex="0" aria-label="Mission day"></svg>
+      <div class="btip" id="btip"></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script src="assets/assistant.js"></script>
+<script>
+"use strict";
+/* Design study: every number on this page is read from data/sim/mission_sim.sqlite (simulated mission). */
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const svg = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const icon = (d, cls) => { const s = svg("svg", {viewBox:"0 0 24 24", fill:"none", stroke:"currentColor", "stroke-width":"2", "stroke-linecap":"round", "stroke-linejoin":"round"}); if (cls) s.setAttribute("class", cls); d.split("|").forEach(p => s.appendChild(svg("path", {d:p}))); return s; };
+const IC = {
+  ok:"M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18|m8 12.5 3 3 5-6",
+  watch:"M12 3.5 2.5 20h19z|M12 10v4.5|M12 17.3v.2",
+  warning:"M8 3h8l5 5v8l-5 5H8l-5-5V8z|M12 8v5|M12 16.3v.2",
+  critical:"M8 3h8l5 5v8l-5 5H8l-5-5V8z|m9 9 6 6|m15 9-6 6",
+  info:"M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18|M12 11v6|M12 7.6v.2",
+  up:"M12 19V5|m6 11 6-6 6 6", down:"M12 5v14|m6 13 6 6 6-6", flat:"M5 12h14|m14 7 5 5-5 5",
+  play:"M7 4.5v15l13-7.5z", pause:"M7 4.5v15|M17 4.5v15", prev:"m14 6-6 6 6 6", next:"m10 6 6 6-6 6",
+  keyprev:"M6 5v14|m18 6-8 6 8 6", keynext:"M18 5v14|m6 6 8 6-8 6",
+  mic:"M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z|M5.5 11a6.5 6.5 0 0 0 13 0|M12 17.5V21", stop:"M7 7h10v10H7z",
+  speak:"M4 9.5v5h4l5 4v-13l-5 4z|M16.5 9a4 4 0 0 1 0 6", earth:"M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18|M3 12h18|M12 3c3 3 3 15 0 18|M12 3c-3 3-3 15 0 18",
+  rules:"M5 4h14v16H5z|M9 9h6|M9 13h6|M9 17h3", ext:"M14 5h5v5|M19 5l-8 8|M17 14v5H5V7h5",
+  Sleep:"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z", Exercise:"M3 12h3|M18 12h3|M6 8v8|M18 8v8|M6 12h12", Food:"M4 11h16a8 8 0 0 1-16 0z|M9 7c0-2 2-2 2-4|M13 7c0-2 2-2 2-4",
+  Fluids:"M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z", Work:"M6 5h12v15H6z|M9 5V3h6v2|M9 10h6|M9 14h4", Tests:"M9 3h6|M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3",
+  Air:"M3 9h11a3 3 0 1 0-3-3|M3 14h15a3 3 0 1 1-3 3|M3 19h7", Medical:"M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z", Landing:"M12 4v12|m6 11 6 6 6-6|M5 20h14",
+  EVA:"M7 20V8a5 5 0 0 1 10 0v12|M7 12h10|M5 20h14", Radiation:"M12 3 4 6v6c0 5 3 8 8 9c5-1 8-4 8-9V6z", Departure:"M12 20V8|m6 13 6-6 6 6|M5 4h14", Routine:"m5 12 4.5 4.5L19 7"
+};
+const ORDER = {ok:0, watch:1, warning:2, critical:3};
+const SWORD = {ok:"OK", watch:"Watch", warning:"Warning", critical:"Critical"};
+const STCOL = {ok:"#9a968c", watch:"#f2c14e", warning:"#ff7a59", critical:"#ff7a59"};
+const tag = (st, label) => { const t = el("span", "tag " + st); t.appendChild(icon(IC[st] || IC.info)); t.append(label || SWORD[st]); return t; };
+const sico = st => { const s = icon(IC[st]); s.setAttribute("class", "sico " + st); return s; };
+const MINUS = "−";
+const num = (v, dec) => v === null || v === undefined ? "–" : Number(v).toFixed(dec).replace("-", MINUS);
+const fmtLight = m => { const mm = Math.floor(m), ss = Math.round((m - mm) * 60); return mm + " min " + String(ss).padStart(2, "0") + " s"; };
+const hhmm = h => String(Math.floor(h)).padStart(2, "0") + ":" + String(Math.round((h % 1) * 60) % 60).padStart(2, "0");
+const mean = a => { let s = 0, n = 0; for (const v of a) if (v !== null && v !== undefined) { s += v; n++; } return n ? s / n : null; };
+const pct = (a, p) => { const s = a.filter(v => v !== null && v !== undefined).sort((x, y) => x - y); if (!s.length) return null; const i = (s.length - 1) * p, lo = Math.floor(i); return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); };
+
+/* ---------- state and caches ---------- */
+const ST = { day: 356, crew: "C1", tab: "body", playing: false, speed: 7, focus: null, pinned: null, askToken: 0, history: [], ai: null };
+let D0 = -30, T0 = 0, T1 = 968, DAYS = [], ENVD = [], EVENTS = [], EVAS = [], KEYDAYS = [], EH = {}, ENVA = {}, SNAPDAYS = {};
+const CREWC = {};          // per crew: body rows, assessments by day, labs, costs by day, hourly arrays, worst status by day
+const V = id => SimDB.vars[id];
+const di = d => d - D0;
+
+function loadCommon() {
+  DAYS = SimDB.q("select * from day order by day"); D0 = DAYS[0].day;
+  T0 = +SimDB.meta.day_launch; T1 = +SimDB.meta.day_last;
+  ENVD = SimDB.q("select * from env_day order by day");
+  EVENTS = SimDB.q("select * from event order by day_start");
+  EVAS = SimDB.q("select * from eva order by day");
+  KEYDAYS = DAYS.filter(r => r.key_label && r.day >= T0).map(r => ({day: r.day, label: r.key_label}));
+  SimDB.q("select day from snapshot").forEach(r => { SNAPDAYS[r.day] = 1; });
+  ENVA = {};
+  SimDB.q("select day, var_id, status, value, reason from assessment where crew_id='ENV'").forEach(r => { (ENVA[r.day] = ENVA[r.day] || {})[r.var_id] = r; });
+  const n = DAYS.length * 24;
+  EH = { co2: new Float32Array(n), pio2: new Float32Array(n), temp: new Float32Array(n), rh: new Float32Array(n), rate: new Float32Array(n) };
+  SimDB.q("select day, hour, cabin_co2_mmhg c, cabin_pio2_mmhg o, cabin_temp_c t, cabin_rh_pct h, dose_rate_usv_h r from env_hour").forEach(r => {
+    const i = di(r.day) * 24 + r.hour; EH.co2[i] = r.c; EH.pio2[i] = r.o; EH.temp[i] = r.t; EH.rh[i] = r.h; EH.rate[i] = r.r; });
+}
+function crewCache(c) {
+  if (CREWC[c]) return CREWC[c];
+  const C = { body: SimDB.q("select * from body_day where crew_id=? order by day", [c]), assess: {}, labs: {}, costs: {}, worst: [] };
+  SimDB.q("select day, var_id, status, value, reason from assessment where crew_id=?", [c]).forEach(r => { (C.assess[r.day] = C.assess[r.day] || {})[r.var_id] = r; });
+  SimDB.q("select day, var_id, value from lab where crew_id=? order by day", [c]).forEach(r => { (C.labs[r.var_id] = C.labs[r.var_id] || []).push(r); });
+  SimDB.q("select day, item, points from readiness_cost where crew_id=? order by day, points desc", [c]).forEach(r => { (C.costs[r.day] = C.costs[r.day] || []).push(r); });
+  const n = DAYS.length * 24;
+  C.hr = new Float32Array(n); C.tc = new Float32Array(n); C.act = new Array(n);
+  SimDB.q("select day, hour, hr_bpm h, temp_core_c t, activity a from body_hour where crew_id=?", [c]).forEach(r => { const i = di(r.day) * 24 + r.hour; C.hr[i] = r.h; C.tc[i] = r.t; C.act[i] = r.a; });
+  CREWC[c] = C; return C;
+}
+const C = () => crewCache(ST.crew);
+const body = d => C().body[di(d)];
+const envd = d => ENVD[di(d)];
+const dayr = d => DAYS[di(d)];
+function labAt(v, d) { const s = C().labs[v] || []; let hit = null; for (const r of s) { if (r.day <= d) hit = r; else break; } return hit; }
+function val(v, d) {
+  const m = V(v); if (!m) return null;
+  if (m.scope === "lab") { const r = labAt(v, d); return r ? r.value : null; }
+  if (m.scope === "env") { const e = envd(d); return m.column_name in e ? e[m.column_name] : dayr(d)[m.column_name]; }
+  return body(d)[m.column_name];
+}
+function series(v, d, n) {           // last n daily values ending at day d (labs: last n panels)
+  const m = V(v);
+  if (m.scope === "lab") return (C().labs[v] || []).filter(r => r.day <= d).slice(-n).map(r => r.value);
+  const out = []; for (let k = Math.max(D0, d - n + 1); k <= d; k++) out.push(val(v, k)); return out;
+}
+function st(v, d) { const a = (C().assess[d] || {})[v] || (ENVA[d] || {})[v]; return a || null; }
+function worst(vars, d) { let w = null; for (const v of vars) { const a = st(v, d); if (a && (!w || ORDER[a.status] > ORDER[w.status])) w = Object.assign({var_id: v}, a); } return w; }
+function fmtv(v, x) {
+  if (x === null || x === undefined) return "–";
+  const dec = V(v) ? V(v).decimals : 1; let s = Number(x).toFixed(dec === null || dec === undefined ? 1 : dec);
+  if (v === "sans_trt_um" && x > 0) s = "+" + s;
+  return s.replace("-", MINUS);
+}
+
+/* ---------- body board: groups ---------- */
+const LABV = ["hemoglobin_g_dl", "wbc_k_ul", "lymph_k_ul", "vitd_ng_ml", "ferritin_ng_ml", "crp_mg_l", "glucose_mg_dl"];
+const GROUPS = [
+  { k:"brain", side:"L", a:[138,31], title:"Sleep and alertness", p:"sleep_h", unit:"h last night", m:["sleep_h","pvt_z"], more:["pvt_z","sleep_debt_h"],
+    sub:d => `Reaction speed ${fmtv("pvt_z", val("pvt_z", d))} SD against your usual. Sleep debt ${fmtv("sleep_debt_h", val("sleep_debt_h", d))} h.` },
+  { k:"mood", side:"L", a:[136,54], title:"Mood and stress", p:"mood_who5", unit:"of 25, wellbeing", m:["mood_who5","stress_0_10"], more:["stress_0_10"],
+    sub:d => `Stress ${fmtv("stress_0_10", val("stress_0_10", d))} of 10.` },
+  { k:"lungs", side:"L", a:[124,202], title:"Lungs and oxygen", p:"spo2_pct", unit:"% blood oxygen", m:["spo2_pct","resp_rate_bpm","vo2max_pct"], more:["resp_rate_bpm","vo2max_pct"],
+    sub:d => `Breathing ${fmtv("resp_rate_bpm", val("resp_rate_bpm", d))} a minute. Aerobic fitness ${fmtv("vo2max_pct", val("vo2max_pct", d))} % of pre-flight.` },
+  { k:"blood", side:"L", a:[39,438], title:"Blood panel", p:"hemoglobin_g_dl", unit:"g/dL hemoglobin", m:LABV, more:["vitd_ng_ml","crp_mg_l","wbc_k_ul","lymph_k_ul","ferritin_ng_ml","glucose_mg_dl"],
+    sub:d => { const r = labAt("hemoglobin_g_dl", d); return r ? `Panel of day ${String(r.day).replace("-", MINUS)}. Vitamin D ${fmtv("vitd_ng_ml", val("vitd_ng_ml", d))} ng/mL, inflammation ${fmtv("crp_mg_l", val("crp_mg_l", d))} mg/L.` : "No panel yet."; } },
+  { k:"bone", side:"L", a:[124,386], title:"Bone, hip and spine", p:"bmd_hip_pct", unit:"% of pre-flight", m:["bmd_hip_pct","urine_ca_mg_day","back_pain_0_10"], more:["urine_ca_mg_day","back_pain_0_10"],
+    sub:d => `Calcium in urine ${fmtv("urine_ca_mg_day", val("urine_ca_mg_day", d))} mg a day.` + (val("back_pain_0_10", d) >= 1 ? ` Back pain ${fmtv("back_pain_0_10", val("back_pain_0_10", d))} of 10.` : "") },
+  { k:"muscle", side:"L", a:[116,610], title:"Leg muscle and exercise", p:"leg_strength_pct", unit:"% leg strength", m:["leg_strength_pct","exercise_pct"], more:["exercise_pct"],
+    sub:d => `Exercise today ${fmtv("exercise_pct", val("exercise_pct", d))} % of plan, 7-day mean ${num(mean(series("exercise_pct", d, 7)), 0)} %.` },
+  { k:"balance", side:"R", a:[190,68], title:"Balance", p:"balance_pct", unit:"% of pre-flight steps", m:["balance_pct","sms_grade"], more:["sms_grade"], nullText:"Not testable in weightlessness.",
+    sub:d => `Motion sickness grade ${fmtv("sms_grade", val("sms_grade", d))} of 3.` },
+  { k:"eyes", side:"R", a:[163,73], title:"Eyes", p:"sans_trt_um", unit:"µm optic disc swelling", m:["sans_trt_um"], more:[],
+    sub:() => "Estimated between the monthly eye scans. Earliest sign above +19.4 µm." },
+  { k:"heart", side:"R", a:[175,213], title:"Heart and circulation", p:"hr_rest_bpm", unit:"bpm at rest", m:["hr_rest_bpm","hrv_rmssd_ms","bp_sys_mmhg","bp_dia_mmhg","stand_dhr_bpm","ortho_risk_pct","temp_core_c"], more:["bp_sys_mmhg","hrv_rmssd_ms","stand_dhr_bpm","ortho_risk_pct","temp_core_c"],
+    sub:d => { const s = val("stand_dhr_bpm", d), g = dayr(d).gravity_g; return `${fmtv("bp_sys_mmhg", val("bp_sys_mmhg", d))}/${fmtv("bp_dia_mmhg", val("bp_dia_mmhg", d))} mmHg. ` + (s !== null ? `Stand test +${fmtv("stand_dhr_bpm", s)} bpm.` : g === 0 ? `Stand-test fail risk if landing today ${fmtv("ortho_risk_pct", val("ortho_risk_pct", d))} %.` : `Variability ${fmtv("hrv_rmssd_ms", val("hrv_rmssd_ms", d))} ms.`); } },
+  { k:"kidney", side:"R", a:[176,268], title:"Kidneys and fluids", p:"urine_l", unit:"L urine", m:["urine_l","fluid_l","stone_risk_irr","creatinine_mg_dl"], more:["fluid_l","stone_risk_irr","creatinine_mg_dl"],
+    sub:d => `Drank ${fmtv("fluid_l", val("fluid_l", d))} L. Kidney-stone risk ${fmtv("stone_risk_irr", val("stone_risk_irr", d))} times pre-flight.` },
+  { k:"gut", side:"R", a:[166,318], title:"Food and body mass", p:"energy_pct", unit:"% of energy need", m:["energy_pct","body_mass_kg","protein_g_kg"], more:["body_mass_kg","protein_g_kg"],
+    sub:d => { const m = val("body_mass_kg", d), m0 = SimDB.crew[ST.crew].launch_mass_kg, p = 100 * (m / m0 - 1); return `Body mass ${fmtv("body_mass_kg", m)} kg, ${num(Math.abs(p), 1)} % ${p < 0 ? "under" : "over"} launch. Protein ${fmtv("protein_g_kg", val("protein_g_kg", d))} g per kg.`; } },
+  { k:"skin", side:"R", a:[199,622], title:"Radiation dose", p:"dose_cum_msv", unit:"mSv this mission", m:["dose_cum_msv","storm_level","dose_rate_usv_h"], more:["dose_day_msv","storm_level"],
+    sub:d => `Today ${num(envd(d).dose_day_msv, 2)} mSv. Career limit ${Math.round(+SimDB.meta.career_limit_msv)} mSv.` }
+];
+const GK = {}; GROUPS.forEach(g => { GK[g.k] = g; });
+/* short names used when a companion value, not the headline value, is the one that is flagged */
+const SHORT = { pvt_z:"Reaction speed", stress_0_10:"Stress", resp_rate_bpm:"Breathing", vo2max_pct:"Aerobic fitness", urine_ca_mg_day:"Calcium in urine", back_pain_0_10:"Back pain",
+  exercise_pct:"Exercise", sms_grade:"Motion sickness", hrv_rmssd_ms:"Variability", bp_sys_mmhg:"Blood pressure", bp_dia_mmhg:"Blood pressure", stand_dhr_bpm:"Stand test", ortho_risk_pct:"Landing",
+  temp_core_c:"Temperature", fluid_l:"Fluids", stone_risk_irr:"Stone risk", creatinine_mg_dl:"Creatinine", body_mass_kg:"Body mass", protein_g_kg:"Protein", storm_level:"Storm", dose_rate_usv_h:"Dose rate" };
+const flagText = (g, w) => (w.var_id === g.p ? "" : (SHORT[w.var_id] || V(w.var_id).label) + ": ") + w.reason + ".";
+const REGION_OF = {}; GROUPS.forEach(g => g.m.concat(g.more, [g.p]).forEach(v => { if (!REGION_OF[v]) REGION_OF[v] = g.k; }));
+REGION_OF.readiness = null;
+
+function trendOf(v, d) {
+  const m = V(v), x = val(v, d); if (x === null) return null;
+  let prev;
+  if (m.scope === "lab") { const s = (C().labs[v] || []).filter(r => r.day <= d); if (s.length < 2) return null; prev = s[s.length - 2].value; }
+  else prev = mean(series(v, d - 1, 30));
+  if (prev === null) return null;
+  const delta = x - prev, dec = m.decimals || 0, tol = Math.max(Math.pow(10, -dec) * 1.5, Math.abs(prev) * 0.015);
+  const ref = m.scope === "lab" ? "last panel" : "30-day mean";
+  if (Math.abs(delta) < tol) return ["flat", "steady"];
+  return [delta > 0 ? "up" : "down", `${Number(Math.abs(delta)).toFixed(dec)} ${delta > 0 ? "over" : "under"} ${ref}`];
+}
+
+const CO = {};      // callout elements by key
+function buildBoard() {
+  GROUPS.forEach(g => {
+    const c = el("div", `callout ${g.side === "L" ? "left" : "right"}`); c.dataset.k = g.k; c.tabIndex = 0; c.setAttribute("role", "button");
+    const h = el("div", "h"), title = el("b", null, g.title), tg = el("span");
+    h.append(title, tg);
+    const v = el("div", "v"), n = el("span", "n num"), u = el("span", "u", g.unit), bd = el("span", "badge");
+    v.append(n, u, bd);
+    const t = el("div", "t"), d = el("div", "d"), x = d;
+    c.append(h, v, t, d);
+    $(g.side === "L" ? "colL" : "colR").append(c);
+    const a = svg("g", {"data-k": g.k});
+    const ring = svg("circle", {cx:g.a[0], cy:g.a[1], r:9, fill:"none", "stroke-width":1, opacity:0});
+    const dot = svg("circle", {cx:g.a[0], cy:g.a[1], r:4, class:"anchor"});
+    a.append(ring, dot); $("anchors").appendChild(a);
+    CO[g.k] = { c, tg, n, bd, t, d, x, ring, dot, rg: document.querySelector(`.rg[data-k="${g.k}"]`), lead: null };
+    const enter = () => setFocus(g.k, false), leave = () => setFocus(null, false);
+    c.addEventListener("mouseenter", enter); c.addEventListener("mouseleave", leave);
+    c.addEventListener("focus", enter); c.addEventListener("blur", leave);
+    c.addEventListener("click", () => togglePin(g.k));
+    c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); togglePin(g.k); } });
+  });
+  document.querySelectorAll("#hits .hit").forEach(hn => {
+    const k = hn.dataset.k; hn.tabIndex = 0; hn.setAttribute("role", "button"); hn.setAttribute("aria-label", GK[k].title);
+    hn.addEventListener("mouseenter", () => setFocus(k, false)); hn.addEventListener("mouseleave", () => setFocus(null, false));
+    hn.addEventListener("focus", () => setFocus(k, false)); hn.addEventListener("blur", () => setFocus(null, false));
+    hn.addEventListener("click", e => { e.stopPropagation(); togglePin(k); });
+    hn.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); togglePin(k); } });
+  });
+  $("board").addEventListener("click", e => { if (!e.target.closest(".callout, .hit, .detail")) { ST.pinned = null; applyFocus(); } });
+  const L = $("legendrow");
+  [["ok","inside your limits"],["watch","act this week"],["warning","act today"],["critical","act now"]].forEach(([s, t]) => { const g = el("span", "g"); g.append(tag(s), t); L.append(g); });
+  [["SIM","sensor"],["MODEL","estimate"],["REPLAY","real, replayed"]].forEach(([b, t]) => { const g = el("span", "g"); g.append(el("span", "badge", b), t); L.append(g); });
+  L.append(el("span", "g", "Click a card for its rule and 30 days of history."));
+}
+function drawLeaders() {
+  if ($("view-body").hidden) return;
+  const host = $("leaders"), board = $("board"), box = board.getBoundingClientRect(), k = box.width / board.offsetWidth;
+  host.textContent = ""; host.setAttribute("viewBox", `0 0 ${board.offsetWidth} ${board.offsetHeight}`);
+  GROUPS.forEach(g => {
+    const o = CO[g.k], card = o.c.getBoundingClientRect(), dot = o.dot.getBoundingClientRect();
+    const x0 = ((g.side === "L" ? card.right : card.left) - box.left) / k, y0 = (card.top + card.height / 2 - box.top) / k;
+    const x1 = (dot.left + dot.width / 2 - box.left) / k, y1 = (dot.top + dot.height / 2 - box.top) / k;
+    const dir = g.side === "L" ? 1 : -1, xe = x0 + dir * 14, len = Math.hypot(x1 - xe, y1 - y0), ux = (x1 - xe) / len, uy = (y1 - y0) / len;
+    const xt = x1 - ux * 8, yt = y1 - uy * 8;
+    const grp = svg("g", {"data-k": g.k});
+    grp.appendChild(svg("path", {d:`M${x0} ${y0}H${xe}L${xt} ${yt}`, fill:"none"}));
+    o.lead = grp; host.appendChild(grp);
+  });
+  paintStatus();
+}
+function paintStatus() {
+  const d = ST.day;
+  GROUPS.forEach(g => {
+    const o = CO[g.k], w = worst(g.m, d), s = w ? w.status : "ok";
+    o.rg.setAttribute("class", "rg " + s + (curFocus() === g.k ? " is-focus" : ""));
+    o.dot.setAttribute("fill", s === "ok" ? "#0a0a0a" : STCOL[s]); o.dot.setAttribute("stroke", s === "ok" ? "#cdcac2" : "#0a0a0a"); o.dot.setAttribute("stroke-width", s === "ok" ? 1.5 : 2);
+    o.ring.setAttribute("stroke", STCOL[s]); o.ring.setAttribute("opacity", s === "ok" ? 0 : .6);
+    if (o.lead) { const p = o.lead.firstChild; p.setAttribute("stroke", s === "ok" ? "#5a5852" : STCOL[s]); p.setAttribute("stroke-width", s === "ok" ? 1 : 1.5); }
+  });
+  const sk = worst(GK.skin.m, d);
+  $("fig").classList.remove("skin-watch", "skin-warning", "skin-critical"); if (sk) $("fig").classList.add("skin-" + sk.status);
+}
+function renderBoard() {
+  const d = ST.day, b = body(d);
+  GROUPS.forEach(g => {
+    const o = CO[g.k], w = worst(g.m, d), s = w ? w.status : "ok", x = val(g.p, d), m = V(g.p);
+    o.c.className = `callout ${g.side === "L" ? "left" : "right"} ${s}` + (curFocus() === g.k ? " is-focus" : "");
+    o.tg.textContent = ""; o.tg.appendChild(tag(s));
+    o.n.textContent = fmtv(g.p, x);
+    o.bd.textContent = m.kind; o.bd.title = m.how_simulated || "";
+    o.t.textContent = "";
+    const tr = trendOf(g.p, d);
+    if (tr) { const t = el("span", "trend"); t.appendChild(icon(IC[tr[0]])); t.append(tr[1]); o.t.appendChild(t); }
+    else if (x === null && g.nullText) o.t.appendChild(el("span", "trend", g.nullText));
+    const subText = g.sub(d);
+    o.d.textContent = w ? flagText(g, w) : subText;      // flagged: the rule's reason; else the companion values
+    o.d.classList.toggle("flag", !!w); o.d.title = w ? subText : "";
+    o.c.setAttribute("aria-label", `${g.title}: ${fmtv(g.p, x)} ${g.unit}, ${SWORD[s]}`);
+  });
+  paintStatus();
+  document.documentElement.style.setProperty("--beat", (60 / Math.max(35, b.hr_rest_bpm || 60)).toFixed(2) + "s");
+  document.documentElement.style.setProperty("--breath", (60 / Math.max(8, b.resp_rate_bpm || 14)).toFixed(2) + "s");
+  if (curFocus()) renderDetail();
+}
+
+/* ---------- hover, focus, pin ---------- */
+const curFocus = () => ST.focus || ST.pinned;
+function setFocus(k) { ST.focus = k; applyFocus(); }
+function togglePin(k) { ST.pinned = ST.pinned === k ? null : k; applyFocus(); }
+function applyFocus() {
+  const k = curFocus();
+  $("board").classList.toggle("has-focus", !!k); $("fig").classList.toggle("has-focus", !!k); $("fig").classList.toggle("focus-skin", k === "skin");
+  GROUPS.forEach(g => { const o = CO[g.k], on = g.k === k; o.c.classList.toggle("is-focus", on); o.rg.classList.toggle("is-focus", on); if (o.lead) o.lead.classList.toggle("is-focus", on); o.dot.setAttribute("r", on ? 5.5 : 4); });
+  if (k) renderDetail(); else $("detail").hidden = true;
+}
+function sparkline(vals, w, h, opt) {
+  opt = opt || {};
+  const s = svg("svg", {width:w, height:h, viewBox:`0 0 ${w} ${h}`, role:"img"});
+  const ok = vals.filter(v => v !== null && v !== undefined);
+  if (ok.length < 2) { s.appendChild(svg("text", {x:0, y:h / 2 + 4}, ok.length ? "one value so far" : "no value in this period")); return s; }
+  let mn = Math.min(...ok), mx = Math.max(...ok); const pad = Math.max((mx - mn) * 0.15, Math.abs(mx) * 0.01, 1e-6); mn -= pad; mx += pad;
+  const top = opt.top || 4, bot = opt.bot || 4, X = i => 3 + i * (w - 10) / (vals.length - 1), Y = v => top + (h - top - bot) * (1 - (v - mn) / (mx - mn));
+  if (opt.band) { const lo = pct(ok, .1), hi = pct(ok, .9); s.appendChild(svg("rect", {x:0, y:Y(hi), width:w, height:Math.max(2, Y(lo) - Y(hi)), fill:"#33302a", rx:2})); }
+  let dstr = "", pen = false;
+  vals.forEach((v, i) => { if (v === null || v === undefined) { pen = false; return; } dstr += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); pen = true; });
+  s.appendChild(svg("path", {d:dstr, fill:"none", stroke:opt.stroke || "#77746d", "stroke-width":opt.sw || 1.5, "stroke-linejoin":"round", "stroke-linecap":"round"}));
+  if (opt.dots) vals.forEach((v, i) => { if (v !== null && v !== undefined) s.appendChild(svg("circle", {cx:X(i), cy:Y(v), r:2, fill:"#77746d"})); });
+  let li = vals.length - 1; while (li > 0 && (vals[li] === null || vals[li] === undefined)) li--;
+  s.appendChild(svg("circle", {cx:X(li), cy:Y(vals[li]), r:3.2, fill:"#e5522c", stroke:"#0e0e0e", "stroke-width":1.5}));
+  return s;
+}
+function renderDetail() {
+  const k = curFocus(), g = GK[k], d = ST.day, box = $("detail"); if (!g) { box.hidden = true; return; }
+  const m = V(g.p), x = val(g.p, d), w = worst(g.m, d), s = w ? w.status : "ok";
+  box.textContent = ""; box.hidden = false; box.className = "detail " + (g.side === "L" ? "onR" : "onL");
+  const dh = el("div", "dh"); dh.append(el("b", null, g.title), tag(s)); box.append(dh);
+  const big = el("div", "big"); big.append(el("span", "n num", fmtv(g.p, x)), el("span", "u", g.unit), el("span", "badge", m.kind)); box.append(big);
+  box.append(el("p", "why", (x === null && g.nullText ? g.nullText + " " : "") + (w ? flagText(g, w) : x === null ? "" : "Inside your limits today.")));
+  const isLab = m.scope === "lab", vals = isLab ? series(g.p, d, 8) : series(g.p, d, 30);
+  box.append(el("h4", null, isLab ? "Last " + vals.length + " panels" : "Last 30 days"));
+  const sp = sparkline(vals, 296, 58, {band: !isLab, dots: isLab, top: 6, bot: 6}); box.append(sp);
+  const ok = vals.filter(v => v !== null && v !== undefined);
+  if (ok.length > 1 && !isLab) box.append(el("p", "m", `Shaded: your usual range, ${fmtv(g.p, pct(ok, .1))} to ${fmtv(g.p, pct(ok, .9))}. Dot: today.`));
+  box.append(el("h4", null, "The rule")); box.append(el("p", null, m.rule_text)); if (m.rule_tag) box.append(el("p", "m", "Source: " + m.rule_tag));
+  box.append(el("h4", null, "Why it matters")); box.append(el("p", null, m.why));
+  if (m.action) { box.append(el("h4", null, "What to do")); box.append(el("p", null, m.action)); }
+  box.append(el("h4", null, "How this value is made")); box.append(el("p", "m", `${m.sensor ? "Sensor: " + m.sensor + ". " : ""}${m.how_simulated || ""}`));
+  if (g.more.length) {
+    box.append(el("h4", null, "Also in this region"));
+    const t = el("table");
+    g.more.forEach(v => { const mv = V(v); if (!mv) return; const a = st(v, d), tr = el("tr"); const xv = val(v, d);
+      const s1 = el("td", "s"); s1.appendChild(sico(a ? a.status : "ok")); s1.title = a ? a.reason : "inside limits";
+      tr.append(el("td", null, mv.label), el("td", "r", fmtv(v, xv) + (xv === null ? "" : " " + mv.unit.replace(" vs own usual", "").replace("10³/µL", "k/µL"))), s1); t.append(tr); });
+    box.append(t);
+  }
+  box.append(el("p", "pin", ST.pinned === k ? "Pinned. Click again or press Esc to release." : "Click to pin this card."));
+}
+
+/* ---------- readiness ---------- */
+function renderReady() {
+  const d = ST.day, b = body(d), r = Math.round(b.readiness), s = r >= 85 ? "ok" : r >= 70 ? "watch" : r >= 50 ? "warning" : "critical";
+  $("rd-n").textContent = r; const t = $("rd-tag"); t.textContent = ""; t.appendChild(tag(s, b.readiness_band));
+  const g = $("rd14"); g.textContent = "";
+  const from = Math.max(D0, d - 13), vals = []; for (let k = from; k <= d; k++) vals.push(Math.round(body(k).readiness));
+  const n = vals.length, W = 180, bw = 9, gap = n > 1 ? (W - n * bw) / (n - 1) : 0, base = 48, y = v => base - v / 100 * 40;
+  [[85, "85"], [70, "70"]].forEach(([v, l]) => { g.appendChild(svg("line", {x1:0, x2:W, y1:y(v), y2:y(v), stroke:"#2b2b2b", "stroke-dasharray":"2 3"})); });
+  g.appendChild(svg("line", {x1:0, x2:W, y1:base + .5, y2:base + .5, stroke:"#4d4c49"}));
+  vals.forEach((v, i) => { const x = i * (bw + gap), last = i === n - 1, hgt = Math.max(2, base - y(v)), rr = Math.min(3, hgt / 2);
+    const p = svg("path", {d:`M${x} ${base}V${base - hgt + rr}a${rr} ${rr} 0 0 1 ${rr}-${rr}h${bw - 2 * rr}a${rr} ${rr} 0 0 1 ${rr} ${rr}V${base}z`, fill: last ? "#e5522c" : "#706e68"});
+    p.appendChild(svg("title", {}, `Day ${from + i}: ${v}`)); g.appendChild(p); });
+  g.appendChild(svg("text", {x:0, y:62}, "day " + from)); g.appendChild(svg("text", {x:W, y:62, "text-anchor":"end"}, "today " + r));
+  const c = $("cost"); c.textContent = "";
+  const costs = (C().costs[d] || []).filter(x => x.points >= 0.95).slice(0, 4), max = Math.max(12, ...costs.map(x => x.points));
+  if (!costs.length) c.appendChild(svg("text", {x:0, y:14}, "Nothing costs points."));
+  costs.forEach((it, i) => { const y0 = i * 16, w = Math.max(3, it.points / max * 26), rr = 3;
+    c.appendChild(svg("text", {x:0, y:y0 + 11, class:"nm"}, it.item));
+    c.appendChild(svg("path", {d:`M134 ${y0 + 2}h${w - rr}a${rr} ${rr} 0 0 1 ${rr} ${rr}v${10 - 2 * rr}a${rr} ${rr} 0 0 1 ${-rr} ${rr}h${-(w - rr)}z`, fill:"#706e68"}));
+    c.appendChild(svg("text", {x:134 + w + 5, y:y0 + 11, class:"v"}, MINUS + Math.round(it.points))); });
+}
+
+/* ---------- top bar ---------- */
+function renderTop() {
+  const d = ST.day, r = dayr(d), cr = SimDB.crew[ST.crew];
+  $("who").textContent = `${cr.call_sign}, ${cr.role}`;
+  $("ck-wl").textContent = r.phase === "surface" ? "Gale crater, Mars" : r.phase === "recovery" ? "Earth" : r.phase === "outbound" ? "Deep space, outbound" : r.phase === "return" ? "Deep space, homebound" : "Earth, before launch";
+  $("ck-where").textContent = r.phase === "surface" ? "sol " + r.sol : r.phase === "recovery" ? "day " + r.phase_day + " after landing" : r.phase === "prelaunch" ? "launch minus " + (-d) : "day " + r.phase_day + " of " + (r.phase === "outbound" ? 172 : 189);
+  $("ck-light").textContent = r.light_time_min > 0.05 ? fmtLight(r.light_time_min) : r.phase === "recovery" || r.phase === "prelaunch" ? "on Earth" : "under 3 s";
+  const lk = $("ck-link"); lk.textContent = "";
+  lk.appendChild(r.comm === "blackout" ? tag("warning", "No link") : r.comm === "degraded" ? tag("watch", "Weak link") : tag("ok", r.phase === "recovery" || r.phase === "prelaunch" ? "In person" : "Link ok"));
+  document.querySelectorAll("#crewsw button").forEach(bn => { const c = bn.dataset.c; bn.setAttribute("aria-pressed", c === ST.crew); });
+}
+function buildCrew() {
+  Object.values(SimDB.crew).forEach(c => { const bn = el("button"); bn.type = "button"; bn.dataset.c = c.crew_id; bn.title = c.role; bn.append(el("i"), c.call_sign);
+    bn.addEventListener("click", () => { ST.crew = c.crew_id; ST.pinned = null; crewCache(c.crew_id); drawBand(); renderAll(true); }); $("crewsw").append(bn); });
+}
+function paintCrewDots() {
+  document.querySelectorAll("#crewsw button").forEach(bn => { const r = SimDB.one("select readiness from body_day where day=? and crew_id=?", [ST.day, bn.dataset.c]); const v = r ? r.readiness : 100;
+    bn.firstChild.className = v >= 85 ? "" : v >= 70 ? "watch" : "warning"; bn.title = SimDB.crew[bn.dataset.c].role + ", readiness " + Math.round(v); });
+}
+
+/* ---------- Today ---------- */
+function ruler(min, max, val, marks, okLo, okHi) {
+  const W = 190, s = svg("svg", {width:W, height:16, viewBox:`0 0 ${W} 16`}), x = v => Math.max(0, Math.min(W, (v - min) / (max - min) * W));
+  s.appendChild(svg("rect", {x:0, y:7, width:W, height:2, fill:"#2b2b2b"}));
+  if (okLo !== undefined) s.appendChild(svg("rect", {x:x(okLo), y:6, width:Math.max(1, x(okHi) - x(okLo)), height:4, fill:"#4a4740", rx:2}));
+  (marks || []).forEach(m => s.appendChild(svg("line", {x1:x(m), x2:x(m), y1:2, y2:14, stroke:"#9a968c", "stroke-dasharray":"2 2"})));
+  if (val !== null && val !== undefined) s.appendChild(svg("circle", {cx:Math.max(4, Math.min(W - 4, x(val))), cy:8, r:4, fill:"#e5522c", stroke:"#0e0e0e", "stroke-width":1.5}));
+  return s;
+}
+function gauge(label, value, unit, rul, cap, a, kind) {
+  const g = el("div", "gauge"), top = el("div", "top"), tg = tag(a ? a.status : "ok"); if (a) tg.title = a.reason;
+  top.append(el("div", "l", label), tg);
+  const v = el("div", "v num", value); v.append(el("small", null, unit), el("span", "badge", kind));
+  g.append(top, v, rul, el("div", "c", a ? a.reason + "." : cap)); return g;
+}
+function kv(l, v, small, wide) { const k = el("div", "kv" + (wide ? " wide" : "")); const vv = el("div", "v num", v); if (small) vv.append(el("small", null, small)); k.append(el("div", "l", l), vv); return k; }
+function renderNow() {
+  const d = ST.day, e = envd(d), r = dayr(d), earth = r.phase === "recovery" || r.phase === "prelaunch", A = ENVA[d] || {};
+  $("airT").textContent = earth ? "Air" : r.phase === "surface" ? "Habitat air" : "Cabin air";
+  $("airS").textContent = earth ? "on Earth, sea level" : `${num(e.cabin_pressure_kpa, 1)} kPa, 34 % oxygen`;
+  const G = $("gauges"); G.textContent = "";
+  G.append(gauge("Carbon dioxide", num(e.cabin_co2_mmhg, 1), "mmHg", ruler(0, 5, e.cabin_co2_mmhg, [2.5, 3]), `24-h mean. 1-h peak ${num(e.cabin_co2_max1h, 1)}, limit 3.0.`, A.cabin_co2_mmhg, V("cabin_co2_mmhg").kind),
+    gauge("Oxygen breathed in", num(e.cabin_pio2_mmhg, 0), "mmHg", ruler(116, 154, e.cabin_pio2_mmhg, [122, 127]), `Low point ${num(e.cabin_pio2_min, 0)}. Watch under 127, floor 122.`, A.cabin_pio2_mmhg, V("cabin_pio2_mmhg").kind),
+    gauge("Temperature", num(e.cabin_temp_c, 1), "°C", ruler(14, 31, e.cabin_temp_c, [], 18, 27), "Comfort band 18 to 27.", A.cabin_temp_c, V("cabin_temp_c").kind),
+    gauge("Humidity", num(e.cabin_rh_pct, 0), "%", ruler(10, 90, e.cabin_rh_pct, [], 25, 75), "Band 25 to 75.", A.cabin_rh_pct, V("cabin_rh_pct").kind));
+  const O = $("out"); O.textContent = "";
+  if (r.phase === "surface") {
+    $("outT").textContent = "Outside"; $("outS").textContent = "Curiosity replay";
+    O.append(kv("Air, high and low", `${num(e.out_temp_max_c, 0)} / ${num(e.out_temp_min_c, 0)}`, "°C"), kv("Pressure", num(e.out_pressure_pa, 0), "Pa"),
+      kv("Sunrise, sunset", `${hhmm(e.sunrise_h)} / ${hhmm(e.sunset_h)}`), kv("Ultraviolet", ["–", "low", "moderate", "high", "very high"][Math.round(e.out_uv_index) || 0]));
+  } else if (earth) {
+    $("outT").textContent = "Where"; $("outS").textContent = "";
+    O.append(kv("Place", "Earth"), kv("Gravity", "1.00", "g"), kv("Programme", r.phase === "recovery" ? "Rehabilitation, 45 days planned" : "Pre-launch quarantine", null, true));
+  } else {
+    $("outT").textContent = "Outside"; $("outS").textContent = "deep space";
+    O.append(kv("To Earth", num(r.dist_earth_au * 149.6, 0), "million km"), kv("To the Sun", num(r.dist_sun_au, 2), "AU"), kv("Gravity", "0", "g"), kv("Season on Mars", r.season ? String(r.season).split(" / ")[0] : "–"));
+  }
+  const bl = EVENTS.find(x => x.type === "comm_blackout");
+  let linkTxt = "";
+  if (earth) linkTxt = "Flight surgeon in person.";
+  else if (r.comm === "blackout") linkTxt = `No link: day ${d - bl.day_start + 1} of ${bl.day_end - bl.day_start + 1}. The Sun stands between Mars and Earth.`;
+  else if (bl && d < bl.day_start) linkTxt = `Question and answer: at least ${num(r.round_trip_min, 0)} min. The Sun cuts the link in ${bl.day_start - d} days, for ${bl.day_end - bl.day_start + 1} days.`;
+  else linkTxt = `Question and answer: at least ${num(r.round_trip_min, 0)} min.` + (r.comm === "degraded" ? " Weak link: short text only." : "");
+  O.append(kv("Link to Earth", linkTxt, null, true));
+
+  const b = body(d), lim = +SimDB.meta.career_limit_msv, cum = b.dose_cum_msv;
+  let proj = cum; for (let k = d + 1; k <= +SimDB.meta.day_earth_landing; k++) { const p = dayr(k).phase; proj += p === "surface" ? +SimDB.meta.dose_rate_surface_msv_day : (p === "outbound" || p === "return") ? +SimDB.meta.dose_rate_transit_msv_day : 0; }
+  $("radN").textContent = num(cum, 0);
+  const a = st("dose_cum_msv", d), rt = $("radTag"); rt.textContent = ""; rt.appendChild(tag(a ? a.status : "ok"));
+  const bar = $("radbar"); bar.textContent = "";
+  const W = 204, mx = Math.max(proj, lim) * 1.02, X = v => v / mx * W;
+  bar.appendChild(svg("rect", {x:0, y:6, width:W, height:10, fill:"#1f1f1f", rx:4}));
+  bar.appendChild(svg("rect", {x:0, y:6, width:Math.max(2, X(proj)), height:10, fill:"#33302a", rx:4}));
+  bar.appendChild(svg("rect", {x:0, y:6, width:Math.max(2, X(Math.min(cum, lim))), height:10, fill:"#9a968c", rx:4}));
+  if (cum > lim) bar.appendChild(svg("rect", {x:X(lim) + 2, y:6, width:Math.max(2, X(cum) - X(lim) - 2), height:10, fill:"#ff7a59", rx:2}));
+  bar.appendChild(svg("line", {x1:X(lim), x2:X(lim), y1:1, y2:21, stroke:"#e8e4d8", "stroke-width":1.5}));
+  bar.appendChild(svg("text", {x:Math.min(X(lim), W - 2), y:34, "text-anchor":"end"}, "limit " + Math.round(lim)));
+  bar.appendChild(svg("text", {x:0, y:34}, Math.round(100 * cum / lim) + " % of limit"));
+  const P = $("radP"); P.textContent = "";
+  P.append(d >= +SimDB.meta.day_earth_landing ? `Mission total ${Math.round(proj)} mSv, above the limit. This was known before launch.` : `On course for about ${Math.round(proj)} mSv at Earth return, above the limit: known before launch. `);
+  const p2 = el("p"); p2.append("Today ", el("b", null, num(e.dose_day_msv, 2) + " mSv"), e.storm_level ? `, storm level S${e.storm_level}` : "", e.shelter_h ? `, ${e.shelter_h} h in the shelter (without it ${num(e.dose_unsheltered_msv, 1)} mSv).` : ".");
+  P.after(p2); while (p2.nextElementSibling) p2.nextElementSibling.remove();
+}
+
+const tips = [];
+function dayChart(host, cfg) {
+  const W = 430, H = 150, L = 42, R = 8, T = 10, B = 22, box = el("div", "chart");
+  const head = el("div", "ch"), hb = el("b", null, cfg.title + " "); hb.append(el("span", "badge", cfg.kind));
+  const hs = el("span"); hs.append("now ", el("b", null, num(cfg.day[cfg.nowH], cfg.dec)), " " + cfg.unit); head.append(hb, hs); box.append(head);
+  const all = cfg.day.concat(cfg.lo, cfg.hi).filter(v => v !== null && isFinite(v));
+  let mn = Math.min(...all), mx = Math.max(...all);
+  (cfg.refs || []).forEach(rf => { const span = Math.max(mx - mn, 1e-6); if (rf.force || (rf.v > mn - span * 0.8 && rf.v < mx + span * 0.8)) { mn = Math.min(mn, rf.v); mx = Math.max(mx, rf.v); rf.show = true; } else rf.show = false; });
+  const raw = (mx - mn) || 1, step = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50].find(s => raw / s <= 4) || 100;
+  mn = Math.floor((mn - raw * 0.06) / step) * step; mx = Math.ceil((mx + raw * 0.06) / step) * step;
+  const s = svg("svg", {width:W, height:H, viewBox:`0 0 ${W} ${H}`, role:"img", "aria-label":`${cfg.title}, 24 hours`});
+  const X = h => L + h / 23 * (W - L - R), Y = v => T + (H - T - B) * (1 - (v - mn) / (mx - mn));
+  for (let v = mn; v <= mx + 1e-9; v += step) { s.appendChild(svg("line", {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:"#2b2b2b"})); s.appendChild(svg("text", {x:L - 6, y:Y(v) + 4, "text-anchor":"end"}, Number(v).toFixed(step < 1 ? (step < 0.1 ? 2 : 1) : 0))); }
+  [0, 6, 12, 18, 23].forEach(h => s.appendChild(svg("text", {x:X(h), y:H - 6, "text-anchor": h === 0 ? "start" : h === 23 ? "end" : "middle"}, hhmm(h))));
+  if (cfg.acts) { let a0 = 0; for (let h = 1; h <= 24; h++) { if (h === 24 || cfg.acts[h] !== cfg.acts[a0]) { const a = cfg.acts[a0];
+        if (a && a !== "work") { const x0 = X(Math.max(0, a0 - .5)), x1 = X(Math.min(23, h - .5)); s.appendChild(svg("rect", {x:x0, y:T, width:x1 - x0, height:H - T - B, fill: a === "sleep" ? "#171717" : "#231713", opacity:.9}));
+          if (x1 - x0 > 30) s.appendChild(svg("text", {x:(x0 + x1) / 2, y:T + 11, "text-anchor":"middle"}, a === "EVA" ? "EVA" : a)); }
+        a0 = h; } } }
+  let band = ""; for (let h = 0; h < 24; h++) band += (h ? "L" : "M") + X(h).toFixed(1) + " " + Y(cfg.hi[h]).toFixed(1); for (let h = 23; h >= 0; h--) band += "L" + X(h).toFixed(1) + " " + Y(cfg.lo[h]).toFixed(1);
+  s.appendChild(svg("path", {d:band + "Z", fill:"#33302a", opacity:.9}));
+  (cfg.refs || []).forEach(rf => { if (!rf.show) return; s.appendChild(svg("line", {x1:L, x2:W - R, y1:Y(rf.v), y2:Y(rf.v), stroke:"#9a968c", "stroke-dasharray":"4 4"})); s.appendChild(svg("text", {x:W - R, y:Y(rf.v) + (rf.below ? 13 : -5), "text-anchor":"end"}, rf.label)); });
+  let line = ""; for (let h = 0; h < 24; h++) line += (h ? "L" : "M") + X(h).toFixed(1) + " " + Y(cfg.day[h]).toFixed(1);
+  s.appendChild(svg("path", {d:line, fill:"none", stroke:"#e5522c", "stroke-width":2, "stroke-linejoin":"round", "stroke-linecap":"round"}));
+  const cross = svg("line", {x1:0, x2:0, y1:T, y2:H - B, stroke:"#9a968c", opacity:0}), dot = svg("circle", {r:4, fill:"#e5522c", stroke:"#0e0e0e", "stroke-width":2, opacity:0});
+  const tip = el("div", "ctip"), hitr = svg("rect", {x:L, y:T, width:W - L - R, height:H - T - B, fill:"transparent"});
+  s.append(cross, dot, hitr); box.append(s, tip);
+  hitr.addEventListener("mousemove", ev => { const r = s.getBoundingClientRect(), k = r.width / W, h = Math.max(0, Math.min(23, Math.round(((ev.clientX - r.left) / k - L) / (W - L - R) * 23)));
+    cross.setAttribute("x1", X(h)); cross.setAttribute("x2", X(h)); cross.setAttribute("opacity", 1); dot.setAttribute("cx", X(h)); dot.setAttribute("cy", Y(cfg.day[h])); dot.setAttribute("opacity", 1);
+    tip.textContent = `${hhmm(h)}  ${num(cfg.day[h], cfg.dec)} ${cfg.unit}, usual ${num(cfg.lo[h], cfg.dec)} to ${num(cfg.hi[h], cfg.dec)}` + (cfg.acts && cfg.acts[h] && cfg.acts[h] !== "work" ? `, ${cfg.acts[h]}` : "");
+    tip.classList.add("on"); tip.style.left = Math.min(W - 230, Math.max(0, X(h) - 110)) + "px"; });
+  hitr.addEventListener("mouseleave", () => { cross.setAttribute("opacity", 0); dot.setAttribute("opacity", 0); tip.classList.remove("on"); });
+  host.append(box);
+}
+function hourly(arr, d) { const o = []; for (let h = 0; h < 24; h++) o.push(arr[di(d) * 24 + h]); return o; }
+function usual(arr, d) {
+  const lo = [], hi = [], from = Math.max(D0, d - 30);
+  for (let h = 0; h < 24; h++) { const v = []; for (let k = from; k < d; k++) v.push(arr[di(k) * 24 + h]); if (!v.length) v.push(arr[di(d) * 24 + h]); lo.push(pct(v, .1)); hi.push(pct(v, .9)); }
+  return [lo, hi];
+}
+function renderCharts() {
+  const d = ST.day, cc = C(), host = $("charts"); host.textContent = "";
+  const acts = []; for (let h = 0; h < 24; h++) acts.push(cc.act[di(d) * 24 + h]);
+  const mk = (title, kind, unit, dec, arr, refs, a) => { const [lo, hi] = usual(arr, d); dayChart(host, {title, kind, unit, dec, day: hourly(arr, d), lo, hi, refs, nowH: 21, acts: a}); };
+  mk("Heart rate", "SIM", "bpm", 0, cc.hr, [], acts);
+  mk("Core body temperature", "SIM", "°C", 1, cc.tc, [], acts);
+  mk("Cabin carbon dioxide", V("cabin_co2_mmhg").kind, "mmHg", 1, EH.co2, [{v:3, label:"limit 3.0, 1-h mean", force:true}]);
+  mk("Oxygen breathed in", V("cabin_pio2_mmhg").kind, "mmHg", 0, EH.pio2, [{v:127, label:"watch under 127", below:true}, {v:122, label:"floor 122", below:true}]);
+  $("chS").textContent = "hour by hour, shown as at 21:00";
+}
+const TROWS = [["sleep_h", "h", "Sleep"], ["pvt_z", "SD", "Reaction speed"], ["hr_rest_bpm", "bpm", "Resting heart rate"], ["hrv_rmssd_ms", "ms", "Heart-rate variability"], ["mood_who5", "of 25", "Wellbeing"],
+  ["energy_pct", "%", "Energy eaten"], ["fluid_l", "L", "Fluids"], ["exercise_pct", "%", "Exercise vs plan"], ["body_mass_kg", "kg", "Body mass"],
+  ["leg_strength_pct", "%", "Leg strength"], ["bmd_hip_pct", "%", "Hip bone density"], ["cabin_co2_mmhg", "mmHg", "Cabin CO₂, 24 h"], ["dose_day_msv", "mSv", "Dose today"]];
+function renderTrend() {
+  const t = $("trendt"), d = ST.day; t.textContent = "";
+  const hr = el("tr"); ["Measure", "Today", "7 days", "30 days", "Last 30 days", "Status"].forEach(h => hr.append(el("th", null, h)));
+  const cg = el("colgroup"); [null, 86, 52, 58, 116, 104].forEach(w => { const c = el("col"); if (w) c.style.width = w + "px"; cg.append(c); });
+  const th = el("thead"); th.append(hr); const tb = el("tbody"); t.append(cg, th, tb);
+  TROWS.forEach(([v, u, name]) => {
+    const m = V(v), s = series(v, d, 30), a = st(v, d), tr = el("tr");
+    const td1 = el("td", "tdy num", fmtv(v, s[s.length - 1])); td1.append(el("small", null, u));
+    const sp = el("td", "sp"); sp.append(sparkline(s, 100, 22));
+    const last = el("td"); last.append(tag(a ? a.status : "ok")); if (a) last.title = a.reason;
+    const nm = el("td", null, name + " "); nm.append(el("span", "badge", m.kind)); nm.title = m.label;
+    tr.append(nm, td1, el("td", "num", fmtv(v, mean(s.slice(-7)))), el("td", "num", fmtv(v, mean(s))), sp, last); tb.append(tr);
+  });
+}
+function renderSlow() {            // texts that need database lookups: debounced while playing
+  const d = ST.day, crew = ST.crew;
+  const P = $("plan"); P.textContent = "";
+  SimDB.q("select topic, text, why from plan where day=? and crew_id=? order by seq", [d, crew]).forEach(p => { const li = el("li"); const ic = icon(IC[p.topic] || IC.Routine); ic.setAttribute("class", "ic");
+    const dv = el("div"); dv.append(el("div", "k", p.topic), el("b", null, p.text), el("p", null, p.why)); li.append(ic, dv); P.append(li); });
+  const S = $("snap"); S.textContent = "";
+  const sn = SimDB.one("select * from snapshot where day=? and crew_id=?", [d, crew]);
+  const ctx = Assistant.contextForDay(d, crew);
+  if (sn) { const pt = el("div", "ptitle", "Why this day matters "); pt.append(el("span", "sub", "written analysis for a key day")); S.append(pt, el("h3", null, sn.title), el("p", "why", sn.why), el("p", "an", sn.analysis)); }
+  else { const pt = el("div", "ptitle", "Today in short "); pt.append(el("span", "sub", "built by the rules, no AI")); S.append(pt, el("p", "why", Assistant.briefing(ctx)));
+    const nx = KEYDAYS.find(k => k.day > d); if (nx) S.append(el("p", "an", `Next key day with a written analysis: day ${nx.day}, ${nx.label}.`)); }
+  const E = $("evl"); E.textContent = "";
+  const b = body(d);
+  const add = (s, title, text, link) => { const li = el("li"); li.appendChild(sico(s === "info" ? "ok" : s)); const dv = el("div"); dv.append(el("b", null, title)); if (text) dv.append(el("span", null, text)); if (link) dv.append(link); li.append(dv); E.append(li); };
+  add("info", "Activity: " + b.activity, b.symptoms ? "Symptoms logged: " + b.symptoms + "." : "No symptoms logged.");
+  const ev = EVAS.find(x => x.day === d && x.crew_ids.split(",").includes(crew));
+  if (ev) { let a = null; if (ev.scenario_id) { a = el("a", "lnk", "Open this walk second by second in the Arm Unit"); a.href = "arm_unit.html?scenario=" + ev.scenario_id; a.style.display = "block"; a.style.marginTop = "2px"; }
+    add(ev.outcome === "postponed" ? "watch" : ev.outcome === "nominal" ? "info" : "warning", ev.outcome === "postponed" ? "EVA postponed" : `EVA ${ev.number}: ${ev.outcome}`, ev.outcome === "postponed" ? ev.summary : `${ev.actual_min} min in the suit, ${num(ev.distance_m / 1000, 1)} km, peak heart rate ${ev.peak_hr} bpm, dose ${Math.round(ev.dose_usv)} µSv.`, a); }
+  EVENTS.filter(x => x.day_start <= d && x.day_end >= d && (x.crew_id === null || x.crew_id === crew)).forEach(x => add(x.severity === "minor" ? "watch" : x.severity === "moderate" || x.severity === "major" ? "warning" : ["watch", "warning", "critical"].includes(x.severity) ? x.severity : "info",
+    x.title, (x.day_end > x.day_start ? `Day ${x.day_start} to ${x.day_end}. ` : "") + x.detail));
+  renderAssistant(ctx);
+}
+
+/* ---------- assistant ---------- */
+function earthCard(ctx) {
+  const up = ctx.data.up, items = ctx.data.items || [], m = el("div", "msg earth");
+  const who = el("div", "who"); who.appendChild(icon(IC.earth)); who.append("From Earth"); m.append(who);
+  if (!up) { m.append(el("div", "meta", "No instruction on file for this day.")); return m; }
+  if (up.status === "none") { m.classList.add("none"); m.append(el("div", "head", `No link to Earth. The last instruction is ${up.age_days} day${up.age_days === 1 ? "" : "s"} old.`), el("div", "meta", `Written from your data up to day ${up.based_on_day}. Until the link is back these standing orders apply and the rules on board decide.`)); }
+  else if (up.status === "in_person") { m.append(el("div", "head", "The flight surgeon is with you in person."), el("div", "meta", "On Earth there is no delay: instructions are given face to face.")); }
+  else { m.append(el("div", "meta", `Received this morning. Written by the flight surgeon team from your data up to day ${up.based_on_day}; the signal took ${(up.delay_min || 0) < 0.1 ? "a few seconds" : fmtLight(up.delay_min)}.` + (up.status === "short" ? " Weak link: short text only." : "")), el("div", "head", up.headline)); }
+  if (items.length) { const ul = el("ul"), row = it => { const li = el("li"); li.append(el("b", null, it.topic + ". "), it.text, el("span", null, "Why: " + it.why)); return li; };
+    items.slice(0, 2).forEach(it => ul.append(row(it))); m.append(ul);
+    if (items.length > 2) { const more = el("button", "more", `Show ${items.length - 2} more point${items.length - 2 > 1 ? "s" : ""}`); more.type = "button"; more.addEventListener("click", () => { items.slice(2).forEach(it => ul.append(row(it))); more.remove(); }); m.append(more); } }
+  if (up.narrative) { const dt = el("details"); dt.append(el("summary", null, "Letter from the flight surgeon"), el("p", null, up.narrative)); m.append(dt); }
+  return m;
+}
+function rulesCard(ctx) {
+  const flags = ctx.data.flags.filter(f => f.var_id !== "readiness"), m = el("div", "msg rules");
+  const who = el("div", "who"); who.appendChild(icon(IC.rules)); who.append("Rules on board, today"); m.append(who);
+  if (!flags.length) { m.append(el("div", null, "Every value is inside its limits.")); return m; }
+  const ul = el("ul"); m.append(ul);
+  const row = f => { const li = el("li"); li.appendChild(sico(f.status)); const dv = el("div"); dv.append(el("b", null, f.label + ". "), el("span", null, f.reason + ".")); li.append(dv); li.title = f.rule_text;
+    li.addEventListener("click", () => { const k = REGION_OF[f.var_id]; if (k) { if (ST.tab !== "body") show("body"); ST.pinned = k; applyFocus(); } }); return li; };
+  flags.slice(0, 4).forEach(f => ul.append(row(f)));
+  if (flags.length > 4) { const more = el("button", "more", `Show ${flags.length - 4} more`); more.type = "button"; more.addEventListener("click", () => { flags.slice(4).forEach(f => ul.append(row(f))); more.remove(); }); m.append(more); }
+  return m;
+}
+function suggested(ctx) {
+  const d = ctx.data; let qs = [];
+  if (d.snap && d.snap.questions_json) { try { qs = JSON.parse(d.snap.questions_json); } catch (e) { qs = []; } }
+  if (!qs.length) { qs = ["How am I doing today?"]; const f = d.flags.find(x => x.var_id !== "readiness" && x.status !== "watch") || d.flags.find(x => x.var_id !== "readiness");
+    if (f) qs.push(`Why is my ${f.label.toLowerCase()} flagged?`); qs.push(d.up && d.up.status === "none" ? "How old is my last instruction from Earth?" : "What did Earth tell me today?"); qs.push("What should I change tomorrow?"); }
+  const c = el("div", "chips"); qs.slice(0, 4).forEach(q => { const b = el("button", null, q); b.type = "button"; b.addEventListener("click", () => ask(q, "chat")); c.append(b); }); return c;
+}
+function renderAssistant(ctx) {
+  ST.askToken++; ST.history = []; Assistant.stopSpeaking();
+  const S = $("stream"); S.textContent = "";
+  S.append(earthCard(ctx), rulesCard(ctx), suggested(ctx)); S.scrollTop = 0;
+  $("ctxLink").href = `context.html?day=${ST.day}&crew=${ST.crew}`;
+  $("afootL").textContent = `Answers use day ${ST.day} only.`;
+}
+/* One turn, the same as on the Arm Unit (Assistant.askAloud): the words appear while they are written and, unless the
+   voice is switched off, the assistant says them, starting with the first sentence. Typed or spoken makes no difference. */
+async function ask(q) {
+  q = String(q || "").trim(); if (!q) return;
+  if (ST.playing) pause();
+  const at = ST.day + ":" + ST.crew; if (ST.histAt !== at) { ST.history = []; ST.histAt = at; }     // the conversation belongs to one day and one crew member
+  const S = $("stream"), token = ++ST.askToken, ctx = Assistant.contextForDay(ST.day, ST.crew), aloud = !ST.muted;
+  S.append(el("div", "msg me", q));
+  const wait = el("div", "msg bot wait", "Reading today's values, the rules and Earth's instruction…"); S.append(wait); S.scrollTop = S.scrollHeight;
+  const mine = () => token === ST.askToken;
+  const r = await Assistant.askAloud(q, ctx, ST.history, aloud ? "voice" : "chat", { speak: aloud,
+    onText: t => { if (!mine() || !t) return; wait.className = "msg bot"; wait.textContent = t; S.scrollTop = S.scrollHeight; } });
+  if (!mine()) return;                                     // the day changed while waiting
+  if (r.aborted) { if (wait.classList.contains("wait")) wait.remove(); return; }       // Stop was pressed
+  wait.className = "msg bot"; wait.textContent = r.answer;
+  const src = el("div", "src"); src.append(Assistant.noteEl(r) || el("span", null, r.offline ? "Built by the rules on board. No AI model is connected." : "AI model, from this day's data only."));
+  wait.append(src);
+  ST.history.push({role:"user", content:q}, {role:"assistant", content:r.answer});
+  S.scrollTop = S.scrollHeight;
+}
+function initAssistant() {
+  $("mic").appendChild(icon(IC.mic));
+  let stop = null;
+  $("askForm").addEventListener("submit", e => { e.preventDefault(); if (stop) { stop(); return; }      // Ask pressed while listening: send what was heard
+    const v = $("askIn").value; $("askIn").value = ""; ask(v); });
+  try { ST.muted = localStorage.getItem("hs.voiceOff") === "1"; } catch (e) { ST.muted = false; }
+  const spk = $("spk"); spk.appendChild(icon(IC.speak));
+  const drawSpk = () => { spk.setAttribute("aria-pressed", String(!ST.muted)); spk.title = ST.muted ? "Answers are shown only. Press to have them spoken." : "Answers are spoken in the assistant's voice. Press to switch the voice off."; spk.setAttribute("aria-label", spk.title); };
+  spk.addEventListener("click", () => { ST.muted = !ST.muted; try { ST.muted ? localStorage.setItem("hs.voiceOff", "1") : localStorage.removeItem("hs.voiceOff"); } catch (e) {} if (ST.muted) Assistant.stopSpeaking(); drawSpk(); }); drawSpk();
+  if (!Assistant.canListen()) { $("mic").disabled = true; $("mic").title = "This browser has no speech recognition. Type the question."; }
+  $("mic").addEventListener("click", () => {
+    if (stop) { stop(); return; }
+    if (ST.playing) pause();
+    Assistant.stopSpeaking(); $("mic").classList.add("live"); $("askIn").placeholder = "Listening… speak now";
+    stop = Assistant.listen({ onText: t => { $("askIn").value = t; },
+      onEnd: t => { stop = null; $("mic").classList.remove("live"); $("askIn").placeholder = "Ask about today, or press the microphone"; const v = t || $("askIn").value; $("askIn").value = ""; if (v) ask(v); },
+      onError: msg => { $("afootL").textContent = msg; } });
+  });
+  Assistant.onStatus(h => { ST.ai = h; const a = $("aiState"); a.classList.toggle("on", !!h.ai); a.lastChild.textContent = (Assistant.aiStatus(h) || (h.ai ? "AI model" : "No AI model: rules")) + " · " + (h.voice ? h.voice_label + " voice" : "no voice: answers on screen");
+    a.title = (h.byo ? (Assistant.aiStatus(h, true) || "") : h.ai ? String(h.model) : "Start tools/serve_preview.py with a key in .env to connect a model.") + " · Voice: " + (h.voice ? h.voice_label : "none connected; answers are shown on screen"); }, $("aiState"));
+  document.addEventListener("assistant-speaking", e => {         // the header always names the voice that is really speaking
+    if (!e.detail.on || !e.detail.engine || !ST.ai) return;
+    $("aiState").lastChild.textContent = (Assistant.aiStatus(ST.ai) || (ST.ai.ai ? "AI model" : "No AI model: rules")) + " · " + e.detail.engine + (/voice$/.test(e.detail.engine) ? "" : " voice"); });
+  window.HS_APP = { mic: () => $("mic").click(), play: () => (ST.playing ? pause() : play()) };       // the presenter's remote (assets/present.js)
+}
+
+/* ---------- timeline dock ---------- */
+const SPEEDS = [[1, "1 day a second"], [7, "1 week a second"], [30, "1 month a second"]];
+let BX = d => 0, BW = 1000;
+function buildDock() {
+  $("bKeyPrev").appendChild(icon(IC.keyprev)); $("bPrev").appendChild(icon(IC.prev)); $("bPlay").appendChild(icon(IC.play)); $("bNext").appendChild(icon(IC.next)); $("bKeyNext").appendChild(icon(IC.keynext));
+  SPEEDS.forEach(([v, l]) => { const b = el("button", null, l); b.type = "button"; b.dataset.v = v; b.addEventListener("click", () => { ST.speed = v; paintSpeed(); }); $("speed").append(b); });
+  const sel = $("keySel"); sel.append(new Option("Jump to a key day…", ""));
+  KEYDAYS.forEach(k => sel.append(new Option(`Day ${k.day}: ${k.label}`, k.day)));
+  sel.addEventListener("change", () => { if (sel.value !== "") { pause(); setDay(+sel.value); sel.value = ""; sel.blur(); } });
+  $("bPrev").addEventListener("click", () => { pause(); setDay(ST.day - 1); }); $("bNext").addEventListener("click", () => { pause(); setDay(ST.day + 1); });
+  $("bKeyPrev").addEventListener("click", () => keyJump(-1)); $("bKeyNext").addEventListener("click", () => keyJump(1));
+  $("bPlay").addEventListener("click", () => ST.playing ? pause() : play());
+  const band = $("band"); let drag = false;
+  const toDay = ev => { const r = band.getBoundingClientRect(); return Math.round(T0 + Math.max(0, Math.min(1, (ev.clientX - r.left - 8) / (r.width - 16))) * (T1 - T0)); };
+  band.addEventListener("pointerdown", ev => { drag = true; band.setPointerCapture(ev.pointerId); pause(); setDay(toDay(ev), true); });
+  band.addEventListener("pointermove", ev => { const d = toDay(ev); if (drag) setDay(d, true); bandTip(ev, d); });
+  band.addEventListener("pointerup", () => { if (drag) { drag = false; setDay(ST.day); } });
+  band.addEventListener("pointerleave", () => $("btip").classList.remove("on"));
+  band.addEventListener("keydown", ev => { if (ev.key === "Home") { setDay(T0); ev.preventDefault(); } if (ev.key === "End") { setDay(T1); ev.preventDefault(); } });
+  paintSpeed();
+}
+function bandTip(ev, d) {
+  const tip = $("btip"), r = $("band").getBoundingClientRect(), L = SimDB.dayLabel(d), key = KEYDAYS.find(k => Math.abs(k.day - d) <= 2);
+  tip.textContent = ""; tip.append(el("b", null, "Day " + d), " · " + L.where + " · " + L.date + (key ? " · " + key.label : ""));
+  const e = envd(d), dr = dayr(d); const extra = dr.comm === "blackout" ? "no link to Earth" : e.storm_level >= 1 ? "solar storm S" + e.storm_level : ""; if (extra) tip.append(" · " + extra);
+  tip.style.left = Math.max(150, Math.min(r.width - 150, ev.clientX - r.left)) + "px"; tip.classList.add("on");
+}
+function paintSpeed() { document.querySelectorAll("#speed button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.v === ST.speed)); }
+function keyJump(dir) { pause(); const k = dir > 0 ? KEYDAYS.find(x => x.day > ST.day) : [...KEYDAYS].reverse().find(x => x.day < ST.day); if (k) setDay(k.day); }
+function drawBand() {
+  const band = $("band"), W = band.clientWidth || 1392, H = 50; BW = W;
+  band.textContent = ""; band.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const x = d => 8 + (d - T0) / (T1 - T0) * (W - 16); BX = x;
+  const defs = svg("defs"); const pt = svg("pattern", {id:"hatch", width:6, height:6, patternUnits:"userSpaceOnUse", patternTransform:"rotate(45)"}); pt.appendChild(svg("rect", {width:2.2, height:6, fill:"#9a968c"})); defs.appendChild(pt); band.appendChild(defs);
+  const PH = {outbound:["Outbound", "#1f1f1f"], surface:["On Mars", "#2a2824"], return:["Homebound", "#1f1f1f"], recovery:["Earth", "#171717"]};
+  /* Phase lengths as the mission plan counts them (landing to departure, departure to landing on Earth): the same numbers as on the Mission tab. */
+  const M = SimDB.meta, land = +M.day_mars_landing, dep = SimDB.dayOfDate(M.mars_departure_utc) || +M.day_mars_departure, home = +M.day_earth_landing;
+  const LEN = {outbound: land, surface: dep - land, return: home - dep};
+  let a = T0;
+  for (let d = T0 + 1; d <= T1 + 1; d++) { if (d === T1 + 1 || dayr(d).phase !== dayr(a).phase) { const p = dayr(a).phase, x0 = x(a), x1 = x(d - 1) + (d === T1 + 1 ? 0 : (x(d) - x(d - 1)));
+      band.appendChild(svg("rect", {x:x0 + .5, y:10, width:Math.max(1, x1 - x0 - 1), height:22, fill:PH[p][1], rx:3}));
+      if (x1 - x0 > 46) band.appendChild(svg("text", {x:x0 + 8, y:25}, x1 - x0 > 150 ? `${PH[p][0]}, ${LEN[p] || d - a} days` : PH[p][0]));
+      a = d; } }
+  const cc = C(); let line = "";                         // readiness of the selected crew member across the mission
+  for (let d = T0; d <= T1; d++) line += (d === T0 ? "M" : "L") + x(d).toFixed(1) + " " + (31 - cc.body[di(d)].readiness / 100 * 20).toFixed(1);
+  band.appendChild(svg("path", {d:line, fill:"none", stroke:"#706e68", "stroke-width":1, opacity:.75}));
+  const span = (pred, y, h, fill, title, op) => { let s0 = null; for (let d = T0; d <= T1 + 1; d++) { const on = d <= T1 && pred(d); if (on && s0 === null) s0 = d; if (!on && s0 !== null) { const r = svg("rect", {x:x(s0) - 1, y, width:Math.max(3, x(d - 1) - x(s0) + 2), height:h, fill, opacity:op || 1, rx:1}); r.appendChild(svg("title", {}, title)); band.appendChild(r); s0 = null; } } };
+  span(d => dayr(d).comm === "degraded", 10, 22, "url(#hatch)", "Weak link to Earth", .28);
+  span(d => dayr(d).comm === "blackout", 10, 22, "url(#hatch)", "No link to Earth", .8);
+  span(d => envd(d).storm_level === 1, 3, 5, "#f2c14e", "Solar storm, level S1");
+  span(d => envd(d).storm_level >= 2, 2, 7, "#ff7a59", "Solar storm, level S2 or more");
+  EVENTS.filter(e => e.type === "co2_removal_fault" || e.type === "device_fault").forEach(e => { const r = svg("rect", {x:x(e.day_start) - 1, y:33, width:Math.max(4, x(e.day_end) - x(e.day_start) + 2), height:4, fill:"#cfcbc0", rx:1}); r.appendChild(svg("title", {}, e.title)); band.appendChild(r); });
+  KEYDAYS.forEach(k => { const xx = x(k.day), g = svg("path", {d:`M${xx} 39l4 4-4 4-4-4z`, fill:"#0e0e0e", stroke:"#cfcbc0", "stroke-width":1.2}); g.appendChild(svg("title", {}, `Day ${k.day}: ${k.label}`)); band.appendChild(g); });
+  const lk = dayr(Math.round((T0 + T1) / 2)); void lk;
+  const h = svg("g", {id:"handle"}); h.appendChild(svg("line", {x1:0, x2:0, y1:1, y2:48, stroke:"#e5522c", "stroke-width":2})); h.appendChild(svg("circle", {cx:0, cy:21, r:7, fill:"#e5522c", stroke:"#060606", "stroke-width":2})); band.appendChild(h);
+  paintHandle();
+}
+function paintHandle() {
+  const h = document.getElementById("handle"); if (h) h.setAttribute("transform", `translate(${BX(ST.day).toFixed(1)} 0)`);
+  const L = SimDB.dayLabel(ST.day), k = dayr(ST.day).key_label;
+  $("roDay").textContent = "Mission day " + ST.day; $("roWhere").textContent = L.where + " · " + L.date; $("roKey").textContent = k || "";
+  $("band").setAttribute("aria-valuenow", ST.day); $("band").setAttribute("aria-valuemin", T0); $("band").setAttribute("aria-valuemax", T1); $("band").setAttribute("aria-valuetext", L.text);
+}
+let raf = 0, lastT = 0, acc = 0;
+function play() { if (ST.day >= T1) setDay(T0, true); ST.playing = true; lastT = 0; acc = 0; $("bPlay").textContent = ""; $("bPlay").appendChild(icon(IC.pause)); $("bPlay").setAttribute("aria-label", "Pause"); raf = requestAnimationFrame(tick); }
+function pause() { if (!ST.playing) return; ST.playing = false; cancelAnimationFrame(raf); $("bPlay").textContent = ""; $("bPlay").appendChild(icon(IC.play)); $("bPlay").setAttribute("aria-label", "Play"); setDay(ST.day); }
+function tick(t) {
+  if (!ST.playing) return;
+  if (lastT) acc += (t - lastT) / 1000 * ST.speed; lastT = t;
+  if (acc >= 1) { const n = Math.floor(acc); acc -= n; if (ST.day + n >= T1) { setDay(T1, true); pause(); return; } setDay(ST.day + n, true); }
+  raf = requestAnimationFrame(tick);
+}
+
+/* ---------- render control ---------- */
+let slowTimer = 0, urlTimer = 0;
+function setDay(d, fast) { ST.day = Math.max(T0, Math.min(T1, Math.round(d))); renderAll(!fast); }
+function renderAll(now) {
+  renderTop(); renderReady(); paintHandle();
+  if (ST.tab === "body") renderBoard(); else { renderNow(); renderCharts(); renderTrend(); }
+  clearTimeout(slowTimer);
+  if (now) { renderSlow(); paintCrewDots(); } else slowTimer = setTimeout(() => { renderSlow(); paintCrewDots(); }, 160);
+  clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, "", `?day=${ST.day}&crew=${ST.crew}&tab=${ST.tab}`), 300);
+}
+function show(name) {
+  ST.tab = name === "today" ? "today" : "body";
+  ["body", "today"].forEach(n => { $("view-" + n).hidden = n !== ST.tab; $("tab-" + n).setAttribute("aria-selected", n === ST.tab); });
+  document.body.classList.toggle("fitbody", ST.tab === "body"); scrollTo(0, 0);
+  if (ST.tab === "body") drawLeaders();
+  renderAll(true);
+}
+function fit() {
+  /* The whole console is scaled as one piece. Width first; on the body board also height, so the figure, all twelve cards
+     and the legend are on the screen without scrolling, from a laptop window to a full-screen projector. */
+  const app = $("app"), dockH = $("dock").offsetHeight || 104, z = parseFloat(app.style.zoom) || 1;
+  const lg = $("legendrow"), legendH = lg && lg.offsetParent ? lg.getBoundingClientRect().height / z + 10 : 60;
+  const need = 60 + 12 + 800 + legendH + 6;                      // top bar, gap, board, legend
+  const k = Math.max(0.45, Math.min(1.4, (innerWidth - 32) / 1392, (innerHeight - 44 - dockH) / need));
+  app.style.zoom = Math.abs(k - 1) < 0.004 ? "" : k;
+  document.documentElement.style.setProperty("--dockh", dockH + "px");
+  app.style.setProperty("--navoff", (44 / k) + "px");
+  app.style.setProperty("--railh", Math.max(480, (innerHeight - 44 - dockH) / k - 60 - 12 - 14) + "px");
+  drawBand(); drawLeaders();
+}
+document.addEventListener("keydown", e => {
+  const typing = e.target.closest && e.target.closest("input, textarea, select");
+  if (e.key === "Escape") { ST.pinned = null; ST.focus = null; applyFocus(); return; }
+  if (typing) return;
+  if (e.key === " " && !e.target.closest("button, a, summary, .callout, .hit")) { e.preventDefault(); ST.playing ? pause() : play(); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); if (e.shiftKey) keyJump(-1); else { pause(); setDay(ST.day - 1); } }
+  if (e.key === "ArrowRight") { e.preventDefault(); if (e.shiftKey) keyJump(1); else { pause(); setDay(ST.day + 1); } }
+});
+
+const BADGE_HELP = { SIM: "Stands for a sensor the crew would carry. Simulated.", MODEL: "An estimate. No sensor measures this directly.", REPLAY: "A real measurement, shown again on the matching mission day.", COMPUTED: "Astronomy for the planned dates. Exact." };
+document.addEventListener("mouseover", e => { const b = e.target.closest && e.target.closest(".badge"); if (b && !b.title && BADGE_HELP[b.textContent]) b.title = BADGE_HELP[b.textContent]; });
+
+SimDB.ready.then(() => {
+  loadCommon();
+  const p = new URLSearchParams(location.search);
+  if (p.get("crew") && SimDB.crew[p.get("crew")]) ST.crew = p.get("crew");
+  if (p.get("day") !== null && p.get("day") !== "") ST.day = Math.max(T0, Math.min(T1, parseInt(p.get("day"), 10) || 0));
+  if (p.get("speed")) ST.speed = +p.get("speed") || 7;
+  crewCache(ST.crew);
+  $("loading").hidden = true; $("ui").hidden = false; $("dock").hidden = false;
+  buildCrew(); buildBoard(); buildDock(); initAssistant();
+  $("tab-body").addEventListener("click", () => show("body")); $("tab-today").addEventListener("click", () => show("today"));
+  fit(); show(p.get("tab") === "today" ? "today" : "body");
+  if (p.get("focus") && GK[p.get("focus")]) { ST.pinned = p.get("focus"); applyFocus(); }
+  addEventListener("resize", fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawLeaders(); });
+  if (p.get("play") === "1") play();
+});
+</script>
+</body>
+</html>

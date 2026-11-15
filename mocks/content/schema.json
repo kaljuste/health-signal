@@ -1,0 +1,1741 @@
+{
+ "generated_by": "tools/export_schema.py",
+ "groups": [
+  "The mission",
+  "Crew and body",
+  "Surroundings",
+  "Rules and instructions",
+  "Mars walks, second by second",
+  "Where the numbers come from"
+ ],
+ "tables": {
+  "meta": {
+   "group": "The mission",
+   "note": "Settings of this run: seed, mission dates, assumptions, totals.",
+   "columns": [
+    {
+     "name": "key",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Setting name, e.g. seed, launch_utc, day_dose_600, dose_total_msv, storm_shielding_assumption, disclaimer."
+    },
+    {
+     "name": "value",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Setting value, always stored as text (numbers and JSON included)."
+    }
+   ]
+  },
+  "crew": {
+   "group": "Crew and body",
+   "note": "The four fictional crew members and their personal starting values.",
+   "columns": [
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member id, C1 to C4. C1 (KESTREL) is the focus astronaut of the apps."
+    },
+    {
+     "name": "call_sign",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Fictional call sign: KESTREL, HERON, OSPREY, WREN."
+    },
+    {
+     "name": "role",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Role on board, e.g. flight engineer, commander."
+    },
+    {
+     "name": "sex",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "F or M. Selects sex-specific lab cut-offs and NASA condition odds."
+    },
+    {
+     "name": "age",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Age at launch, years."
+    },
+    {
+     "name": "height_cm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Height, cm."
+    },
+    {
+     "name": "launch_mass_kg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Body mass at launch, kg. Reference for mass change."
+    },
+    {
+     "name": "eva_team",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "EVA team: A (C1 and C3) or B (C2 and C4)."
+    },
+    {
+     "name": "baseline_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "JSON: mean of the 30 pre-launch days for ten daily values (resting heart rate, HRV, blood pressure, blood oxygen, core temperature, sleep, reaction time, wellbeing, body mass)."
+    },
+    {
+     "name": "traits_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "JSON: personal model settings. vo2 = aerobic fitness at launch (mL/kg/min); bone = hip bone change per month in weightlessness (%); sans = optic-disc swelling the person tends to (µm); e_adh, x_adh = how well the person keeps to the food and exercise plan (1 = fully); ortho = sensitivity to standing up after flight (1 = average)."
+    }
+   ]
+  },
+  "variable": {
+   "group": "Rules and instructions",
+   "note": "The dictionary of all 76 values: label, unit, how it is made, its limits, the rule in words and its source.",
+   "columns": [
+    {
+     "name": "var_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Value id. Body and environment ids equal their column name; arm-unit ids start with eva.; lab ids are values of lab.var_id. Exception: comm_state is the column day.comm."
+    },
+    {
+     "name": "scope",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "env, body, lab or eva (arm unit)."
+    },
+    {
+     "name": "grp",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Display group, e.g. Air, Radiation, Sleep and mind, Arm unit."
+    },
+    {
+     "name": "label",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Plain-English name shown in the apps."
+    },
+    {
+     "name": "unit",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Unit shown in the apps."
+    },
+    {
+     "name": "decimals",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Decimals to show."
+    },
+    {
+     "name": "cadence",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "hourly, daily, every 28 days, every second or under gravity."
+    },
+    {
+     "name": "table_name",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Table that holds the value."
+    },
+    {
+     "name": "column_name",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Column that holds the value. For lab, the value of lab.var_id."
+    },
+    {
+     "name": "kind",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Provenance label: COMPUTED, REPLAY, SIM or MODEL (11_provenance.md)."
+    },
+    {
+     "name": "method",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "How the generator makes it: computed, replay, model or learned."
+    },
+    {
+     "name": "sensor",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "What would measure it on a real mission."
+    },
+    {
+     "name": "region",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Body region or system, for grouping on the body map."
+    },
+    {
+     "name": "catalog_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Row id in the indicator catalog (kb/13; indicator.indicator_id in the reference database)."
+    },
+    {
+     "name": "hrp_risk",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "NASA Human Research Program risk the value belongs to."
+    },
+    {
+     "name": "better",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Direction: high (higher is better), low, band (inside a range) or info (no direction)."
+    },
+    {
+     "name": "watch_low",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Watch level, low side, if one number expresses it. Display only: the rules in tools/sim/rules.py decide."
+    },
+    {
+     "name": "watch_high",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Watch level, high side. Display only (see watch_low)."
+    },
+    {
+     "name": "warn_low",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Warning level, low side. Display only."
+    },
+    {
+     "name": "warn_high",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Warning level, high side. Display only."
+    },
+    {
+     "name": "crit_low",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Critical level, low side. Display only."
+    },
+    {
+     "name": "crit_high",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Critical level, high side. Display only."
+    },
+    {
+     "name": "rule_text",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The rule in words, as the apps show it."
+    },
+    {
+     "name": "rule_tag",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Source of the thresholds: NASA, CLIN, RES or INF (our assumption), with the reference."
+    },
+    {
+     "name": "why",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Why the value matters, in plain words."
+    },
+    {
+     "name": "action",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "What to do when it is flagged."
+    },
+    {
+     "name": "how_simulated",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "How the generator makes the value, in words."
+    },
+    {
+     "name": "learned_from",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Dataset a shape was learned from, if any."
+    },
+    {
+     "name": "sort",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Display order."
+    }
+   ]
+  },
+  "day": {
+   "group": "The mission",
+   "note": "The calendar: one row per mission day, with the phase, the sol, the signal delay and the link state.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "date_utc",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Calendar date, YYYY-MM-DD."
+    },
+    {
+     "name": "phase",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "prelaunch, outbound, surface, return or recovery."
+    },
+    {
+     "name": "phase_day",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Days since the first day of the phase (0 = first day)."
+    },
+    {
+     "name": "sol",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Mars sol in progress (1 to 546); empty off Mars."
+    },
+    {
+     "name": "mars_ls",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Mars season angle (solar longitude Ls), degrees."
+    },
+    {
+     "name": "season",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Mars season by hemisphere, with the dust season marked."
+    },
+    {
+     "name": "gravity_g",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Gravity, g. COMPUTED. Gravity the crew feels: 1 on Earth, 0 in transit, 0.38 on Mars."
+    },
+    {
+     "name": "light_time_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Signal time to Earth, one way, min. COMPUTED."
+    },
+    {
+     "name": "round_trip_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Two-way signal time, minutes."
+    },
+    {
+     "name": "comm",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Link to Earth. COMPUTED."
+    },
+    {
+     "name": "dist_earth_au",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Distance between crew and Earth, AU."
+    },
+    {
+     "name": "dist_sun_au",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Distance between crew and Sun, AU."
+    },
+    {
+     "name": "analog_date",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Real date whose measurements are replayed on this day (date minus 8,065 days)."
+    },
+    {
+     "name": "key_label",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Title of a key day (launch, landings, departure, snapshot days); empty on other days."
+    }
+   ]
+  },
+  "env_day": {
+   "group": "Surroundings",
+   "note": "Cabin air, radiation, storms and Mars weather, one row per day.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "cabin_co2_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily mean of env_hour.cabin_co2_mmhg, mmHg."
+    },
+    {
+     "name": "cabin_co2_max1h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Highest hourly cabin CO₂ of the day, mmHg. The 3 mmHg one-hour rule reads this."
+    },
+    {
+     "name": "cabin_pio2_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily mean inspired oxygen, mmHg."
+    },
+    {
+     "name": "cabin_pio2_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Lowest hourly inspired oxygen of the day (airlock dips), mmHg."
+    },
+    {
+     "name": "cabin_pressure_kpa",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Cabin pressure, kPa. SIM."
+    },
+    {
+     "name": "cabin_temp_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily mean cabin temperature, °C."
+    },
+    {
+     "name": "cabin_rh_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily mean relative humidity, %."
+    },
+    {
+     "name": "dose_rate_usv_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily mean dose rate outside the storm shelter, µSv/h."
+    },
+    {
+     "name": "dose_day_msv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Radiation dose today, mSv. REPLAY."
+    },
+    {
+     "name": "dose_unsheltered_msv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Dose the day would have given without the storm shelter, mSv."
+    },
+    {
+     "name": "shelter_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Hours the crew spends in the storm shelter."
+    },
+    {
+     "name": "storm_level",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Solar storm level, S-scale. REPLAY."
+    },
+    {
+     "name": "proton_flux_pfu",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Daily maximum proton flux above 10 MeV at Earth on the replayed day (OMNI), pfu. Transit days only."
+    },
+    {
+     "name": "out_temp_max_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Outside air, daily high, °C. REPLAY."
+    },
+    {
+     "name": "out_temp_min_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Outside air, nightly low, °C. REPLAY."
+    },
+    {
+     "name": "out_pressure_pa",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Outside air pressure, Pa. REPLAY."
+    },
+    {
+     "name": "out_uv_index",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Outside ultraviolet, index 1-4. REPLAY."
+    },
+    {
+     "name": "sunrise_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Sunrise at Gale crater, local mean solar time, hours. Surface only."
+    },
+    {
+     "name": "sunset_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Sunset at Gale crater, local mean solar time, hours. Surface only."
+    }
+   ]
+  },
+  "env_hour": {
+   "group": "Surroundings",
+   "note": "Cabin air and dose rate, one row per hour.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "hour",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Hour of the day, 0 to 23."
+    },
+    {
+     "name": "cabin_co2_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Cabin carbon dioxide, mmHg. REPLAY."
+    },
+    {
+     "name": "cabin_pio2_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Oxygen you breathe in, mmHg. SIM."
+    },
+    {
+     "name": "cabin_temp_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Cabin temperature, °C. REPLAY."
+    },
+    {
+     "name": "cabin_rh_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Cabin humidity, %. REPLAY."
+    },
+    {
+     "name": "dose_rate_usv_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Radiation dose rate, µSv/h. REPLAY."
+    }
+   ]
+  },
+  "body_day": {
+   "group": "Crew and body",
+   "note": "The body, one row per person and day: sleep, heart, fitness, bone, eyes, dose, readiness.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "hr_rest_bpm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Resting heart rate, bpm. SIM."
+    },
+    {
+     "name": "hrv_rmssd_ms",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Heart-rate variability, ms. SIM."
+    },
+    {
+     "name": "bp_sys_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Blood pressure, upper value, mmHg. SIM."
+    },
+    {
+     "name": "bp_dia_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Blood pressure, lower value, mmHg. SIM."
+    },
+    {
+     "name": "spo2_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Blood oxygen, %. SIM."
+    },
+    {
+     "name": "resp_rate_bpm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Breathing rate, per min. SIM."
+    },
+    {
+     "name": "temp_core_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Core body temperature, °C. SIM."
+    },
+    {
+     "name": "stand_dhr_bpm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Stand test, heart-rate rise, bpm. SIM."
+    },
+    {
+     "name": "ortho_risk_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Chance to fail a stand test if landing today, %. MODEL."
+    },
+    {
+     "name": "sleep_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Sleep last night, h. SIM."
+    },
+    {
+     "name": "sleep_eff_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Sleep efficiency, %. SIM."
+    },
+    {
+     "name": "sleep_debt_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Sleep debt, h. MODEL."
+    },
+    {
+     "name": "pvt_rt_ms",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Reaction time, ms. SIM."
+    },
+    {
+     "name": "pvt_z",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Reaction speed, SD vs own usual. SIM."
+    },
+    {
+     "name": "mood_who5",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Wellbeing (WHO-5), of 25. SIM."
+    },
+    {
+     "name": "stress_0_10",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Stress, 0-10. SIM."
+    },
+    {
+     "name": "body_mass_kg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Body mass, kg. SIM."
+    },
+    {
+     "name": "energy_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Energy eaten vs need, %. SIM."
+    },
+    {
+     "name": "protein_g_kg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Protein, g per kg. SIM."
+    },
+    {
+     "name": "fluid_l",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Fluids, L. SIM."
+    },
+    {
+     "name": "urine_l",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Urine volume, L. SIM."
+    },
+    {
+     "name": "stone_risk_irr",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Kidney-stone risk vs pre-flight, x. MODEL."
+    },
+    {
+     "name": "exercise_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Exercise minutes, min. SIM."
+    },
+    {
+     "name": "exercise_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Exercise done vs plan, %. SIM."
+    },
+    {
+     "name": "resist_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes of resistive exercise."
+    },
+    {
+     "name": "vo2max_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Aerobic fitness vs pre-flight, %. MODEL."
+    },
+    {
+     "name": "leg_strength_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Leg strength vs pre-flight, %. MODEL."
+    },
+    {
+     "name": "bmd_hip_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Hip bone density vs pre-flight, %. MODEL."
+    },
+    {
+     "name": "back_pain_0_10",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Back pain, 0-10. SIM."
+    },
+    {
+     "name": "sms_grade",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Motion sickness, grade 0-3. SIM."
+    },
+    {
+     "name": "balance_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Balance, heel-to-toe walk, % of pre-flight. SIM."
+    },
+    {
+     "name": "sans_trt_um",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Optic disc swelling, µm. MODEL."
+    },
+    {
+     "name": "dose_day_msv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Dose received that day, mSv (same as env_day.dose_day_msv)."
+    },
+    {
+     "name": "dose_cum_msv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Radiation dose this mission, mSv. MODEL."
+    },
+    {
+     "name": "readiness",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Readiness, of 100. MODEL."
+    },
+    {
+     "name": "readiness_band",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Ready (85 and over), Ready with limits (70 to 84), Restricted (50 to 69), Stand down (under 50)."
+    },
+    {
+     "name": "activity",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Main activity: work day, EVA nn, storm shelter, launch, Mars landing, Mars departure, Earth landing, pre-launch quarantine or rehabilitation."
+    },
+    {
+     "name": "symptoms",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Symptoms of the day in plain words, separated by ; . Empty if none."
+    }
+   ]
+  },
+  "body_hour": {
+   "group": "Crew and body",
+   "note": "Heart rate, temperature and activity, one row per person and hour.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "hour",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Hour of the day, 0 to 23."
+    },
+    {
+     "name": "hr_bpm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Heart rate in that hour, bpm (24-hour shape learned from MMASH)."
+    },
+    {
+     "name": "temp_core_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Core temperature in that hour, °C (daily wave around body_day.temp_core_c)."
+    },
+    {
+     "name": "activity",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "sleep, work, exercise, EVA or shelter."
+    }
+   ]
+  },
+  "lab": {
+   "group": "Crew and body",
+   "note": "Blood and urine panels, one row per person, panel day and value.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "var_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Which lab value. One of the variable rows with scope = 'lab' (listed below)."
+    },
+    {
+     "name": "value",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Result, in the unit of that variable."
+    }
+   ]
+  },
+  "assessment": {
+   "group": "Rules and instructions",
+   "note": "Rule results: every value that crossed a limit, per person and day, with the reason.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member C1 to C4, or ENV for environment rules."
+    },
+    {
+     "name": "var_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Value that was flagged (variable.var_id)."
+    },
+    {
+     "name": "status",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "watch, warning or critical. Only flagged values have a row: no row means ok."
+    },
+    {
+     "name": "value",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Value the rule looked at (can be a mean, e.g. the 7-day sleep mean)."
+    },
+    {
+     "name": "reason",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Why, in plain words."
+    }
+   ]
+  },
+  "readiness_cost": {
+   "group": "Crew and body",
+   "note": "What cost readiness points on a day, item by item.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "item",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "What costs points: Sleep debt, Reaction speed, Heart strain, Energy and fluids, Exercise shortfall, Symptoms, Mood and stress, Balance and standing, Cabin air, Bone trend."
+    },
+    {
+     "name": "points",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Points taken off 100. Items under 0.5 points are not stored."
+    }
+   ]
+  },
+  "event": {
+   "group": "The mission",
+   "note": "What happened: solar storms, faults, illnesses and injuries, with start and end day.",
+   "columns": [
+    {
+     "name": "event_id",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Row id."
+    },
+    {
+     "name": "day_start",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "First mission day of the event."
+    },
+    {
+     "name": "day_end",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Last mission day of the event (inclusive)."
+    },
+    {
+     "name": "scope",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "env, mission or crew."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Crew member for crew events; empty otherwise."
+    },
+    {
+     "name": "type",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "medical, solar_storm, co2_removal_fault, comm_blackout, comm_degraded, device_fault, workload, behaviour or countermeasure."
+    },
+    {
+     "name": "severity",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "info, watch or warning; medical events use minor, moderate or major."
+    },
+    {
+     "name": "title",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Short title."
+    },
+    {
+     "name": "detail",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Detail in plain words."
+    },
+    {
+     "name": "origin",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Where it comes from, e.g. scripted, REAL replay; shielding factors assumed, REAL astronomy, MODEL: NASA medical-conditions ranking (kb/19), rule."
+    }
+   ]
+  },
+  "plan": {
+   "group": "Rules and instructions",
+   "note": "Tomorrow's plan, written by the on-board rules every day.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Day the plan is written. It is the plan for the next day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "seq",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Order of the item in that plan (0 first)."
+    },
+    {
+     "name": "topic",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Sleep, Exercise, Food, Fluids, EVA, Landing, Departure, Work, Air, Radiation, Tests, Medical or Routine."
+    },
+    {
+     "name": "text",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The instruction."
+    },
+    {
+     "name": "why",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The reason, from that day's values."
+    }
+   ]
+  },
+  "uplink": {
+   "group": "Rules and instructions",
+   "note": "Earth's daily instruction for each person, with its delay and its age.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Day the instruction arrives (in the morning)."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Crew member, C1 to C4. Joins to crew.crew_id."
+    },
+    {
+     "name": "status",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "received, short (weak link: two items at most), none (blackout: standing orders apply) or in_person (on Earth)."
+    },
+    {
+     "name": "based_on_day",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Day whose data Earth used: normally the day before; in the blackout, the last day with a link."
+    },
+    {
+     "name": "age_days",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Days since the last instruction arrived (counts up during the blackout)."
+    },
+    {
+     "name": "delay_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "One-way signal time that day, minutes. Empty without a link."
+    },
+    {
+     "name": "headline",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "One-line summary."
+    },
+    {
+     "name": "items_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "JSON list of items: topic, text, why, priority (1 = most important), and standing: true when repeated as standing orders."
+    },
+    {
+     "name": "narrative",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Full letter from the flight surgeon on snapshot days of the focus astronaut; empty otherwise."
+    }
+   ]
+  },
+  "snapshot": {
+   "group": "The mission",
+   "note": "24 key days of the focus astronaut, each with a written analysis and questions to ask.",
+   "columns": [
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Always the focus astronaut, C1."
+    },
+    {
+     "name": "title",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Title of the snapshot day."
+    },
+    {
+     "name": "why",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Why the day matters."
+    },
+    {
+     "name": "analysis",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Written analysis, built from that day's numbers."
+    },
+    {
+     "name": "questions_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "JSON list of suggested questions for the assistant."
+    }
+   ]
+  },
+  "eva": {
+   "group": "Mars walks, second by second",
+   "note": "All 157 planned Mars walks: who, how long, how it ended.",
+   "columns": [
+    {
+     "name": "eva_id",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Row id."
+    },
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "sol",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Mars sol in progress (1 to 546); empty off Mars."
+    },
+    {
+     "name": "team",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "A or B."
+    },
+    {
+     "name": "crew_ids",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The two team members, comma-separated."
+    },
+    {
+     "name": "number",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Running EVA number of the team. Empty if postponed."
+    },
+    {
+     "name": "planned_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Planned length, minutes."
+    },
+    {
+     "name": "actual_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Actual length, minutes (0 if postponed)."
+    },
+    {
+     "name": "distance_m",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Distance walked, m. Drawn for ordinary EVAs; twice the farthest point for the four scenario walks."
+    },
+    {
+     "name": "peak_hr",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Highest heart rate, bpm."
+    },
+    {
+     "name": "dose_usv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Dose during the EVA, µSv."
+    },
+    {
+     "name": "outcome",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "nominal, postponed, shortened: fatigue, terminated: CO2 scrubber fault or terminated: solar storm warning."
+    },
+    {
+     "name": "summary",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Story text for the four scenario walks, reason for postponed EVAs; empty otherwise."
+    },
+    {
+     "name": "scenario_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Scenario walk for the four second-by-second EVAs; empty otherwise."
+    }
+   ]
+  },
+  "eva_scenario": {
+   "group": "Mars walks, second by second",
+   "note": "The four walks that are simulated second by second.",
+   "columns": [
+    {
+     "name": "scenario_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Second-by-second walk: nominal, fatigue, co2 or storm. Joins to eva_scenario.scenario_id."
+    },
+    {
+     "name": "eva_id",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Not filled (always empty). Link through eva.scenario_id instead."
+    },
+    {
+     "name": "sort",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Display order, 1 to 4."
+    },
+    {
+     "name": "title",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Title of the walk."
+    },
+    {
+     "name": "day",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Mission day: 0 = launch (2037-09-03), -30 = first pre-launch day, 968 = last day. Joins to day.day."
+    },
+    {
+     "name": "sol",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Mars sol in progress (1 to 546); empty off Mars."
+    },
+    {
+     "name": "date_utc",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Calendar date, YYYY-MM-DD."
+    },
+    {
+     "name": "crew_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The focus astronaut, C1."
+    },
+    {
+     "name": "start_local_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Local start time at suit seal, hours (10.0)."
+    },
+    {
+     "name": "duration_s",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Length from suit seal to helmet off, seconds (= rows in eva_sample)."
+    },
+    {
+     "name": "snapshot_t_s",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Second the apps open on by default."
+    },
+    {
+     "name": "outcome",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Same values as eva.outcome."
+    },
+    {
+     "name": "summary",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The story of the walk in plain words."
+    },
+    {
+     "name": "context_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "JSON: that day's values that drive the walk (readiness, fitness, resting heart rate, dose rate, sunset, ...) and the walk's summary numbers."
+    }
+   ]
+  },
+  "eva_sample": {
+   "group": "Mars walks, second by second",
+   "note": "One row per second of those four walks: body, suit, time left, what the arm unit says.",
+   "columns": [
+    {
+     "name": "scenario_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Second-by-second walk: nominal, fatigue, co2 or storm. Joins to eva_scenario.scenario_id."
+    },
+    {
+     "name": "t_s",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Seconds since suit seal."
+    },
+    {
+     "name": "phase",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "airlock, prebreathe, depress, egress, traverse, work, rest, ingress, repress or post."
+    },
+    {
+     "name": "task",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Current task in words; Rest ordered by the unit during an ordered rest."
+    },
+    {
+     "name": "seg_left_s",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Seconds left in the current task; empty while walking."
+    },
+    {
+     "name": "state",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Unit state: go, caution or return (the code also has emergency, not reached in the four walks)."
+    },
+    {
+     "name": "limiter",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Resource with the smallest margin: Stamina, Oxygen, Battery, Cooling water, CO₂ scrubber, Daylight, or an event rule (CO₂ limit, Storm rule). Empty inside."
+    },
+    {
+     "name": "stay_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "You can stay, min. MODEL. Minutes the crew member can stay: the smallest margin after the walk back and the reserve."
+    },
+    {
+     "name": "walk_back_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes needed to walk back to the airlock from here."
+    },
+    {
+     "name": "dist_m",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Walk back to the airlock, m. SIM."
+    },
+    {
+     "name": "x_m",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Position relative to the airlock, x axis, m (map of the route)."
+    },
+    {
+     "name": "y_m",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Position relative to the airlock, y axis, m."
+    },
+    {
+     "name": "met_w",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Work rate, W. MODEL."
+    },
+    {
+     "name": "hr_bpm",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Heart rate, bpm. SIM."
+    },
+    {
+     "name": "core_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Core temperature, °C. SIM."
+    },
+    {
+     "name": "lactate_mmol",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Lactate, mmol/L. MODEL."
+    },
+    {
+     "name": "stamina_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Stamina left, %. MODEL."
+    },
+    {
+     "name": "balance_score",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Balance, of 100. MODEL."
+    },
+    {
+     "name": "faint_risk_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Chance to faint, %. MODEL."
+    },
+    {
+     "name": "heat_kj_kg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Stored heat, kJ/kg. MODEL."
+    },
+    {
+     "name": "suit_p_kpa",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Suit pressure, kPa. SIM."
+    },
+    {
+     "name": "suit_o2_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Oxygen tank, %. SIM."
+    },
+    {
+     "name": "suit_co2_mmhg",
+     "type": "REAL",
+     "key": false,
+     "meaning": "CO2 in the helmet, mmHg. SIM."
+    },
+    {
+     "name": "suit_temp_c",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Suit temperature, °C. SIM."
+    },
+    {
+     "name": "battery_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Battery, %. SIM."
+    },
+    {
+     "name": "water_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Cooling water, %. SIM."
+    },
+    {
+     "name": "scrubber_pct",
+     "type": "REAL",
+     "key": false,
+     "meaning": "CO2 scrubber, %. SIM."
+    },
+    {
+     "name": "cooling_level",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Suit cooling setting, 1 to 5."
+    },
+    {
+     "name": "dose_rate_usv_h",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Dose rate outside, µSv/h. REPLAY."
+    },
+    {
+     "name": "eva_dose_usv",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Dose this EVA, µSv. MODEL."
+    },
+    {
+     "name": "drink_ml",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Water drunk so far, mL."
+    },
+    {
+     "name": "left_o2_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes the oxygen lasts at the current rate."
+    },
+    {
+     "name": "left_battery_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes the battery lasts."
+    },
+    {
+     "name": "left_water_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes the cooling water lasts."
+    },
+    {
+     "name": "left_scrubber_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes the CO₂ scrubber lasts."
+    },
+    {
+     "name": "left_daylight_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes to sunset."
+    },
+    {
+     "name": "left_stamina_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes until stamina reaches its floor (15 %)."
+    },
+    {
+     "name": "left_event_min",
+     "type": "REAL",
+     "key": false,
+     "meaning": "Minutes left under an event rule (storm: indoors within 30 min; CO₂: time to 20 mmHg). Empty without an event."
+    },
+    {
+     "name": "next_id",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Instruction shown on the unit; key into eva_text.next_id."
+    }
+   ]
+  },
+  "eva_text": {
+   "group": "Mars walks, second by second",
+   "note": "The sentences the arm unit shows as the next step.",
+   "columns": [
+    {
+     "name": "scenario_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Second-by-second walk: nominal, fatigue, co2 or storm. Joins to eva_scenario.scenario_id."
+    },
+    {
+     "name": "next_id",
+     "type": "INTEGER",
+     "key": true,
+     "meaning": "Instruction number, 1 to 19."
+    },
+    {
+     "name": "text",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Instruction text (the same 19 texts for each walk)."
+    }
+   ]
+  },
+  "eva_event": {
+   "group": "Mars walks, second by second",
+   "note": "Cautions, alarms and steps during the four walks.",
+   "columns": [
+    {
+     "name": "scenario_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Second-by-second walk: nominal, fatigue, co2 or storm. Joins to eva_scenario.scenario_id."
+    },
+    {
+     "name": "t_s",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Second of the walk."
+    },
+    {
+     "name": "kind",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "phase (new task), caution, alarm (return called), action or info."
+    },
+    {
+     "name": "severity",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "info, caution or return."
+    },
+    {
+     "name": "var_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Value that triggered it (variable.var_id); empty for phase changes."
+    },
+    {
+     "name": "text",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "What the unit says."
+    }
+   ]
+  },
+  "learned_param": {
+   "group": "Where the numbers come from",
+   "note": "What was learned from real data: curves and starting ranges, as summaries only.",
+   "columns": [
+    {
+     "name": "param_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "hr_day_shape, lactate_curve, hr_vo2, pvt_sleep_loss, tilt_response, baseline_nhanes or baseline_i4."
+    },
+    {
+     "name": "value_json",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "The learned numbers (JSON). Aggregates only, no individual record."
+    },
+    {
+     "name": "dataset_id",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Reference dataset it was learned from."
+    },
+    {
+     "name": "n",
+     "type": "INTEGER",
+     "key": false,
+     "meaning": "Number of people, tests or sessions used."
+    },
+    {
+     "name": "method",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "How it was learned, in words."
+    },
+    {
+     "name": "used_for",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Which simulated values use it."
+    }
+   ]
+  },
+  "source_use": {
+   "group": "Where the numbers come from",
+   "note": "Every real dataset we hold: whether and how the simulation uses it, and which values it feeds.",
+   "columns": [
+    {
+     "name": "dataset_id",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Dataset id in the reference database, or jpl_horizons, nasa_imm_ranking, indicator_catalog, nasa_std_3001."
+    },
+    {
+     "name": "title",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Dataset title."
+    },
+    {
+     "name": "kind",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "timeseries, events, subjects, computed, table or document."
+    },
+    {
+     "name": "provenance",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "e.g. REAL, REAL astronomy, NASA model output, NASA standard."
+    },
+    {
+     "name": "licence",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Licence. Ends in (no redistribution) where that applies."
+    },
+    {
+     "name": "source_url",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Where the data comes from."
+    },
+    {
+     "name": "how",
+     "type": "TEXT",
+     "key": true,
+     "meaning": "Use in the simulation: replay, shape, baseline, check, level, computed, probability, model, rule or not used."
+    },
+    {
+     "name": "used_for",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "What it feeds, in words."
+    },
+    {
+     "name": "note",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Note on the use."
+    },
+    {
+     "name": "feeds",
+     "type": "TEXT",
+     "key": false,
+     "meaning": "Comma-separated variable.var_id values it feeds (for links on the site)."
+    }
+   ]
+  }
+ }
+}

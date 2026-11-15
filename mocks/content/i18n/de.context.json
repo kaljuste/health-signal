@@ -1,0 +1,30 @@
+{
+ "_about": "context.html page and its slides.",
+ "strings": {
+  "What the assistant knows · Health Signal": "Was der Assistent weiss · Mars 2037 Gesundheit",
+  "What the assistant knows": "Was der Assistent weiss",
+  "Nothing is hidden. For any moment of the mission, this is the complete text the health assistant receives before it answers: the values, the rule results, Earth's instruction and the knowledge-base notes. It is read from the simulated mission database.": "Nichts ist versteckt. Für jeden Moment der Mission ist dies der vollständige Text, den der Gesundheitsassistent erhält, bevor er antwortet: die Werte, die Ergebnisse der Regeln, die Anweisung der Erde und die Notizen der Wissensbasis. Er wird aus der simulierten Missionsdatenbank gelesen. Der Text selbst bleibt Englisch, so wie ihn das KI-Modell bekommt.",
+  "App": "App",
+  "Mission day": "Missionstag",
+  "Crew member": "Crewmitglied",
+  "Scenario": "Szenario",
+  "Second": "Sekunde",
+  "Show": "Zeigen",
+  "Ask with this context": "Mit diesem Kontext fragen",
+  "Ask the assistant": "Den Assistenten fragen",
+  "Briefing without AI (built by rules):": "Zusammenfassung ohne KI (von Regeln erstellt):",
+  "Habitat App (a mission day)": "Habitat-App (ein Missionstag)",
+  "Arm Unit (a second of a Mars walk)": "Armgerät (eine Sekunde eines Ausseneinsatzes)"
+ },
+ "patterns": {
+  "{1} characters": "{1} Zeichen",
+  "AI model connected: {*1}": "KI-Modell verbunden: {*1}"
+ },
+ "skip": [
+  "#ctx",
+  "#brief",
+  "#ans",
+  "#crew",
+  "#scn"
+ ]
+}

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data · Health Signal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* The data we chose: what it is, why, what we took from it, where it shows. Tokens and base classes: assets/site.css. */
+[hidden]{display:none!important}
+.funnel{display:flex;align-items:stretch;margin-top:var(--space-8)}
+.funnel div{flex:1 1 0;border-left:3px solid var(--color-border-default);padding:2px var(--space-4) 2px var(--space-4)}
+.funnel div.use{border-left-color:var(--color-status-success)}
+.funnel div.out{border-left-color:var(--color-status-warning)}
+.funnel b{display:block;font:300 49px/1 "Manrope",sans-serif;color:var(--color-text-display);letter-spacing:-.6px}
+.funnel span{display:block;margin-top:6px;font:var(--type-body-small);color:var(--color-text-muted);max-width:26ch}
+.funnel i{flex:none;width:44px;display:flex;align-items:center;justify-content:center;color:var(--color-border-strong);font-style:normal}
+.funnel i svg{width:28px;height:14px}
+.page .aside{margin-top:var(--space-4);font:var(--type-body-small);color:var(--color-text-muted);max-width:90ch}
+
+/* one example = one chain: real data -> what we took -> the simulated value */
+.chain{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) 40px minmax(0,1.5fr);margin-top:var(--space-6);align-items:stretch}
+.chain + .chain{margin-top:var(--space-8)}
+.chain > h3{grid-column:1 / -1;margin:0 0 var(--space-2);display:flex;align-items:center;gap:12px}
+.step{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-top:3px solid var(--color-border-strong);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6) var(--space-4);min-width:0}
+.step.real{border-top-color:var(--color-status-success)} .step.sim{border-top-color:var(--color-status-warning)}
+.step .k{font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);margin:0 0 8px}
+.step b{display:block;font:400 20px/1.3 "Manrope",sans-serif;color:var(--color-text-display);margin-bottom:6px}
+.step p{font:var(--type-body-small);color:var(--color-text-default);margin:0 0 8px;max-width:none}
+.step p.m{color:var(--color-text-muted)}
+.step svg{display:block;width:100%;height:auto;overflow:visible;margin-top:4px}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--color-border-strong)}
+.arrow svg{width:28px;height:14px}
+.chain .why{grid-column:1 / -1;margin:10px 0 0;font:var(--type-body-small);color:var(--color-text-muted);max-width:none}
+.chain .why b{color:var(--color-text-default);font-weight:600}
+.badge.MODEL{border-color:var(--color-status-warning);color:var(--color-text-status-warning)}
+.badge.REPLAY{border-color:var(--color-status-live);color:var(--color-text-status-live)}
+.badge.SIM{border-color:var(--color-border-strong)}
+
+/* the full list */
+.flow{width:100%;border-collapse:collapse;margin-top:var(--space-4)}
+.flow th{font:var(--type-label);letter-spacing:1.2px;text-transform:uppercase;color:var(--color-text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--color-border-strong)}
+.flow td{padding:12px 12px;border-bottom:1px solid var(--color-border-default);vertical-align:top;font:var(--type-body-small)}
+.flow td.src b{display:block;font:var(--type-body-default);color:var(--color-text-display);font-weight:400}
+.flow td.src span,.flow td.src a{color:var(--color-text-muted);font:var(--type-body-small)}
+.flow tr.grp td{padding:var(--space-6) 12px 8px;border-bottom:1px solid var(--color-border-strong);font:var(--type-heading-3);font-size:21px;color:var(--color-text-display)}
+.flow tr.grp td small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:12px}
+.feeds{display:flex;flex-wrap:wrap;gap:6px}
+.feeds a{font:var(--type-body-small);color:var(--color-text-default);text-decoration:none;background:var(--color-surface-input);border:1px solid var(--color-border-default);border-radius:var(--radius-sm);padding:3px 8px}
+.feeds a:hover{background:var(--color-surface-input-hover);border-color:var(--color-border-strong);color:var(--color-text-display)}
+.gaps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--space-12);padding:0;margin:0;list-style:none}
+.gaps li{padding:12px 0;border-bottom:1px solid var(--color-border-default);font:var(--type-body-small)}
+.gaps b{display:block;font:var(--type-body-default);color:var(--color-text-display);font-weight:400;margin-bottom:2px}
+details{margin-top:var(--space-6)}
+summary{cursor:pointer;font:var(--type-body-default);color:var(--color-text-accent-soft)}
+.next{display:flex;justify-content:space-between;align-items:center;gap:var(--space-6);margin-top:var(--space-12);padding:var(--space-6) var(--space-8);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);text-decoration:none;color:inherit!important}
+.next:hover{border-color:var(--color-border-strong)}
+.next b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display)}
+.next span{color:var(--color-text-muted)}
+.next em{font-style:normal;color:var(--color-text-accent-soft);white-space:nowrap}
+@media (max-width:1000px){.chain{grid-template-columns:1fr}.arrow{height:28px;transform:rotate(90deg)}.funnel{flex-wrap:wrap;gap:var(--space-4)}.funnel i{display:none}.funnel div{flex:1 1 40%}.gaps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>The data we used</h1>
+  <p class="lead">Nobody has flown to Mars, so no data from such a mission exists. We looked widely, kept only what could teach a simulation something, and built one complete mission from it. This page shows the data we chose: what it is, why we chose it, what we took from it, and where you see it in the apps.</p>
+
+  <div class="funnel" id="funnel" aria-label="From sources looked at to simulated values"></div>
+  <p class="aside">The long list of everything we looked at is our research notebook. It is not part of the product and not shown here. All data on this page is recorded history. None of it is a live feed.</p>
+
+  <h2>From a real measurement to a value on the screen</h2>
+  <p>Four examples, one for each way we use real data.</p>
+  <div id="chains"></div>
+
+  <h2>All the data we chose, and why</h2>
+  <p>Twenty sources, grouped by what they are for. Select a value to see its rule and its course over the mission.</p>
+  <table class="flow" id="flow"></table>
+  <details><summary id="unusedSum">Collected, but not used</summary><p class="aside">We hold these datasets and checked them. They did not add anything the chosen ones do not already give, so the simulation does not read them.</p><table class="flow" id="unused"></table></details>
+
+  <h2>What real data cannot tell us</h2>
+  <ul class="gaps">
+    <li><b>Nobody has lived at Mars gravity.</b>Every body value on Mars is a model between two known ends: weightlessness and Earth.</li>
+    <li><b>Open astronaut body data is four people for three days.</b>The Inspiration4 crew. Long-mission changes come from published group results in NASA reports and papers.</li>
+    <li><b>Radiation depends on the ship.</b>How much a storm reaches the crew depends on shielding. Our shielding factors are stated assumptions, not a calculation.</li>
+    <li><b>Studies on Earth are not astronauts.</b>The exercise, sleep and heart datasets come from athletes, students and volunteers at Earth gravity.</li>
+  </ul>
+
+  <a class="next" href="simulation.html"><span><b>Next: how the simulation was made</b><br>Six steps turn this data into 999 days of one mission.</span><em>Open Simulation →</em></a>
+</main>
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const svg = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const ARROW = () => { const s = svg("svg", { viewBox: "0 0 28 14", fill: "none", stroke: "currentColor", "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round" }); s.append(svg("path", { d: "M1 7h24M19 2l6 5-6 5" })); return s; };
+const SOURCES_LOOKED_AT = 57;        // registered in config/data_sources.json (docs/02_data_sources.md)
+
+/* Why each source was chosen and what we took from it, in plain words. Titles, licences and the values fed come from the database (table source_use). */
+const WHY = {
+  jpl_horizons: ["The only exact part of a future mission: where the planets will be.", "Every date, sol and signal delay, and the days without a link."],
+  msl_rad: ["The only instrument that has measured radiation on the surface of Mars.", "The daily dose pattern on Mars, and the hour-by-hour curve of a real storm (10 to 13 September 2017)."],
+  crater: ["It measures in deep space near the Moon, outside Earth's magnetic shield: the closest open record to the trip itself.", "The day-to-day change and the storm days on the way out and back."],
+  omni: ["An hourly record of solar protons near Earth: it tells how strong each storm was.", "The storm level, S1 to S4, of each replayed day."],
+  noaa_sep_events: ["The official list of solar proton storms.", "Names and dates of the replayed storms."],
+  donki_sep_events: ["NASA's own list of solar particle events, with the far side of the Sun.", "The real event behind the storm on Mars."],
+  mars_weather: ["Curiosity's weather station stands in Gale crater, our landing site.", "Temperature, pressure and UV for each sol, matched by Mars season."],
+  iss_env: ["The only open hour-by-hour record of the air inside a crewed spacecraft.", "The pattern of CO₂, temperature and humidity, rescaled to today's CO₂ limit."],
+  mmash_24h: ["Every heartbeat of 22 people over 24 hours: it shows how a normal day moves.", "The shape of the heart rate through a day."],
+  cycle_graded_actes: ["Heart rate and oxygen uptake measured together during exercise.", "How fast the heart rate rises with the work."],
+  graded_tests_lactate_tcd: ["833 exercise tests with a blood sample at every step.", "The curve of lactate against effort."],
+  sleepdep_eeg_behaviour: ["The reaction test used on the Space Station, before and after a night without sleep.", "How much lost sleep slows reactions."],
+  nhanes_2013_2014_baseline: ["Thousands of healthy adults: it tells what a normal starting value is.", "Starting ranges for blood values, pulse, blood pressure and sleep."],
+  i4_cbc: ["Blood counts of four real astronauts (Inspiration4, 2021), open through NASA.", "A check that our crew starts where real astronauts start."],
+  i4_cmp: ["Blood chemistry of the same four astronauts.", "The same check, for kidney and blood-sugar values."],
+  indicator_catalog: ["Our own collection of 72 indicators from NASA reports and research papers, fact-checked.", "How fast each body value changes in weightlessness, on Mars and back on Earth."],
+  nasa_imm_ranking: ["NASA's ranking of 98 medical conditions for a long planetary mission.", "The odds of each illness and injury."],
+  nasa_std_3001: ["NASA's own crew-health standard.", "The hard limits: cabin air, radiation, bone, fitness, suit."],
+  sunspots: ["It tells where in the Sun's eleven-year cycle the mission flies.", "The choice of the replay window. No value is copied."],
+  hdt_graded_hrv: ["People tilted head-down: it imitates the fluid shift of weightlessness.", "A check on the direction of the heart values. No value is copied."],
+};
+const ORDER = ["computed", "replay", "shape", "baseline", "model", "probability", "rule", "level", "check"];
+const GROUP = { computed: ["The mission itself", "astronomy, exact"], replay: ["The surroundings", "real measurements, shown again on the matching day"], shape: ["The body: patterns", "a curve taken from real people"],
+  baseline: ["The body: where the crew starts", "healthy ranges and real astronauts"], model: ["The body: change over the mission", "sizes and speeds from published flight results"],
+  probability: ["Illness and injury", "how often something happens"], rule: ["Limits", "where a threshold comes from"], level: ["Timing", "chooses the replay window"], check: ["Checks", "to check a direction, nothing copied"] };
+function anchor(id) { const bare = id.replace(/^eva\./, ""); return SimDB.vars[bare] && id !== bare ? id : bare; }
+
+function funnel() {
+  const used = SimDB.one("select count(distinct dataset_id) n from source_use where how!='not used'").n, all = SimDB.one("select count(distinct dataset_id) n from source_use").n;
+  const parts = [[SOURCES_LOOKED_AT, "sources looked at: NASA archives, space agencies, open studies", ""], [all, "datasets collected and checked", ""], [used, "used in the simulation", "use"], [Object.keys(SimDB.vars).length, "simulated values, each with a rule and a source", "out"]];
+  parts.forEach(([n, t, c], i) => { if (i) { const a = el("i"); a.append(ARROW()); $("funnel").append(a); } const d = el("div", c); d.append(el("b", null, n), el("span", null, t)); $("funnel").append(d); });
+}
+
+/* A small line chart over the mission days. series: [{pts:[[day, value]], color, width}], bands: phase shading, lines: [{y, label, color}] */
+function chart(series, o) {
+  const W = 560, H = 190, L = 44, R = 10, T = 14, B = 26, X = d => L + (W - L - R) * (d - o.x0) / (o.x1 - o.x0), Y = v => T + (H - T - B) * (1 - (v - o.y0) / (o.y1 - o.y0));
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": o.label });
+  (o.bands || []).forEach(([a, b, name]) => { g.append(svg("rect", { x: X(a), y: T, width: X(b) - X(a), height: H - T - B, fill: "#3a221b", opacity: .45 }), svg("text", { x: (X(a) + X(b)) / 2, y: T + 13, fill: "#9a968c", "font-size": 11, "text-anchor": "middle", "font-family": "Manrope" }, name)); });
+  o.yt.forEach(v => g.append(svg("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: "#2b2b2b" }), svg("text", { x: L - 7, y: Y(v) + 4, fill: "#9a968c", "font-size": 11, "text-anchor": "end", "font-family": "Azeret Mono" }, v)));
+  o.xt.forEach(([d, t]) => g.append(svg("text", { x: X(d), y: H - 8, fill: "#9a968c", "font-size": 11, "text-anchor": "middle", "font-family": "Azeret Mono" }, t)));
+  (o.lines || []).forEach(l => g.append(svg("line", { x1: L, x2: W - R, y1: Y(l.y), y2: Y(l.y), stroke: l.color, "stroke-dasharray": "5 4", "stroke-width": 1.5 }), svg("text", { x: L + 6, y: Y(l.y) + 14, fill: l.color, "font-size": 11, "font-family": "Manrope" }, l.label)));
+  series.forEach(s => g.append(svg("path", { d: s.pts.map(([d, v], i) => (i ? "L" : "M") + X(d).toFixed(1) + " " + Y(Math.max(o.y0, Math.min(o.y1, v))).toFixed(1)).join(""), fill: "none", stroke: s.color, "stroke-width": s.width || 1.6, "stroke-linejoin": "round" })));
+  if (o.unit) g.append(svg("text", { x: L, y: 10, fill: "#9a968c", "font-size": 11, "font-family": "Manrope" }, o.unit));
+  return g;
+}
+function chain(title, kind, real, took, sim, why) {
+  const c = el("section", "chain"), h = el("h3", null, title + " "); h.append(el("span", "badge " + kind, kind)); c.append(h);
+  const a = el("div", "step real"); a.append(el("p", "k", "Real data"), el("b", null, real[0]), el("p", null, real[1]), el("p", "m", real[2]));
+  const b = el("div", "step"); b.append(el("p", "k", "What we took from it"), el("b", null, took[0]), el("p", null, took[1])); if (took[2]) b.append(el("p", "m", took[2]));
+  const d = el("div", "step sim"); d.append(el("p", "k", "In the simulated mission"), el("b", null, sim[0])); if (sim[1]) d.append(sim[1]); d.append(el("p", "m", sim[2]));
+  const ar = () => { const x = el("div", "arrow"); x.append(ARROW()); return x; };
+  const w = el("p", "why"); w.append(el("b", null, "Why this data: "), why);
+  c.append(a, ar(), b, ar(), d, w); $("chains").append(c);
+}
+function chains() {
+  const M = SimDB.meta, land = +M.day_mars_landing, dep = +M.day_mars_departure, end = +M.day_earth_landing;
+  const xt = [[0, "launch"], [land, "Mars"], [dep, "leave"], [end, "home"]], bands = [[land, dep, "on Mars"]];
+  const P = {}; SimDB.q("select * from learned_param").forEach(r => { P[r.param_id] = { v: JSON.parse(r.value_json), n: r.n }; });
+
+  { // 1. radiation: replayed
+    const pts = SimDB.q("select day, dose_day_msv v from env_day where day between 0 and ? order by day", [end]).map(r => [r.day, r.v]);
+    chain("Radiation", "REPLAY",
+      ["Radiation measured in space and on Mars", "Curiosity's detector on the surface of Mars (MSL RAD), and a detector in orbit around the Moon (LRO CRaTER), outside Earth's magnetic shield.", "NASA Planetary Data System, public domain."],
+      ["The real ups and downs, day by day", `Each mission day shows what the instruments measured ${Number(M.replay_shift_days).toLocaleString("en")} days earlier: the same point in the Sun's eleven-year cycle. Real storms arrive on their real dates.`, `The level is NASA's published dose rate: ${M.dose_rate_transit_msv_day} mSv a day in deep space, ${M.dose_rate_surface_msv_day} mSv a day on Mars.`],
+      ["Radiation dose, every day", chart([{ pts, color: "#e8e4d8" }], { x0: 0, x1: end, y0: 0, y1: 4, yt: [0, 1, 2, 3, 4], xt, bands, unit: "mSv a day", label: "Daily radiation dose over the mission" }),
+       `${Math.round(M.dose_total_msv)} mSv over the whole mission. NASA's career limit of ${Math.round(M.career_limit_msv)} mSv is passed on day ${M.day_dose_600}. The peaks are solar storms.`],
+      "radiation is the one risk the crew cannot train away. Real storms give the simulation honest timing and size.");
+  }
+  { // 2. bone: modelled
+    const crew = Object.values(SimDB.crew), col = ["#e5522c", "#e8e4d8", "#9a968c", "#f2c14e"];
+    const series = crew.map((c, i) => ({ color: col[i % 4], pts: SimDB.q("select day, bmd_hip_pct v from body_day where crew_id=? and day>=0 and day%4=0 order by day", [c.crew_id]).map(r => [r.day, r.v]) }));
+    const lo = SimDB.one("select min(bmd_hip_pct) v from body_day").v, last = +M.day_last;
+    chain("Bone density", "MODEL",
+      ["Bone scans of Space Station crews", "No bone scanner flies, so bone is never measured during a mission. NASA scans astronauts before and after, and publishes how much hip bone a crew loses per month.", "NASA Human Research Program, fracture-risk evidence; limit from NASA-STD-3001."],
+      ["A monthly loss rate and a limit", "Each crew member loses 0.2 to 0.5 % of hip bone a month in weightlessness: a personal rate inside the published range. Missed strength training doubles it.", "On Mars we assume 0.4 times that rate. Nobody has lived at Mars gravity, so this is our assumption."],
+      ["Hip bone density, estimated every day", chart(series, { x0: 0, x1: last, y0: 86, y1: 100.5, yt: [88, 92, 96, 100], xt, bands, unit: "% of the value before launch", lines: [{ y: 95, label: "NASA limit, 95 %", color: "#ff7a59" }], label: "Hip bone density of the four crew members over the mission" }),
+       `Four crew members, four courses. The lowest reaches ${lo.toFixed(1)} %. The app warns when someone is on course to pass the limit, months before it happens.`],
+      "bone loss cannot be felt. Only an estimate with an early warning lets the crew act in time.");
+  }
+  { // 3. heart: a shape learned
+    const p = P.hr_day_shape, W = 560, H = 190, L = 44, T = 14, B = 26, X = h => L + (W - L - 10) * h / 23, Y = v => T + (H - T - B) * (1 - (v - 0.9) / 0.7);
+    const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Heart rate through a day as a multiple of the sleeping level" });
+    [1.0, 1.2, 1.4].forEach(v => g.append(svg("line", { x1: L, x2: W - 10, y1: Y(v), y2: Y(v), stroke: "#2b2b2b" }), svg("text", { x: L - 7, y: Y(v) + 4, fill: "#9a968c", "font-size": 11, "text-anchor": "end", "font-family": "Azeret Mono" }, v.toFixed(1))));
+    [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [23, "23:00"]].forEach(([h, t]) => g.append(svg("text", { x: X(h), y: H - 8, fill: "#9a968c", "font-size": 11, "text-anchor": "middle", "font-family": "Azeret Mono" }, t)));
+    g.append(svg("text", { x: L, y: 10, fill: "#9a968c", "font-size": 11, "font-family": "Manrope" }, "times the sleeping level"));
+    g.append(svg("path", { d: p.v.map((v, h) => (h ? "L" : "M") + X(h).toFixed(1) + " " + Y(v).toFixed(1)).join(""), fill: "none", stroke: "#e8e4d8", "stroke-width": 2, "stroke-linejoin": "round" }));
+    chain("Heart rate through a day", "SIM",
+      [`${p.n} people, 24 hours each`, "Every heartbeat recorded for a full day and night, with sleep and activity (the MMASH study).", "PhysioNet, open licence."],
+      ["The shape of a day", "For each hour: the heart rate as a multiple of the person's own sleeping level. Only this average shape leaves the dataset. No person's record is copied."],
+      ["Hourly heart rate in the Habitat App", g, "The astronaut's own resting level, multiplied by this shape, plus the effects of the day: a Mars walk, a fever, a short night."],
+      "a heart rate that never moves looks fake. A real daily rhythm makes the hourly view believable.");
+  }
+  { // 4. reaction speed: a size learned
+    const p = P.pvt_sleep_loss, W = 560, H = 190, T = 22, B = 26, Y = v => T + (H - T - B) * (1 - v / 400), bw = 150;
+    const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Reaction time rested and after a night without sleep" });
+    [0, 100, 200, 300, 400].forEach(v => g.append(svg("line", { x1: 44, x2: W - 10, y1: Y(v), y2: Y(v), stroke: "#2b2b2b" }), svg("text", { x: 37, y: Y(v) + 4, fill: "#9a968c", "font-size": 11, "text-anchor": "end", "font-family": "Azeret Mono" }, v)));
+    g.append(svg("text", { x: 44, y: 10, fill: "#9a968c", "font-size": 11, "font-family": "Manrope" }, "reaction time, milliseconds"));
+    [["Rested", p.v.rested_ms, "#706e68", 110], ["One night without sleep", p.v.deprived_ms, "#e5522c", 320]].forEach(([n, v, c, x]) => g.append(svg("rect", { x, y: Y(v), width: bw, height: Y(0) - Y(v), rx: 4, fill: c }),
+      svg("text", { x: x + bw / 2, y: Y(v) - 7, fill: "#e8e4d8", "font-size": 13, "text-anchor": "middle", "font-family": "Azeret Mono" }, Math.round(v) + " ms"), svg("text", { x: x + bw / 2, y: H - 8, fill: "#9a968c", "font-size": 12, "text-anchor": "middle", "font-family": "Manrope" }, n)));
+    chain("Reaction speed", "SIM",
+      [`${p.n} test sessions`, "The reaction test used on the Space Station, done after normal sleep and after 24 hours awake.", "OpenNeuro, public domain (CC0)."],
+      ["One number", `Reactions are ${(p.v.slowing_per_debt_hour * 100).toFixed(1)} % slower for each hour of sleep debt.`, "Sleep debt itself follows a published rule: every hour awake beyond about 16 adds to it."],
+      ["The daily reaction test, and readiness", g, "A week of short nights slows the simulated astronaut by an amount she does not feel. The test shows it, and readiness drops."],
+      "tired people rate themselves as fine. A measured slowing is what makes the stand-down on sol 180 credible.");
+  }
+}
+
+function flow() {
+  const rows = SimDB.q("select * from source_use order by title");
+  const head = (t, cols) => { const tr = el("tr"); cols.forEach(h => tr.append(el("th", null, h))); const th = el("thead"); th.append(tr); t.append(th); };
+  const src = r => { const a = el("td", "src"); a.append(el("b", null, r.title)); if (r.source_url) { const l = el("a", null, [r.provenance, r.licence].filter(Boolean).join(" · ")); l.href = r.source_url; l.target = "_blank"; l.rel = "noopener"; a.append(l); } else a.append(el("span", null, [r.provenance, r.licence].filter(Boolean).join(" · "))); return a; };
+  const t = $("flow"); head(t, ["Data", "Why we chose it", "What we took", "Shows as"]); const tb = el("tbody"); t.append(tb);
+  ORDER.forEach(h => {
+    const rs = rows.filter(r => r.how === h); if (!rs.length) return;
+    const gr = el("tr", "grp"), td = el("td", null, GROUP[h][0]); td.colSpan = 4; td.append(el("small", null, GROUP[h][1])); gr.append(td); tb.append(gr);
+    rs.forEach(r => {
+      const tr = el("tr"), w = WHY[r.dataset_id] || [r.note, r.used_for], c = el("td"), f = el("div", "feeds");
+      (r.feeds || "").split(",").filter(Boolean).forEach(id => { const v = SimDB.vars[id]; if (!v) return; const l = el("a", null, v.label + (id.startsWith("eva.") ? " (Arm Unit)" : "")); l.href = "measures.html#" + anchor(id); f.append(l); });
+      if (f.children.length) c.append(f); else c.append(el("span", "muted", r.used_for || "not shown as a value"));
+      tr.append(src(r), el("td", null, w[0]), el("td", null, w[1]), c); tb.append(tr);
+    });
+  });
+  const un = rows.filter(r => r.how === "not used"), u = $("unused"), ub = el("tbody"); u.append(ub);
+  $("unusedSum").textContent = `Collected, but not used (${un.length})`;
+  un.forEach(r => { const tr = el("tr"); tr.append(src(r)); ub.append(tr); });
+}
+SimDB.ready.then(() => { funnel(); chains(); flow(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Keys and local settings
+.env
+# Python and system files
+__pycache__/
+*.pyc
+.DS_Store
+# Source data is not part of this repository (see README)
+data/anchors/
+data/reference/
+data/explorer/

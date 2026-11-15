@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation · Health Signal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* How the simulated mission is made: six steps, the scenarios, the checks. Tokens and base classes: assets/site.css. */
+[hidden]{display:none!important}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-6);margin-top:var(--space-8)}
+.facts div{border-left:3px solid var(--color-border-default);padding-left:var(--space-4)}
+.facts b{display:block;font:300 39px/1 "Manrope",sans-serif;color:var(--color-text-display);letter-spacing:-.6px}
+.facts span{font:var(--type-body-small);color:var(--color-text-muted)}
+
+/* the six steps: a real sequence, so they are numbered */
+.steps{list-style:none;margin:var(--space-6) 0 0;padding:0;border-top:1px solid var(--color-border-strong)}
+.steps li{display:grid;grid-template-columns:56px minmax(0,1.05fr) minmax(0,1fr) minmax(0,1.15fr);gap:var(--space-6);padding:var(--space-6) 0;border-bottom:1px solid var(--color-border-default);align-items:start}
+.steps .n{font:300 49px/0.9 "Manrope",sans-serif;color:var(--color-text-accent)}
+.steps h3{margin:0 0 6px;font:var(--type-heading-3)}
+.steps p{margin:0;font:var(--type-body-small);color:var(--color-text-default);max-width:none}
+.steps .k{display:block;font:var(--type-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:6px}
+.steps .in{border-left:3px solid var(--color-status-success);padding-left:var(--space-4)}
+.steps .out{border-left:3px solid var(--color-status-warning);padding-left:var(--space-4)}
+.steps .out a{display:inline-flex;align-items:baseline;gap:6px;margin:0 10px 4px 0;font:var(--type-mono-default);color:var(--color-text-display);text-decoration:none;white-space:nowrap}
+.steps .out a i{font-style:normal;color:var(--color-text-muted)}
+.steps .out a:hover{color:var(--color-text-accent-soft)}
+.steps .lab{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.end{display:flex;align-items:center;gap:var(--space-6);margin-top:var(--space-6);padding:var(--space-6) var(--space-8);background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-top:3px solid var(--color-border-accent);border-radius:var(--radius-md)}
+.end b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display)}
+.end p{margin:4px 0 0;color:var(--color-text-muted);font:var(--type-body-small);max-width:none}
+.end a{margin-left:auto;white-space:nowrap}
+
+/* scenarios */
+.scen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4);margin-top:var(--space-6)}
+.scen a{display:block;background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6);color:inherit!important;text-decoration:none;transition:border-color var(--duration-fast)}
+.scen a:hover{border-color:var(--color-border-strong)}
+.scen .when{font:var(--type-mono-default);color:var(--color-text-muted)}
+.scen b{display:block;margin:4px 0 4px;font:400 20px/1.3 "Manrope",sans-serif;color:var(--color-text-display)}
+.scen p{margin:0 0 8px;font:var(--type-body-small);color:var(--color-text-default);max-width:none}
+.scen em{font:var(--type-body-small);font-style:normal;color:var(--color-text-accent-soft)}
+.chance{margin-top:var(--space-6);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-8);align-items:center}
+.chance svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* checks */
+table.chk{width:100%;border-collapse:collapse;margin-top:var(--space-4);max-width:1000px}
+.chk th{font:var(--type-label);letter-spacing:1.2px;text-transform:uppercase;color:var(--color-text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--color-border-strong)}
+.chk td{padding:12px;border-bottom:1px solid var(--color-border-default);font:var(--type-body-small);vertical-align:top}
+.chk td:first-child{color:var(--color-text-display);font:var(--type-body-default)}
+.chk td.v{font:var(--type-mono-default);color:var(--color-text-display);white-space:nowrap}
+.assume{margin:var(--space-6) 0 0;padding:0;list-style:none;max-width:86ch}
+.assume li{padding:12px 0;border-top:1px solid var(--color-border-default);color:var(--color-text-default)}
+.assume b{color:var(--color-text-display);font-weight:600}
+.badge.MODEL{border-color:var(--color-status-warning);color:var(--color-text-status-warning)}
+.badge.REPLAY{border-color:var(--color-status-live);color:var(--color-text-status-live)}
+.badge.COMPUTED{border-color:var(--color-status-success);color:var(--color-text-status-success)}
+@media (max-width:1000px){.steps li{grid-template-columns:44px 1fr}.steps .in,.steps .out{grid-column:2}.scen,.chance,.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>How the simulation was made</h1>
+  <p class="lead">One program run turns real data and published results into a complete mission: every day from launch to landing, four crew members, every rule result, Earth's instruction for each day, and four Mars walks second by second. The same run always gives the same mission.</p>
+  <div class="facts" id="facts"></div>
+
+  <h2>Six steps</h2>
+  <p>Green is what goes in: real data and published results. Amber is what comes out: tables of the simulated mission. Select a table to open it.</p>
+  <ol class="steps" id="steps"></ol>
+  <div class="end">
+    <div><b>One file holds the result</b><p>A single SQLite database, kept apart from the real data it learned from. The apps and the assistant read only this file.</p></div>
+    <a href="database.html">Explore the database →</a>
+  </div>
+
+  <h2>The scenarios</h2>
+  <p>A health monitor shows its worth when something goes wrong. So the mission contains situations a real crew would have to handle. Some are written into the mission on purpose; others happen by chance, at the odds NASA publishes.</p>
+  <h3>Written in on purpose</h3>
+  <div class="scen" id="scen"></div>
+  <h3>Happening by chance, at NASA's odds</h3>
+  <div class="chance">
+    <p id="chanceT"></p>
+    <div id="chanceC"></div>
+  </div>
+
+  <h2>Does it behave like the real thing?</h2>
+  <p>We compared the simulated crew with what has been measured on real crews. The simulated numbers are read from the database as you open this page.</p>
+  <table class="chk" id="chk"></table>
+
+  <h2>What is assumed</h2>
+  <ul class="assume">
+    <li><b>Mars gravity.</b> No human has lived at 0.38 g. Bone, muscle and balance on Mars are placed between weightlessness and Earth, and marked as assumptions.</li>
+    <li><b>Shielding in a storm.</b> How much of a solar storm reaches the crew in the cabin and in the shelter is our stated assumption, not a calculation.</li>
+    <li><b>The next solar cycle.</b> We assume the Sun behaves as it did at the same point of its last cycle.</li>
+    <li><b>The size of some effects.</b> How much an illness costs in sleep, appetite and readiness is ours. NASA's data gives how often it happens, not how it feels.</li>
+    <li><b>Not checked against flight data</b> beyond the table above. This is a preview, not a medical device.</li>
+  </ul>
+</main>
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const svg = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const n = t => SimDB.one(`select count(*) n from "${t}"`).n;
+
+function facts() {
+  const M = SimDB.meta;
+  [[n("day").toLocaleString("en"), "days, from 30 days before launch to 45 days after the landing on Earth"], [n("crew"), "fictional crew members, two women and two men"],
+   [Object.keys(SimDB.vars).length, "values per person and for the cabin, each with a rule"], ["seed " + M.seed, "one number fixes every random choice: the run can be repeated exactly"]]
+    .forEach(([v, t]) => { const d = el("div"); d.append(el("b", null, v), el("span", null, t)); $("facts").append(d); });
+}
+function steps() {
+  const kinds = {}; Object.values(SimDB.vars).forEach(v => kinds[v.kind] = (kinds[v.kind] || 0) + 1);
+  const S = [
+    ["Plan the trip", "Positions of Earth and Mars give the best launch window, every date, the Mars day (sol), the signal delay and the days when the Sun blocks the link.",
+      "Positions of the planets from NASA JPL Horizons.", ["day"], ["COMPUTED"]],
+    ["Replay the surroundings", "Radiation, solar storms, cabin air and Mars weather are real measurements, shown again on the matching mission day.",
+      "Curiosity's radiation and weather instruments, a detector in lunar orbit, solar proton records, Space Station cabin air.", ["env_day", "env_hour"], ["REPLAY"]],
+    ["Give four people a starting point", "Each crew member gets personal starting values inside healthy ranges, and personal traits: how fast bone is lost, how well the exercise plan is kept.",
+      "Healthy adults (a US health survey) and the blood values of four real astronauts before flight.", ["crew"], []],
+    ["Let the body change, day by day", "Sleep, heart, fitness, muscle, bone, eyes and blood follow the mission: weightless on the way, Mars gravity on the surface, weightless again, then Earth. Exercise done is the main dial.",
+      "Published results from real space missions and bed-rest studies, and curves learned from people on Earth.", ["body_day", "body_hour", "lab"], ["SIM", "MODEL"]],
+    ["Add what goes wrong", "Faults, short nights and a solar storm are written in on purpose. Illness and injury happen by chance, at NASA's published odds. Mars walks are planned every week.",
+      "NASA's ranking of medical conditions for a long planetary mission. Our scenario script.", ["event", "eva", "eva_scenario", "eva_sample"], []],
+    ["Apply the rules, write Earth's instruction", "Every limit is checked for every person on every day. The results give readiness, tomorrow's plan and Earth's daily instruction. All of this text is built by rules from the numbers, not by AI.",
+      "Limits from NASA's crew-health standard, clinical practice and research papers, each marked with its source.", ["assessment", "readiness_cost", "plan", "uplink"], []],
+  ];
+  S.forEach(([title, text, inp, tables, labs], i) => {
+    const li = el("li"), a = el("div"), b = el("div", "in"), c = el("div", "out");
+    a.append(el("h3", null, title), el("p", null, text));
+    b.append(el("span", "k", "Goes in"), el("p", null, inp));
+    c.append(el("span", "k", "Comes out"));
+    tables.forEach(t => { const l = el("a"); l.href = "database.html?table=" + t; l.append(t, el("i", null, n(t).toLocaleString("en") + " rows")); c.append(l); });
+    if (labs.length) { const lb = el("div", "lab"); labs.forEach(k => lb.append(el("span", "badge " + k, k + " " + (kinds[k] || "")))); c.append(lb); }
+    li.append(el("span", "n", i + 1), a, b, c); $("steps").append(li);
+  });
+}
+function scenarios() {
+  const walks = SimDB.q("select scenario_id, title, day, sol, summary from eva_scenario order by sort");
+  const ev = SimDB.q("select min(day_start) a, max(day_end) b, title, detail from event where origin like 'scripted%' group by title order by a");
+  const short = t => { const s = String(t).replace(/^Scripted( device fault)?\.\s*/, ""); const cut = s.split(/(?<=\.)\s/).slice(0, 2).join(" "); return cut; };
+  const items = [];
+  ev.forEach(e => { if (/Solar particle event at Mars/.test(e.title)) return; items.push({ a: e.a, when: e.a === e.b ? `Day ${e.a}` : `Days ${e.a} to ${e.b}`, title: e.title, text: short(e.detail), href: `habitat.html?day=${Math.round((e.a + e.b) / 2)}&tab=today`, go: "See it in the Habitat App" }); });
+  walks.forEach(w => items.push({ a: w.day, when: `Day ${w.day} · sol ${w.sol} · Mars walk`, title: w.title, text: short(w.summary), href: `arm_unit.html?scenario=${w.scenario_id}`, go: "Play it on the Arm Unit" }));
+  items.sort((x, y) => x.a - y.a).forEach(s => { const a = el("a"); a.href = s.href; a.append(el("span", "when", s.when), el("b", null, s.title), el("p", null, s.text), el("em", null, s.go + " →")); $("scen").append(a); });
+
+  const tot = SimDB.one("select count(*) n from event where type='medical'").n, sev = {}; SimDB.q("select severity, count(*) n from event where type='medical' group by 1").forEach(r => sev[r.severity] = r.n);
+  $("chanceT").textContent = `NASA ranks 98 medical conditions by how likely each is on a 36-month planetary mission. The run draws from those odds for each crew member: ${tot} events for four people in this mission, ${sev.minor || 0} of them minor, ${sev.moderate || 0} moderate and ${sev.major || 0} major. Real solar storms arrive the same way: on the dates they really happened, moved onto the mission.`;
+  const top = SimDB.q("select title, count(*) n from event where type='medical' group by title order by n desc limit 7"), W = 560, mx = Math.max(...top.map(e => e.n));
+  const g = svg("svg", { viewBox: `0 0 ${W} ${top.length * 26 + 4}`, role: "img", "aria-label": "The most frequent medical events in the simulated mission" });
+  top.forEach((e, i) => { const y = 4 + i * 26, w = (W - 280) * e.n / mx; g.append(svg("text", { x: 226, y: y + 13, fill: "#e8e4d8", "font-size": 12, "text-anchor": "end", "font-family": "Manrope" }, e.title), svg("rect", { x: 236, y, width: Math.max(2, w), height: 17, rx: 4, fill: "#706e68" }), svg("text", { x: 242 + w, y: y + 13, fill: "#9a968c", "font-size": 12, "font-family": "Azeret Mono" }, e.n)); });
+  $("chanceC").append(g);
+}
+function checks() {
+  const one = sql => SimDB.one(sql).v, M = SimDB.meta, land = +M.day_mars_landing, home = +M.day_earth_landing;
+  const rows = [
+    ["Sleep on the way to Mars, crew mean", one("select avg(sleep_h) v from body_day b join day d on d.day=b.day where d.phase='outbound'").toFixed(1) + " h", "6.1 h on Space Station missions"],
+    ["Aerobic fitness on flight day 15", Math.round(one("select avg(vo2max_pct) v from body_day where day=15")) + " % of pre-flight", "about 83 % (a drop of about 17 %)"],
+    ["Leg strength at Mars arrival", Math.round(one(`select avg(leg_strength_pct) v from body_day where day=${land - 1}`)) + " % of pre-flight", "about 94 % with modern exercise devices"],
+    ["Hip bone lost per month on the way to Mars", (one(`select (100-avg(bmd_hip_pct))/(${land}/30.4) v from body_day where day=${land}`)).toFixed(2) + " %", "0.64 % ± 0.43: our crew trains well, by choice"],
+    ["Balance walk on the day of landing on Earth", Math.round(one(`select avg(balance_pct) v from body_day where day=${home}`)) + " % of steps correct", "39 %"],
+    ["Radiation dose of the whole mission", Math.round(M.dose_total_msv) + " mSv", "about 790 mSv from NASA's dose rates for this route"],
+  ];
+  const t = $("chk"), h = el("tr"); ["Check", "Simulated", "Measured on real crews"].forEach(x => h.append(el("th", null, x))); const th = el("thead"); th.append(h); t.append(th);
+  const tb = el("tbody"); rows.forEach(([a, b, c]) => { const tr = el("tr"); tr.append(el("td", null, a), el("td", "v", b), el("td", null, c)); tb.append(tr); }); t.append(tb);
+}
+SimDB.ready.then(() => { facts(); steps(); scenarios(); checks(); });
+</script>
+</body>
+</html>

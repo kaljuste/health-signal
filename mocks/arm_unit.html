@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+/* Three ways to open this page: the normal player; the presenter's view (the Present switch in the navigation bar, or ?presenter=1) adds the live stream; /live (or ?audience) is the audience view on a phone. */
+(function () {
+  var path = location.pathname.replace(/\/+$/, ""), q = new URLSearchParams(location.search);
+  var pres = q.get("presenter") === "1"; try { pres = pres || localStorage.getItem("hs.present") === "1"; } catch (e) {}
+  window.ARM_MODE = (/\/live$/.test(path) || q.has("audience")) ? "audience" : pres ? "presenter" : "";
+  if (window.ARM_MODE === "audience") {
+    window.SIM_AUDIENCE = true; window.NO_SITENAV = true;
+    document.documentElement.classList.add("audience");
+    document.querySelector('meta[name="viewport"]').setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no");
+    document.title = "Arm Unit, live";
+  }
+})();
+</script>
+<title>Arm Unit · Health Signal</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500&family=Chakra+Petch:wght@600&family=Manrope:wght@300;400;600&display=swap">
+<style>
+/* Design tokens of Health Signal (dark theme). */
+:root{
+  --color-surface-default:#0e0e0e; --color-surface-raised:#171717; --color-surface-input:#1f1f1f; --color-surface-input-hover:#2b2b2b;
+  --color-surface-accent-tint:#231713; --color-surface-glow:#1a1210; --color-surface-signal:#e5522c; --color-surface-inverse:#e8e4d8;
+  --color-surface-status-danger:rgba(229,82,44,0.15); --color-surface-status-live:rgba(62,143,198,0.1);
+  --color-surface-status-warning:rgba(242,193,78,0.14); --color-surface-status-success:rgba(111,191,115,0.15);
+  --color-border-default:#2b2b2b; --color-border-strong:#706e68; --color-border-accent:#e5522c; --color-border-focus:#f2c14e;
+  --color-text-default:#e8e4d8; --color-text-display:#ddd6c5; --color-text-muted:#9a968c; --color-text-accent:#e5522c;
+  --color-text-accent-soft:#ffb39e; --color-text-on-signal:#0e0e0e; --color-text-on-inverse:#0e0e0e;
+  --color-text-status-danger:#ff7a59; --color-text-status-live:#3e8fc6; --color-text-status-warning:#f2c14e; --color-text-status-success:#6fbf73;
+  --color-action-primary:#e5522c; --color-action-primary-hover:#ff7a59; --color-action-primary-pressed:#de4c24; --color-action-on-primary:#0e0e0e;
+  --color-status-live:#3e8fc6; --color-status-success:#6fbf73; --color-status-warning:#f2c14e; --color-status-danger:#ff7a59;
+  --viz-highlight-focus:#e5522c; --viz-highlight-muted:#706e68; --viz-chrome-grid:#2b2b2b; --viz-chrome-axis:#4d4c49;
+  --viz-chrome-label:#9a968c; --viz-chrome-annotation:#e8e4d8; --viz-sequential-neutral-1:#33302a; --viz-sequential-neutral-2:#4a4740;
+  --font-family-display:"Manrope",sans-serif; --font-family-ui:"Chakra Petch",sans-serif; --font-family-mono:"Azeret Mono",monospace;
+  --type-heading-3:400 25px/1.2 "Manrope",sans-serif; --type-lead:400 20px/1.5 "Manrope",sans-serif;
+  --type-body-default:400 16px/1.5 "Manrope",sans-serif; --type-body-small:400 13px/1.4 "Manrope",sans-serif;
+  --type-label:600 13px/1.2 "Chakra Petch",sans-serif; --type-button:600 13px/1.2 "Chakra Petch",sans-serif;
+  --type-mono-default:500 13px/1.4 "Azeret Mono",monospace;
+  --space-1:4px; --space-2:8px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --radius-sm:6px; --radius-md:12px; --radius-lg:20px; --radius-pill:999px;
+  --duration-fast:150ms; --duration-base:200ms;
+  /* Space extension: deliberate deviations from the brand set */
+  --x-void:#060606;                                   /* page backdrop, one step below surface.default */
+  --x-screen:#040404;                                 /* device screen */
+  --x-type-hero:300 140px/0.84 "Manrope",sans-serif;  /* device hero numerals, above display.1 */
+  --x-type-state:600 31px/1 "Chakra Petch",sans-serif;/* ui face at heading.2 size */
+  --x-type-micro:600 10px/1 "Chakra Petch",sans-serif;/* provenance badge */
+  --x-dock-h:176px;
+  --x-nav-h:44px;                                     /* tells assets/nav.js that this page brings its own styles */
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--x-void);color:var(--color-text-default);font:var(--type-body-default);-webkit-font-smoothing:antialiased;padding-bottom:calc(var(--x-dock-h) + 20px)}
+:focus-visible{outline:2px solid var(--color-border-focus);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--color-text-accent-soft);text-underline-offset:3px}
+a:hover{color:var(--color-text-status-danger)}
+h1,h2,h3,p{margin:0}
+
+.page{width:1392px;margin:0 auto;padding:12px 0 var(--space-2)}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);margin-bottom:10px}
+.top h1{font:var(--type-heading-3);color:var(--color-text-display)}
+.top p{margin-top:2px;font:var(--type-body-small);color:var(--color-text-muted)}
+
+/* Segmented switches (scenario, speed) */
+.scn{display:flex;align-items:center;gap:var(--space-4)}
+.scn > span{font:var(--type-body-small);color:var(--color-text-muted)}
+.seg{display:flex;background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:3px;gap:3px}
+.seg button{font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;color:var(--color-text-accent-soft);background:transparent;border:0;border-radius:9px;padding:10px 14px;cursor:pointer;transition:background-color var(--duration-fast);white-space:nowrap}
+.seg button:hover{background:var(--color-surface-input-hover)}
+.seg button[aria-pressed="true"]{background:var(--color-surface-signal);color:var(--color-text-on-signal)}
+.seg.sm button{padding:7px 10px}
+
+.stage{display:grid;grid-template-columns:1042px 334px;gap:16px}
+
+/* The plate: forearm seen from above, device strapped on */
+.plate{position:relative;width:1042px;height:682px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border-default);background:var(--color-surface-glow)}
+.plate > svg{position:absolute;inset:0;width:100%;height:100%}
+.plate .anno{font:var(--type-body-small);fill:var(--color-text-muted)}
+
+.device{position:absolute;left:26px;top:56px;width:920px;height:570px;background:#0a0a0a;border:1px solid #333;border-radius:30px;padding:16px 18px 0}
+.device::before{content:"";position:absolute;inset:3px;border-radius:27px;border:1px solid #1c1c1c;pointer-events:none}
+.screen{position:relative;height:468px;border-radius:14px;background:var(--x-screen);border:1px solid #1f1f1f;overflow:hidden;display:grid;grid-template-rows:34px 1fr 62px}
+
+.bar{display:flex;align-items:center;gap:var(--space-6);padding:0 var(--space-4);border-bottom:1px solid var(--color-border-default);font:var(--type-mono-default);color:var(--color-text-muted);white-space:nowrap}
+.bar b{font-weight:500;color:var(--color-text-default)}
+.bar .sp{flex:1}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--color-text-muted);display:inline-block;margin-right:6px}
+.playing .pulse{background:var(--color-status-live);animation:pulse 1s steps(2,end) infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+.main{display:grid;grid-template-columns:316px 1fr;min-height:0}
+.hero{padding:14px var(--space-4) 12px;border-right:1px solid var(--color-border-default);display:flex;flex-direction:column;min-width:0}
+.state{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;font:var(--x-type-state);letter-spacing:1.5px;text-transform:uppercase;padding:8px 14px 8px 10px;border-radius:var(--radius-sm)}
+.state svg{width:30px;height:30px}
+.state.go{background:var(--color-surface-status-success);color:var(--color-text-status-success)}
+.state.caution{background:var(--color-surface-status-warning);color:var(--color-text-status-warning)}
+.state.return,.state.emergency{background:var(--color-surface-signal);color:var(--color-text-on-signal)}
+.state.inside{background:var(--color-surface-input);color:var(--color-text-default)}
+.hero .q{margin-top:14px;font:var(--type-body-default);color:var(--color-text-muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.hero .q span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero .q span + span{font:var(--type-body-small);white-space:nowrap}
+.hero .big{font:var(--x-type-hero);letter-spacing:-4px;color:var(--color-text-display);margin:8px 0 0 -7px;white-space:nowrap;cursor:pointer}
+.hero .big.tight{font-size:104px;line-height:1.13;letter-spacing:-3px;margin-left:-4px}
+.hero .why{margin-top:8px;font:var(--type-body-default);color:var(--color-text-muted);display:flex;align-items:center;gap:8px;min-height:24px}
+.hero .why b{font-weight:400;color:var(--color-text-default)}
+.home{margin-top:auto;padding-top:12px;border-top:1px solid var(--color-border-default);display:flex;align-items:center;gap:12px}
+.home svg{width:28px;height:28px;color:var(--color-text-muted);flex:none}
+.home .v{font:var(--type-heading-3);color:var(--color-text-display);white-space:nowrap}
+.home .l{font:var(--type-body-small);color:var(--color-text-muted)}
+
+.side{padding:12px var(--space-4) 10px;display:flex;flex-direction:column;min-width:0}
+.side h2{font:var(--type-body-small);color:var(--color-text-muted);display:flex;justify-content:space-between;gap:var(--space-4)}
+.side h2 b{font-weight:400;color:var(--color-text-default)}
+.view{display:flex;flex-direction:column;flex:1;min-height:0}
+.view[hidden]{display:none}
+#runway{display:block;margin-top:4px}
+#runway text{font:var(--type-body-small);fill:var(--viz-chrome-label)}
+#runway .val{font:var(--type-mono-default);fill:var(--viz-chrome-annotation)}
+#runway .halo{paint-order:stroke;stroke:var(--x-screen);stroke-width:4px;stroke-linejoin:round}
+#runway .name.on{fill:var(--color-text-default)}
+#runway .hit{fill:transparent}
+
+.cells{margin:auto 0 0 -12px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-border-default)}
+.cell{padding:6px 8px 5px 12px;border:0;border-left:1px solid var(--color-border-default);min-width:0;position:relative;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.cell:nth-child(4n+1){border-left:0}
+.cell:nth-child(n+5){border-top:1px solid var(--color-border-default)}
+.cell:hover{background:var(--color-surface-default)}
+.cell[aria-pressed="true"]::after{content:"";position:absolute;left:12px;right:8px;bottom:0;height:2px;background:var(--color-text-default)}
+.cell .l{font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.cell .v{font:var(--type-heading-3);line-height:1.15;color:var(--color-text-display);white-space:nowrap}
+.cell .v small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:3px}
+.cell .f{display:none;position:absolute;right:8px;bottom:9px}
+.cell .f svg{width:20px;height:20px;display:block}
+.cell.watch .f,.cell.alarm .f{display:inline-flex}
+.cell.watch .f{color:var(--color-text-status-warning)}
+.cell.alarm .f{color:var(--color-text-status-danger)}
+.cell.watch::before,.cell.alarm::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.cell.watch::before{background:var(--color-status-warning)}
+.cell.alarm::before{background:var(--color-status-danger)}
+.cell.watch,.cell.watch:hover{background:var(--color-surface-status-warning)}
+.cell.alarm,.cell.alarm:hover{background:var(--color-surface-status-danger)}
+.badge{font:var(--x-type-micro);letter-spacing:.6px;color:var(--color-text-muted);border:1px solid var(--color-border-strong);border-radius:4px;padding:2px 3px 1px;white-space:nowrap}
+.beat{width:7px;height:7px;border-radius:50%;background:var(--color-text-muted);display:inline-block;margin-left:1px}
+.playing .beat{animation:beat var(--beat,1s) ease-out infinite}
+@keyframes beat{0%{transform:scale(1.5);background:var(--color-text-default)}35%{transform:scale(1)}100%{transform:scale(1)}}
+
+.unitmap{display:block;margin-top:6px}
+.routeinfo{margin-top:auto;padding-top:8px;border-top:1px solid var(--color-border-default);display:flex;justify-content:space-between;align-items:baseline;gap:12px;font:var(--type-body-small);color:var(--color-text-muted)}
+.routeinfo b{font:var(--type-heading-3);font-weight:400;color:var(--color-text-display)}
+
+.next{display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-4);border-top:1px solid var(--color-border-default);background:var(--color-surface-default)}
+.next .k{font:var(--type-label);letter-spacing:1.56px;text-transform:uppercase;color:var(--color-text-muted)}
+.next .t{font:var(--type-lead);line-height:1.2;color:var(--color-text-default);flex:1}
+.next .ack{font:var(--type-body-small);color:var(--color-text-muted);display:none;align-items:center;gap:5px;white-space:nowrap}
+.next .ack svg{width:16px;height:16px}
+.next.acked .ack{display:inline-flex}
+.next.caution{background:var(--color-surface-status-warning)}
+.next.caution .k{color:var(--color-text-status-warning)}
+.next.return,.next.emergency{background:var(--color-surface-signal);border-top-color:var(--color-surface-signal)}
+.next.return .k,.next.return .t,.next.return .ack,.next.emergency .k,.next.emergency .t,.next.emergency .ack{color:var(--color-text-on-signal)}
+
+/* Assistant answer, shown on the unit above the next-action strip */
+.ans{position:absolute;left:316px;right:0;bottom:62px;z-index:4;min-height:178px;background:var(--color-surface-raised);border-left:1px solid var(--color-border-default);border-top:3px solid var(--color-border-accent);padding:12px var(--space-4) 10px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:6px 16px;align-items:start}
+.ans[hidden]{display:none}
+.ans .aq{grid-column:1 / -1;font:var(--type-body-small);color:var(--color-text-muted)}
+.ans .aa{grid-column:1 / -1;font:400 18px/1.35 "Manrope",sans-serif;color:var(--color-text-default)}
+.ans .an{grid-column:1;align-self:center;font:var(--type-body-small);color:var(--color-text-muted)}
+.ans button{grid-column:2;font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;color:var(--color-text-accent-soft);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:9px 12px;cursor:pointer}
+.ans button:hover{background:var(--color-surface-input-hover)}
+
+/* Hardware keys on the bezel: gloved hands press these, not the glass */
+.keys{display:grid;grid-template-columns:1.25fr 1fr 1fr 58px;gap:12px;height:58px;margin-top:12px}
+.key{font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;border-radius:var(--radius-md);border:1px solid var(--color-border-strong);background:var(--color-surface-input);color:var(--color-text-accent-soft);cursor:pointer;transition:background-color var(--duration-fast);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.key svg{width:18px;height:18px}
+.key:hover{background:var(--color-surface-input-hover)}
+.key.primary{background:var(--color-action-primary);border-color:var(--color-action-primary);color:var(--color-action-on-primary)}
+.key.primary:hover{background:var(--color-action-primary-hover)}
+.key.primary:active{background:var(--color-action-primary-pressed)}
+.key[aria-pressed="true"]{background:var(--color-surface-inverse);border-color:var(--color-surface-inverse);color:var(--color-text-on-inverse)}
+.crown{border-radius:50%;width:58px;height:58px;border:1px solid var(--color-border-strong);background:repeating-conic-gradient(#1f1f1f 0 6deg,#2b2b2b 6deg 12deg);position:relative}
+.crown::after{content:"";position:absolute;inset:9px;border-radius:50%;background:#141414;border:1px solid #333}
+
+.tip{position:absolute;z-index:6;pointer-events:none;background:var(--color-surface-inverse);color:var(--color-text-on-inverse);font:var(--type-body-small);padding:6px 10px;border-radius:var(--radius-sm);max-width:300px;opacity:0;transition:opacity var(--duration-fast)}
+.tip.on{opacity:1}
+.ftip{position:fixed;z-index:60;pointer-events:none;background:var(--color-surface-inverse);color:var(--color-text-on-inverse);font:var(--type-body-small);padding:6px 10px;border-radius:var(--radius-sm);max-width:340px;opacity:0;transition:opacity var(--duration-fast)}
+.ftip.on{opacity:1}
+.ftip b{font:var(--type-mono-default);font-weight:500}
+
+/* Rail beside the cuff */
+.rail{display:flex;flex-direction:column;gap:12px;height:682px;min-width:0}
+.card{background:var(--color-surface-raised);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:14px 16px}
+.card h2{font:var(--type-body-default);font-weight:600;color:var(--color-text-display);line-height:1.25}
+.card .meta{font:var(--type-mono-default);color:var(--color-text-muted);margin-top:3px;white-space:nowrap}
+.card p{font:var(--type-body-small);color:var(--color-text-muted)}
+.scard{flex:1;min-height:0;display:flex;flex-direction:column;border-top:3px solid var(--color-border-accent)}
+.scard .sum{margin-top:8px;overflow:auto;flex:1;min-height:72px;color:var(--color-text-default);scrollbar-width:thin;scrollbar-color:#4d4c49 transparent}
+.scard .sum.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
+.tag{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--radius-sm);font:var(--type-label);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;margin-top:8px;align-self:flex-start}
+.tag svg{width:14px;height:14px}
+.tag.ok{background:var(--color-surface-status-success);color:var(--color-text-status-success)}
+.tag.watch{background:var(--color-surface-status-warning);color:var(--color-text-status-warning)}
+.tag.warning{background:var(--color-surface-status-danger);color:var(--color-text-status-danger)}
+.morning{display:grid;grid-template-columns:repeat(3,auto);gap:6px 14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--color-border-default)}
+.morning div{min-width:0}
+.morning .l{font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap}
+.morning .v{font:var(--type-body-default);color:var(--color-text-display);white-space:nowrap}
+.morning .v small{font:var(--type-body-small);color:var(--color-text-muted);margin-left:3px}
+.scard .lnk{margin-top:8px;font:var(--type-body-small)}
+.mcard{padding:10px 12px 8px}
+.mcard .mh{display:flex;justify-content:space-between;align-items:baseline;font:var(--type-body-small);color:var(--color-text-muted);padding:0 4px 4px}
+.mcard .mh b{font-weight:400;color:var(--color-text-default)}
+.map text{font:400 11px/1 "Manrope",sans-serif;fill:var(--viz-chrome-label)}
+.map .site{fill:var(--color-text-default)}
+.map .halo{paint-order:stroke;stroke:var(--color-surface-raised);stroke-width:3px;stroke-linejoin:round}
+.unitmap .halo{stroke:var(--x-screen)}
+.map .here{fill:var(--viz-highlight-focus);stroke:var(--x-void);stroke-width:2}
+.map .ring2{fill:none;stroke:var(--viz-highlight-focus);stroke-width:1.5;opacity:0}
+.playing .map .ring2{animation:ping 1.6s ease-out infinite}
+@keyframes ping{0%{r:5;opacity:.8}100%{r:16;opacity:0}}
+.acard .row{display:flex;gap:8px;margin-top:8px}
+.acard input{flex:1;min-width:0;font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:9px 10px}
+.acard input::placeholder{color:var(--color-text-muted)}
+.btn{font:var(--type-button);letter-spacing:1.04px;text-transform:uppercase;color:var(--color-text-accent-soft);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:9px 12px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--color-surface-input-hover)}
+.btn svg{width:16px;height:16px}
+.btn[aria-pressed="true"]{background:var(--color-surface-inverse);border-color:var(--color-surface-inverse);color:var(--color-text-on-inverse)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{font:var(--type-body-small);color:var(--color-text-default);background:none;border:1px solid var(--color-border-strong);border-radius:var(--radius-pill);padding:4px 10px;cursor:pointer}
+.chips button:hover{background:var(--color-surface-input-hover)}
+.acard .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.acard .hd a{font:var(--type-body-small);white-space:nowrap}
+.acard .st{margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn.quiet[aria-pressed="true"]{background:var(--color-surface-input);border-color:var(--color-border-strong);color:var(--color-text-accent-soft)}
+.btn.quiet[aria-pressed="false"]{color:var(--color-text-muted)}
+
+/* Under the cuff */
+.below{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:var(--space-8);margin-top:var(--space-6);padding:0 var(--space-2)}
+.below h3{margin-bottom:var(--space-1);font:var(--type-body-small);font-weight:600;color:var(--color-text-display)}
+.below p,.below li{font:var(--type-body-small);color:var(--color-text-muted)}
+.below ul{margin:0;padding:0;list-style:none}
+.below ul.dash li{padding-left:14px;position:relative}
+.below ul.dash li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:1px;background:var(--color-border-strong)}
+.below b{font-weight:400;color:var(--color-text-default)}
+.log li{display:grid;grid-template-columns:62px 86px 1fr;gap:10px;padding:5px 6px;border-bottom:1px solid var(--color-border-default);cursor:pointer;border-radius:4px}
+.log li:hover{background:var(--color-surface-raised)}
+.log li .tm{font:var(--type-mono-default);color:var(--color-text-muted)}
+.log li .kd{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.log li .kd svg{width:14px;height:14px}
+.log li.caution .kd{color:var(--color-text-status-warning)}
+.log li.alarm .kd{color:var(--color-text-status-danger)}
+.log li .tx{color:var(--color-text-default)}
+.log li.future{opacity:.42}
+.log li.now{background:var(--color-surface-raised)}
+
+/* Player dock: fixed to the bottom like a video player */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:40;height:var(--x-dock-h);background:var(--x-void);border-top:1px solid var(--color-border-default);padding:10px 16px 6px}
+.dock-in{max-width:1392px;margin:0 auto}
+.ctl{display:flex;align-items:center;gap:12px;height:40px}
+.pp{width:44px;height:40px;border-radius:var(--radius-md);border:0;background:var(--color-action-primary);color:var(--color-action-on-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.pp:hover{background:var(--color-action-primary-hover)}
+.pp:active{background:var(--color-action-primary-pressed)}
+.pp svg{width:20px;height:20px}
+.time{font:var(--type-mono-default);color:var(--color-text-muted);white-space:nowrap}
+.time b{font-weight:500;color:var(--color-text-default);font-size:16px}
+.cap{flex:1;min-width:0;font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cap b{font-weight:400;color:var(--color-text-default)}
+.trsel{display:flex;align-items:center;gap:8px;font:var(--type-body-small);color:var(--color-text-muted);white-space:nowrap}
+.trsel select{font:var(--type-body-small);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:7px 8px}
+.trsel b{font:var(--type-mono-default);font-weight:500;color:var(--color-text-default);min-width:86px}
+#tl{display:block;width:100%;height:118px;margin-top:4px;cursor:pointer;touch-action:none;user-select:none}
+#tl text{font:400 11px/1 "Manrope",sans-serif;fill:var(--viz-chrome-label)}
+#tl .ax{font:500 11px/1 "Azeret Mono",monospace}
+#tl .bl{fill:var(--color-text-muted);pointer-events:none}
+#tl .halo{paint-order:stroke;stroke:var(--x-void);stroke-width:3px;stroke-linejoin:round}
+
+/* ---------- beeps, live stream (presenter) ---------- */
+.livectl{display:none;align-items:center;gap:8px}
+body.presenter .livectl{display:inline-flex}
+.btn .dot{width:9px;height:9px;border-radius:50%;background:var(--color-text-muted);flex:none}
+#bLive[aria-pressed="true"]{background:var(--color-surface-signal);border-color:var(--color-surface-signal);color:var(--color-text-on-signal)}
+#bLive[aria-pressed="true"] .dot{background:var(--color-text-on-signal);animation:livepulse 1.4s ease-in-out infinite}
+@keyframes livepulse{50%{opacity:.25}}
+.liven{font:var(--type-mono-default);color:var(--color-text-muted);white-space:nowrap}
+body.presenter .cap{display:none}
+body.presenter .trsel{margin-left:auto}
+body.presenter .trsel select{max-width:170px}
+.liven.err{color:var(--color-text-status-danger)}
+.qrov{position:fixed;inset:0;z-index:80;background:#050505;display:none;align-items:center;justify-content:center;gap:72px;padding:48px 64px}
+.qrov.on{display:flex}
+.qrtile{flex:none;width:min(72vh,600px);height:min(72vh,600px);background:var(--color-surface-inverse);border-radius:var(--radius-lg);padding:20px}
+.qrtile svg{display:block;width:100%;height:100%}
+.qrtxt{max-width:560px}
+.qrtxt h1{font:300 49px/1.05 "Manrope",sans-serif;letter-spacing:-.49px;color:var(--color-text-display);margin:0 0 20px}
+.qrtxt ol{margin:0 0 28px;padding:0;list-style:none;counter-reset:s}
+.qrtxt li{counter-increment:s;font:400 20px/1.5 "Manrope",sans-serif;color:var(--color-text-default);padding:8px 0 8px 44px;position:relative}
+.qrtxt li::before{content:counter(s);position:absolute;left:0;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--color-border-strong);font:var(--type-mono-default);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted)}
+.qrurl{font:500 22px/1.3 "Azeret Mono",monospace;color:var(--color-text-accent-soft);word-break:break-all;margin:0 0 24px}
+.qrstat{display:flex;align-items:baseline;gap:14px;margin:0 0 28px}
+.qrstat b{font:300 61px/1 "Manrope",sans-serif;color:var(--color-text-display)}
+.qrstat span{font:var(--type-body-default);color:var(--color-text-muted)}
+.qrbtns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.qrbtns .btn.go{background:var(--color-action-primary);border-color:var(--color-action-primary);color:var(--color-action-on-primary)}
+.qredit{margin-top:28px;font:var(--type-body-small);color:var(--color-text-muted)}
+.qredit input{width:100%;margin-top:6px;font:var(--type-mono-default);color:var(--color-text-default);background:var(--color-surface-input);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:8px 10px}
+.qrnote{margin-top:10px;font:var(--type-body-small);color:var(--color-text-status-warning)}
+@media (max-width:1100px){.qrov{flex-direction:column;gap:28px;padding:24px}.qrtile{width:min(46vh,420px);height:min(46vh,420px)}}
+
+/* ---------- audience view: the unit alone, full screen, always landscape, no controls ---------- */
+#liveRoot{display:none}
+html.audience,html.audience body{height:100%;overflow:hidden;background:#000;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.audience body{padding:0}
+html.audience #page,html.audience #dock,html.audience #ftip,html.audience .sitenav{display:none!important}
+html.audience #liveRoot{display:block;position:fixed;inset:0;background:#000;overflow:hidden;z-index:60}
+#liveLand{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;background:#000}
+#liveStage{position:absolute;left:0;top:0;width:920px;height:570px;transform-origin:0 0}
+#liveStage .device{left:0;top:0;pointer-events:none}
+#liveStage .device .tip,#liveStage #ansX{display:none}
+#liveBadge{position:absolute;left:10px;top:8px;z-index:3;display:flex;align-items:center;gap:6px;font:600 11px/1 "Chakra Petch",sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--color-text-muted)}
+#liveBadge i{width:8px;height:8px;border-radius:50%;background:var(--color-text-muted)}
+#liveBadge.on{color:var(--color-text-status-danger)}
+#liveBadge.on i{background:var(--color-status-danger);animation:livepulse 1.4s ease-in-out infinite}
+#liveOv{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.86);text-align:center;padding:16px}
+#liveOv[hidden]{display:none}
+.lo{max-width:520px}
+.lo .k{font:600 12px/1.2 "Chakra Petch",sans-serif;letter-spacing:1.6px;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:10px}
+.lo h1{font:300 34px/1.1 "Manrope",sans-serif;letter-spacing:-.3px;color:var(--color-text-display);margin:0 0 10px}
+.lo p{font:400 15px/1.45 "Manrope",sans-serif;color:var(--color-text-default);margin:0 auto 16px;max-width:44ch}
+.lo .b{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.lo button{font:600 13px/1.2 "Chakra Petch",sans-serif;letter-spacing:1.04px;text-transform:uppercase;border-radius:var(--radius-md);border:1px solid var(--color-border-strong);background:var(--color-surface-input);color:var(--color-text-accent-soft);padding:14px 20px;cursor:pointer;touch-action:manipulation}
+.lo button.primary{background:var(--color-action-primary);border-color:var(--color-action-primary);color:var(--color-action-on-primary)}
+.lo .s{font:500 12px/1.4 "Azeret Mono",monospace;color:var(--color-text-muted);margin:14px 0 0}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <header class="top">
+    <div>
+      <h1>Arm Unit</h1>
+      <p>The second-by-second view on the suit forearm. Four complete Mars walks, from suit seal to helmet off, read from the simulated mission.</p>
+    </div>
+    <div class="scn">
+      <span>Scenario</span>
+      <div class="seg" role="group" aria-label="Scenario" id="scns"></div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <section class="plate" aria-label="Left forearm of the suit seen from above, with the Arm Unit">
+      <svg viewBox="170 0 1042 682" aria-hidden="true">
+        <defs>
+          <pattern id="weave" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+            <rect width="7" height="7" fill="#101010"/><rect width="1" height="7" fill="#161616"/>
+          </pattern>
+          <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".22" stop-color="#000" stop-opacity="0"/>
+            <stop offset=".78" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/>
+          </linearGradient>
+          <radialGradient id="dust" cx="96%" cy="50%" r="40%">
+            <stop offset="0" stop-color="#38211a"/><stop offset="1" stop-color="#1a1210"/>
+          </radialGradient>
+        </defs>
+        <!-- Mars ground under the arm -->
+        <rect x="170" width="1042" height="682" fill="url(#dust)"/>
+        <!-- Sleeve, tapering to the wrist ring -->
+        <path d="M0 0H820C980 6 1090 28 1152 58V624C1090 654 980 676 820 682H0Z" fill="url(#weave)"/>
+        <path d="M0 0H820C980 6 1090 28 1152 58V624C1090 654 980 676 820 682H0Z" fill="url(#shade)"/>
+        <!-- Identification stripe near the elbow -->
+        <rect x="170" y="0" width="8" height="682" fill="#fd8a30" opacity=".45"/>
+        <!-- Stitched seams -->
+        <path d="M190 30H820C960 34 1060 52 1140 82" fill="none" stroke="#2b2b2b" stroke-dasharray="6 5"/>
+        <path d="M190 652H820C960 648 1060 630 1140 600" fill="none" stroke="#2b2b2b" stroke-dasharray="6 5"/>
+        <!-- Straps under the device -->
+        <g>
+          <rect x="292" y="0" width="76" height="682" fill="#151515" stroke="#2b2b2b"/>
+          <path d="M300 0V682M360 0V682" stroke="#333" stroke-dasharray="5 5" fill="none"/>
+          <rect x="286" y="10" width="88" height="24" rx="5" fill="#1f1f1f" stroke="#4d4c49"/><rect x="286" y="648" width="88" height="24" rx="5" fill="#1f1f1f" stroke="#4d4c49"/>
+          <rect x="944" y="0" width="76" height="682" fill="#151515" stroke="#2b2b2b"/>
+          <path d="M952 4V678M1012 12V670" stroke="#333" stroke-dasharray="5 5" fill="none"/>
+          <rect x="938" y="14" width="88" height="24" rx="5" fill="#1f1f1f" stroke="#4d4c49"/><rect x="938" y="644" width="88" height="24" rx="5" fill="#1f1f1f" stroke="#4d4c49"/>
+        </g>
+        <!-- Cuff mount plate -->
+        <rect x="180" y="42" width="952" height="598" rx="40" fill="#131313" stroke="#2b2b2b"/>
+        <g fill="#1f1f1f" stroke="#4d4c49"><circle cx="205" cy="67" r="6"/><circle cx="1107" cy="67" r="6"/><circle cx="205" cy="615" r="6"/><circle cx="1107" cy="615" r="6"/></g>
+        <!-- Glove: start of the back of the left hand -->
+        <path d="M1190 158C1238 140 1300 142 1344 168V514C1300 540 1238 542 1190 524Z" fill="#151515" stroke="#3a3a3a"/>
+        <!-- Wrist ring -->
+        <rect x="1150" y="50" width="42" height="582" rx="21" fill="#1d1d1d" stroke="#5a5852"/>
+        <rect x="1163" y="66" width="16" height="550" rx="8" fill="none" stroke="#333"/>
+        <rect x="1158" y="321" width="26" height="40" rx="5" fill="#2b2b2b" stroke="#5a5852"/>
+        <g class="anno"><text x="386" y="30">cuff strap</text><text x="1140" y="30">wrist ring</text></g>
+      </svg>
+
+      <div class="device">
+        <div class="screen" id="screen">
+          <div class="bar num">
+            <span><i class="pulse"></i><span id="evaNo">EVA</span> <b id="clock">0:00:00</b></span>
+            <span id="soltime"></span>
+            <span class="sp"></span>
+            <span id="callsign"></span>
+            <span>Habitat link <b>OK</b></span>
+            <span>1 Hz</span>
+          </div>
+          <div class="main">
+            <div class="hero">
+              <div class="state inside" id="state"></div>
+              <div class="q"><span id="heroQ">Loading the walk</span><span id="heroU"></span></div>
+              <div class="big num" id="heroV" title="Show the stay time on the timeline">–</div>
+              <div class="why" id="heroWhy"></div>
+              <div class="home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>
+                <div><div class="v num" id="homeV">–</div><div class="l" id="homeL">walk back to the airlock</div></div>
+              </div>
+            </div>
+            <div class="side">
+              <div class="view" id="vRead">
+                <h2><b>Time left, by resource</b><span>shaded: walk back + 30 min reserve</span></h2>
+                <svg id="runway" width="570" height="160" viewBox="0 0 570 160" role="img" aria-label="Time left for each resource"></svg>
+                <div class="cells" id="cells"></div>
+              </div>
+              <div class="view" id="vRoute" hidden>
+                <h2><b>Route home</b><span>rings: distance from the airlock</span></h2>
+                <svg class="map unitmap" id="umap" width="536" height="270" viewBox="0 0 536 270" role="img" aria-label="Route of this walk"></svg>
+                <div class="routeinfo"><span>Walk back <b class="num" id="rDist">–</b></span><span id="rNote">along the way you came</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="next" id="next"><span class="k">Next</span><span class="t" id="nextT">Reading the simulated mission…</span><span class="ack" id="ackT"></span></div>
+          <div class="ans" id="ans" hidden>
+            <div class="aq" id="ansQ"></div>
+            <div class="aa" id="ansA"></div>
+            <div class="an" id="ansN"></div>
+            <button type="button" id="ansX">Close</button>
+          </div>
+          <div class="tip" id="tip"></div>
+        </div>
+        <div class="keys">
+          <button class="key primary" type="button" id="kAck">Acknowledge</button>
+          <button class="key" type="button" id="kAsk" aria-pressed="false"></button>
+          <button class="key" type="button" id="kHome" aria-pressed="false">Route home</button>
+          <div class="crown" title="Scroll crown"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <section class="card scard" aria-label="This scenario">
+        <h2 id="sTitle">Scenario</h2>
+        <div class="meta" id="sMeta"></div>
+        <span class="tag ok" id="sTag"></span>
+        <p class="sum" id="sSum"></p>
+        <div class="morning" id="sMorning"></div>
+        <p class="lnk"><a id="sLink" href="habitat.html">This day in the Habitat App</a></p>
+      </section>
+      <section class="card mcard" aria-label="Route map">
+        <div class="mh"><b>Route</b><span id="mInfo"></span></div>
+        <svg class="map" id="map" width="308" height="150" viewBox="0 0 308 150" role="img" aria-label="Route of this walk with the current position"></svg>
+      </section>
+      <section class="card acard" aria-label="Ask the unit">
+        <div class="hd"><h2>Ask the unit</h2><a id="ctxLink" href="context.html">What the assistant knows</a></div>
+        <form class="row" id="askForm">
+          <input id="askQ" type="text" autocomplete="off" placeholder="Type, or press Ask on the cuff" aria-label="Question for the assistant">
+          <button class="btn" type="submit">Ask</button>
+          <button class="btn quiet" type="button" id="bMute" aria-pressed="true"></button>
+        </form>
+        <div class="chips" id="chips"></div>
+        <p class="st" id="aiSt">Checking for an AI model…</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="below">
+    <div><h3>Log of this walk</h3><ul class="log" id="log"></ul></div>
+    <div><h3>Limits behind the warnings</h3>
+      <ul class="dash">
+        <li><b>Heat strain:</b> heart rate above 140 bpm for 2 min, or core 0.6 °C over the value before the walk: ease the pace. Both together: stop, rest 5 min, cooling to max (NASA-STD-3001 V2 11011).</li>
+        <li><b>Stay time:</b> the shortest resource minus the walk back and a 30-minute reserve. A task that does not fit is dropped.</li>
+        <li><b>Suit CO₂:</b> a steady climb without effort is treated as a scrubber fault and ends the walk. Limit 20 mmHg for at most 1 h (V2 11040).</li>
+        <li><b>Radiation:</b> caution at 1.2 times the usual rate; a confirmed storm ends the walk, indoors within 30 min (our rule).</li>
+        <li>The rules decide. The assistant only explains them.</li>
+      </ul>
+    </div>
+    <div><h3>Where the numbers come from</h3>
+      <ul class="dash">
+        <li><span class="badge">SIM</span> stands for a suit or body sensor: a model with sourced numbers.</li>
+        <li><span class="badge">MODEL</span> an estimate, no direct sensor exists: stamina, lactate, balance, faint risk, stay time.</li>
+        <li><span class="badge">REPLAY</span> a real measurement replayed: the dose rate follows Curiosity's instrument at Gale crater; the storm is its record of 10 to 13 September 2017, in real time.</li>
+        <li>Heart rate and lactate follow shapes learned from open exercise-test datasets. Simulated data, not a medical device.</li>
+      </ul>
+      <p style="margin-top:var(--space-2)"><a href="manuals/health_signal_arm_unit_manual.pdf" download="health_signal_arm_unit_manual.pdf" title="User manual of the Arm Unit (PDF, to download)">Manual (PDF)</a></p>
+    </div>
+  </section>
+</div>
+
+<div class="dock" id="dock" aria-label="Player">
+  <div class="dock-in">
+    <div class="ctl">
+      <button class="pp" type="button" id="bPlay" aria-label="Play"></button>
+      <button class="btn" type="button" id="bStart"></button>
+      <button class="btn" type="button" id="bKey"></button>
+      <div class="seg sm" role="group" aria-label="Playback speed" id="speeds"></div>
+      <button class="btn quiet" type="button" id="bSnd" aria-pressed="false"></button>
+      <span class="livectl" id="liveCtl">
+        <button class="btn" type="button" id="bLive" aria-pressed="false"><span class="dot"></span><span id="bLiveT">Go live</span></button>
+        <button class="btn" type="button" id="bQR">QR code</button>
+        <span class="liven" id="liveN"></span>
+      </span>
+      <div class="time num"><b id="tNow">0:00:00</b> / <span id="tDur">0:00:00</span></div>
+      <div class="cap" id="cap"></div>
+      <label class="trsel">Trace <select id="trace" aria-label="Value drawn on the timeline"></select><b class="num" id="trVal"></b></label>
+    </div>
+    <svg id="tl" role="slider" tabindex="0" aria-label="Position in the walk" aria-valuemin="0"></svg>
+  </div>
+</div>
+<div class="ftip" id="ftip" role="tooltip"></div>
+
+<!-- Presenter only: the screen shown to the audience before the demo -->
+<div class="qrov" id="qrOv" role="dialog" aria-modal="true" aria-label="Follow the Arm Unit on your phone">
+  <div class="qrtile" id="qrTile"></div>
+  <div class="qrtxt">
+    <h1>Follow the Arm Unit on your phone</h1>
+    <ol><li>Scan the code.</li><li>Tap “Follow”.</li><li>Turn the phone sideways.</li></ol>
+    <p class="qrurl" id="qrUrl"></p>
+    <div class="qrstat"><b class="num" id="qrN">0</b><span id="qrNL">phones following</span></div>
+    <div class="qrbtns">
+      <button class="btn go" type="button" id="qrLive">Start the live view</button>
+      <button class="btn" type="button" id="qrClose">Close</button>
+      <span class="liven" id="qrSt"></span>
+    </div>
+    <label class="qredit">Address the audience opens (the server's public address, plus /live)
+      <input id="qrIn" type="url" spellcheck="false" autocomplete="off"></label>
+    <p class="qrnote" id="qrNote" hidden></p>
+  </div>
+</div>
+
+<!-- Audience only: the unit alone, scaled to the phone, always landscape -->
+<div id="liveRoot">
+  <div id="liveLand">
+    <div id="liveStage"></div>
+    <div id="liveBadge"><i></i><span id="liveBadgeT">Waiting</span></div>
+    <div id="liveOv">
+      <div class="lo">
+        <div class="k">Mars 2037 crew health · simulated data</div>
+        <h1 id="loT">Arm Unit, live</h1>
+        <p id="loP">This phone shows exactly what the presenter's Arm Unit shows, second by second. There is nothing to press: it follows the demo.</p>
+        <div class="b" id="loB"><button class="primary" type="button" id="loGo">Follow with sound</button><button type="button" id="loMute">Follow silently</button></div>
+        <div class="s" id="loS"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/nav.js" defer></script>
+<script src="vendor/sqljs/sql-wasm.js"></script>
+<script src="assets/simdb.js"></script>
+<script src="assets/assistant.js"></script>
+<script>
+/* Everything on this page is read from data/sim/mission_sim.sqlite (tables eva_scenario, eva_sample, eva_event, eva_text, variable).
+   State, stay time, limiter and next action are the generator's rule results; the page only shows them. */
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const svg = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const icon = (d, fill) => { const s = svg("svg", fill ? {viewBox:"0 0 24 24", fill:"currentColor"} : {viewBox:"0 0 24 24", fill:"none", stroke:"currentColor", "stroke-width":"2", "stroke-linecap":"round", "stroke-linejoin":"round"}); d.split("|").forEach(p => s.appendChild(svg("path", {d:p}))); s.setAttribute("aria-hidden", "true"); return s; };
+const hm = m => { m = Math.max(0, Math.round(m)); return Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0"); };
+const mss = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const hms = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 3600) + ":" + String(Math.floor(s % 3600 / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+const words = m => { m = Math.max(0, Math.round(m)); const h = Math.floor(m / 60), r = m % 60; return (h ? h + " h " : "") + r + " min"; };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+const IC = {
+  go:"M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z|m8 12.5 3 3 5-6", caution:"M12 3.5 2.5 20h19z|M12 10v4.5|M12 17.3v.2",
+  return:"M9 14 4 9l5-5|M4 9h10a6 6 0 0 1 0 12h-3", emergency:"M8 3h8l5 5v8l-5 5H8l-5-5V8z|M12 8v5|M12 16.3v.2",
+  inside:"M6 21V4h12v17|M3 21h18|M14.5 12.5v.2", check:"m5 12.5 4.5 4.5L19 7.5", info:"M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z|M12 11v5|M12 7.8v.2",
+  mic:"M9 3h6v11H9z|M5.5 11a6.5 6.5 0 0 0 13 0|M12 17.5V21", speaker:"M4 9.5h3.5L12 6v12l-4.5-3.5H4z|M15.5 9a4 4 0 0 1 0 6|M18 6.5a7.5 7.5 0 0 1 0 11",
+  play:"M8 5v14l11-7z", pause:"M6 5h4v14H6z|M14 5h4v14h-4z", start:"M5 5h2.5v14H5z|M20 5v14L9 12z", key:"M12 3l7 9-7 9-7-9z"
+};
+const STATE = { go:["Go", IC.go], caution:["Caution", IC.caution], return:["Return", IC.return], emergency:["Emergency", IC.emergency], inside:["Airlock", IC.inside] };
+const OUTSIDE = new Set(["egress", "traverse", "work", "rest", "ingress"]);
+const START_H = 10;                                   // local start time of every walk (eva_scenario.start_local_h)
+/* key, column, short label on the cuff, unit */
+const CELLS = [
+  ["hr", "hr_bpm", "Heart rate", "bpm"], ["core", "core_c", "Core temp", "°C"], ["lact", "lactate_mmol", "Lactate", "mmol/L"], ["stam", "stamina_pct", "Stamina", "%"],
+  ["bal", "balance_score", "Balance", "/100"], ["faint", "faint_risk_pct", "Faint risk", "%"], ["rate", "dose_rate_usv_h", "Dose rate", "µSv/h"], ["dose", "eva_dose_usv", "EVA dose", "µSv"],
+  ["press", "suit_p_kpa", "Suit pressure", "kPa"], ["o2", "suit_o2_pct", "Oxygen", "%"], ["co2", "suit_co2_mmhg", "Suit CO₂", "mmHg"], ["temp", "suit_temp_c", "Suit temp", "°C"]
+];
+const RES = [["Oxygen", "left_o2_min"], ["Battery", "left_battery_min"], ["Cooling water", "left_water_min"], ["CO₂ scrubber", "left_scrubber_min"], ["Daylight", "left_daylight_min"], ["Stamina", "left_stamina_min", "MODEL"]];
+const NUM = ["seg_left_s", "stay_min", "walk_back_min", "dist_m", "x_m", "y_m", "met_w", "hr_bpm", "core_c", "lactate_mmol", "stamina_pct", "balance_score", "faint_risk_pct", "heat_kj_kg",
+  "suit_p_kpa", "suit_o2_pct", "suit_co2_mmhg", "suit_temp_c", "battery_pct", "water_pct", "scrubber_pct", "cooling_level", "dose_rate_usv_h", "eva_dose_usv", "drink_ml",
+  "left_o2_min", "left_battery_min", "left_water_min", "left_scrubber_min", "left_daylight_min", "left_stamina_min", "left_event_min", "next_id"];
+/* what can be drawn on the timeline: column, threshold line */
+const TRACE = [["stay_min"], ["hr_bpm", w => 140], ["core_c", w => w.core0 + 0.6], ["heat_kj_kg", w => 2.4], ["met_w"], ["lactate_mmol", w => 4], ["stamina_pct", w => 35], ["balance_score", w => 65],
+  ["faint_risk_pct", w => 10], ["dose_rate_usv_h", w => 1.2 * w.rate0], ["eva_dose_usv"], ["suit_co2_mmhg", w => 8], ["suit_p_kpa"], ["suit_o2_pct"], ["suit_temp_c"], ["battery_pct"], ["water_pct"], ["scrubber_pct"], ["dist_m"]];
+const DEFAULT_TRACE = { nominal:"stamina_pct", fatigue:"hr_bpm", co2:"suit_co2_mmhg", storm:"dose_rate_usv_h" };
+const SHORT = { "airlock":"Leak check", "prebreathe":"Pre-breathe", "depress":"Air out", "egress":"Out", "ingress":"In", "repress":"Air in", "post":"Helmet off", "rest":"Rest", "traverse":"Walk" };
+const BANDFILL = { airlock:"#191919", prebreathe:"#191919", depress:"#191919", repress:"#191919", post:"#191919", egress:"#2b2b2b", ingress:"#2b2b2b", traverse:"#4a4740", work:"#33302a", rest:"#232220" };
+const SPEEDS = [[1, "1×", "Real time"], [10, "10×", "10 times"], [60, "60×", "60 times: one minute a second"], [300, "300×", "300 times: five minutes a second"]];
+const QUESTIONS = ["How long can I stay?", "What do I do now?"];
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const STRC = ["phase", "task", "state", "limiter"];
+const AUD = window.ARM_MODE === "audience", PRES = window.ARM_MODE === "presenter";
+const WALKS = {};
+let cur = null, t = 0, playing = false, speed = 60, traceKey = "hr_bpm", lastI = -1, lastTs = 0, view = "read", acked = null, hist = [], histAt = null, muted = false, stopListen = null, drag = false, urlTimer = 0;
+const vv = k => SimDB.vars["eva." + k] || {};
+const fmt = (k, v) => (v === null || v === undefined || Number.isNaN(v)) ? "–" : Number(v).toFixed(vv(k).decimals == null ? 1 : vv(k).decimals).replace(/^-(0(\.0+)?)$/, "$1");
+
+/* ---------- load one walk into arrays ---------- */
+/* The same walk from two places: the SQLite file (this page) or the light pack the server sends to audience phones. */
+function walkFromDb(sid) {
+  const rows = SimDB.q("select * from eva_sample where scenario_id=? order by t_s", [sid]);
+  const d = { sc: SimDB.one("select * from eva_scenario where scenario_id=?", [sid]), n: rows.length, num: {}, str: {}, text: {} };
+  NUM.forEach(k => { d.num[k] = rows.map(r => r[k]); });
+  STRC.forEach(k => { d.str[k] = rows.map(r => r[k]); });
+  SimDB.q("select next_id, text from eva_text where scenario_id=?", [sid]).forEach(r => { d.text[r.next_id] = r.text; });
+  d.events = SimDB.q("select t_s, kind, severity, var_id, text from eva_event where scenario_id=? order by t_s, rowid", [sid]);
+  return d;
+}
+function walkFromPack(p) {
+  const d = { sc: p.sc, n: p.n, num: p.num, str: {}, text: p.text, events: p.events };
+  STRC.forEach(k => { const runs = p.str[k], out = []; for (let j = 0; j < runs.length; j += 2) for (let m = 0; m < runs[j + 1]; m++) out.push(runs[j]); d.str[k] = out; });
+  return d;
+}
+function loadWalk(sid) { return WALKS[sid] || buildWalk(sid, walkFromDb(sid)); }
+function buildWalk(sid, d) {
+  const sc = d.sc, n = d.n, c = {};
+  NUM.forEach(k => { const a = new Float64Array(n), src = d.num[k]; for (let i = 0; i < n; i++) { const v = src[i]; a[i] = (v === null || v === undefined) ? NaN : v; } c[k] = a; });
+  STRC.forEach(k => { c[k] = d.str[k]; });
+  const w = { sid, sc, n, c, ctx: JSON.parse(sc.context_json), text: d.text, traces: {} };
+  w.events = d.events;
+  w.marks = w.events.filter(e => e.kind === "caution" || e.kind === "alarm");
+  w.spans = [];
+  for (let i = 0; i < n; i++) { const s = w.spans[w.spans.length - 1]; if (s && s.phase === c.phase[i] && s.task === c.task[i]) s.t1 = i; else w.spans.push({ t0: i, t1: i, phase: c.phase[i], task: c.task[i] }); }
+  w.core0 = c.core_c[0];
+  let s0 = 0; const k0 = Math.min(600, n); for (let i = 0; i < k0; i++) s0 += c.dose_rate_usv_h[i]; w.rate0 = s0 / k0;
+  w.hasEvent = c.left_event_min.some(v => !Number.isNaN(v));
+  w.eventName = sid === "storm" ? "Storm rule" : "CO₂ limit";
+  /* which readout to light up: the generator's cues, mirrored (tools/sim/eva.py). A tripped cue stays lit while the unit holds its caution. */
+  const first = (kind, v) => { const e = w.events.find(x => x.kind === kind && x.var_id === v); return e ? e.t_s : null; };
+  const tc = { co2: first("caution", "eva.suit_co2_mmhg"), rate: first("caution", "eva.dose_rate_usv_h") }, ta = { co2: first("alarm", "eva.suit_co2_mmhg"), rate: first("alarm", "eva.dose_rate_usv_h") };
+  const F = {}, FT = {}; CELLS.forEach(([k]) => { F[k] = new Uint8Array(n); });
+  const hold = {}, lvl = {}; let run = 0;
+  const WHY = { hr:"Above 140 bpm for 2 min", core:"0.6 °C or more over the value before the walk", lact:"4 mmol/L or more", stam:"Under 35 %", bal:"Under 65", faint:"10 % or more",
+    co2:"Climbing without effort: scrubber pattern", rate:"1.2 times the usual surface rate or more" };
+  for (let i = 0; i < n; i++) {
+    const out = OUTSIDE.has(c.phase[i]);
+    run = c.hr_bpm[i] > 140 ? run + 1 : 0;
+    const raw = {
+      hr: out && run >= 120 ? 1 : 0,
+      core: !out ? 0 : c.core_c[i] >= 39.0 ? 2 : c.core_c[i] - w.core0 >= 0.6 ? 1 : 0,
+      lact: out && c.lactate_mmol[i] >= 4 ? 1 : 0,
+      stam: !out ? 0 : c.stamina_pct[i] < 20 ? 2 : c.stamina_pct[i] < 35 ? 1 : 0,
+      bal: out && c.balance_score[i] < 65 ? 1 : 0,
+      faint: !out ? 0 : c.faint_risk_pct[i] >= 20 ? 2 : c.faint_risk_pct[i] >= 10 ? 1 : 0
+    };
+    for (const k in raw) {
+      if (raw[k]) { hold[k] = 300; lvl[k] = raw[k]; F[k][i] = raw[k]; }
+      else if (hold[k] > 0 && c.state[i] !== "go" && out) { hold[k]--; F[k][i] = lvl[k]; }
+      else hold[k] = 0;
+    }
+    if (c.phase[i] !== "post") F.co2[i] = (ta.co2 !== null && i >= ta.co2) ? 2 : ((tc.co2 !== null && i >= tc.co2) || c.suit_co2_mmhg[i] > 8) ? 1 : 0;
+    if (out) F.rate[i] = (ta.rate !== null && i >= ta.rate) ? 2 : (tc.rate !== null && i >= tc.rate) ? 1 : 0;
+  }
+  w.F = F; w.WHY = WHY;
+  /* route, one point every 5 s, with the length walked */
+  const pts = [], cum = []; let L = 0;
+  for (let i = 0; i < n; i += 5) { const p = [c.x_m[i], c.y_m[i]]; if (pts.length) L += Math.hypot(p[0] - pts[pts.length - 1][0], p[1] - pts[pts.length - 1][1]); pts.push(p); cum.push(L); }
+  w.route = { pts, cum, total: L };
+  return (WALKS[sid] = w);
+}
+
+/* ---------- route map (panel beside the cuff, and the route view on the unit) ---------- */
+function makeMap(host, W, H, pad) {
+  let sx, st = {};
+  function setWalk(w) {
+    host.textContent = "";
+    const A = w.ctx.site_a, B = w.ctx.site_b, xs = [0, A[0], B[0]], ys = [0, A[1], B[1]];
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min((W - 2 * pad) / (x1 - x0), (H - 2 * pad) / (y1 - y0));
+    const ox = pad + ((W - 2 * pad) - k * (x1 - x0)) / 2, oy = pad + ((H - 2 * pad) - k * (y1 - y0)) / 2;
+    sx = p => [ox + k * (p[0] - x0), H - oy - k * (p[1] - y0)];
+    const o = sx([0, 0]);
+    const clip = svg("clipPath", {id: host.id + "-clip"}); clip.appendChild(svg("rect", {x:0, y:0, width:W, height:H})); host.appendChild(clip);
+    const rings = svg("g", {"clip-path": `url(#${host.id}-clip)`});
+    [250, 500, 750].forEach(r => {
+      rings.appendChild(svg("circle", {cx:o[0], cy:o[1], r:r * k, fill:"none", stroke:"#2b2b2b", "stroke-dasharray":"2 4"}));
+      const a = -0.16, lx = o[0] + r * k * Math.cos(a), ly = o[1] + r * k * Math.sin(a);
+      if (lx < W - 30) rings.appendChild(svg("text", {x:lx + 4, y:ly + 4, class:"halo"}, r + " m"));
+    });
+    host.appendChild(rings);
+    const d = w.route.pts.map((p, i) => { const q = sx(p); return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join("");
+    host.appendChild(svg("path", {d, fill:"none", stroke:"#4d4c49", "stroke-width":1.5, "stroke-dasharray":"1 4", "stroke-linecap":"round"}));
+    st.walked = svg("path", {d, fill:"none", stroke:"#e8e4d8", "stroke-width":2, "stroke-linejoin":"round", "stroke-linecap":"round", pathLength:Math.max(w.route.total, 1)});
+    host.appendChild(st.walked);
+    [["A", A, "Site A"], ["B", B, "Site B"]].forEach(([s, p, name]) => {
+      const q = sx(p);
+      host.appendChild(svg("path", {d:`M${q[0]} ${q[1] - 6}l6 6-6 6-6-6z`, fill:"#171717", stroke:"#9a968c", "stroke-width":1.5}));
+      const right = q[0] > W * 0.72;
+      host.appendChild(svg("text", {x:q[0] + (right ? -10 : 10), y:q[1] + (right ? 4 : -7), "text-anchor": right ? "end" : "start", class:"site halo"}, name));
+    });
+    host.appendChild(svg("path", {d:`M${o[0] - 7} ${o[1] + 6}v-8l7-6 7 6v8z`, fill:"#171717", stroke:"#e8e4d8", "stroke-width":1.5, "stroke-linejoin":"round"}));
+    host.appendChild(svg("text", {x:o[0] + 11, y:o[1] + 16, class:"site halo"}, "Airlock"));
+    st.ring = svg("circle", {class:"ring2", r:5}); st.here = svg("circle", {class:"here", r:5});
+    host.append(st.ring, st.here);
+  }
+  function update(w, i) {
+    const j = Math.min(w.route.cum.length - 1, Math.floor(i / 5)), q = sx([w.c.x_m[i], w.c.y_m[i]]);
+    st.walked.setAttribute("stroke-dasharray", w.route.cum[j].toFixed(1) + " " + (w.route.total + 10).toFixed(1));
+    st.here.setAttribute("cx", q[0]); st.here.setAttribute("cy", q[1]); st.ring.setAttribute("cx", q[0]); st.ring.setAttribute("cy", q[1]);
+    st.here.style.display = st.ring.style.display = OUTSIDE.has(w.c.phase[i]) ? "" : "none";
+  }
+  return { setWalk, update };
+}
+const MAP = makeMap($("map"), 308, 150, 20), UMAP = makeMap($("umap"), 536, 270, 30);
+
+/* ---------- resource runway (built once per walk, updated each second) ---------- */
+const RW = { X0:118, X1:500, MAXM:600, top:22 };
+function buildRunway(w) {
+  const elr = $("runway"); elr.textContent = "";
+  const rows = (w.hasEvent ? [[w.eventName, "left_event_min", "RULE"]] : []).concat(RES);
+  const pitch = rows.length > 6 ? 17 : 20, top = RW.top, bottom = top + rows.length * pitch;
+  const x = m => RW.X0 + (RW.X1 - RW.X0) * Math.min(Math.max(m, 0), RW.MAXM) / RW.MAXM;
+  RW.x = x; RW.rows = rows; RW.pitch = pitch;
+  RW.shade = svg("rect", {x:RW.X0, y:top - 6, width:0, height:bottom - top + 6, fill:"#33302a", opacity:.55}); elr.appendChild(RW.shade);
+  for (let h = 0; h <= 10; h += 2) {
+    elr.appendChild(svg("line", {x1:x(h * 60), x2:x(h * 60), y1:top - 6, y2:bottom, stroke: h ? "#2b2b2b" : "#4d4c49"}));
+    elr.appendChild(svg("text", {x:x(h * 60), y:bottom + 14, "text-anchor":"middle"}, h + " h"));
+  }
+  RW.line = svg("line", {y1:top - 10, y2:bottom, stroke:"#9a968c", "stroke-dasharray":"3 3"}); elr.appendChild(RW.line);
+  RW.lineT = svg("text", {y:top - 9}, ""); elr.appendChild(RW.lineT);
+  RW.el = rows.map(([name, col, prov], i) => {
+    const y = top + i * pitch, o = { name, col, prov, y };
+    o.nm = svg("text", {x:RW.X0 - 10, y:y + 10, "text-anchor":"end", class:"name"}, name); elr.appendChild(o.nm);
+    o.bar = svg("path", {fill:"#706e68"}); elr.appendChild(o.bar);
+    o.val = svg("text", {y:y + 10, class:"val halo"}, ""); elr.appendChild(o.val);
+    o.note = svg("text", {y:y + 10, class:"halo"}, ""); elr.appendChild(o.note);
+    const hit = svg("rect", {x:0, y:y - 3, width:570, height:pitch, class:"hit"});
+    hit.addEventListener("mousemove", ev => { const v = cur.c[col][Math.floor(t)]; tip(ev, Number.isNaN(v) ? `${name}: not active` : `${name}: ${words(v)} left at the current rate${prov === "MODEL" ? " (model estimate)" : prov === "RULE" ? " (rule limit)" : ""}`); });
+    hit.addEventListener("mouseleave", () => $("tip").classList.remove("on"));
+    elr.appendChild(hit);
+    return o;
+  });
+}
+function updateRunway(w, i) {
+  const c = w.c, outside = !Number.isNaN(c.stay_min[i]), lim = c.limiter[i];
+  const line = c.walk_back_min[i] + 30, x = RW.x;
+  RW.shade.setAttribute("width", Math.max(0, x(line) - RW.X0));
+  RW.line.setAttribute("x1", x(line)); RW.line.setAttribute("x2", x(line));
+  RW.lineT.setAttribute("x", x(line) + 5); RW.lineT.textContent = "return line " + hm(line);
+  RW.el.forEach(o => {
+    const left = c[o.col][i], off = Number.isNaN(left), focus = outside && !off && o.name === lim;
+    const wd = off ? 0 : Math.max(3, x(left) - RW.X0), h = 10, rr = Math.min(4, wd / 2), y = o.y;
+    o.bar.setAttribute("d", off ? "" : `M${RW.X0} ${y + 1}h${wd - rr}a${rr} ${rr} 0 0 1 ${rr} ${rr}v${h - 2 * rr}a${rr} ${rr} 0 0 1 ${-rr} ${rr}h${-(wd - rr)}z`);
+    o.bar.setAttribute("fill", focus ? "#e5522c" : "#706e68");
+    o.nm.setAttribute("class", "name" + (focus ? " on" : ""));
+    const txt = off ? "not active" : hm(left);
+    o.val.setAttribute("x", RW.X0 + wd + 7); o.val.textContent = txt; o.val.setAttribute("class", off ? "halo" : "val halo");
+    o.note.setAttribute("x", RW.X0 + wd + 7 + txt.length * 8 + 8); o.note.textContent = focus ? (c.state[i] === "return" ? "the limit" : "limits your stay") : "";
+  });
+}
+function tip(ev, text) {
+  const tp = $("tip"), box = $("screen").getBoundingClientRect(), k = box.width / $("screen").offsetWidth;
+  tp.textContent = text; tp.classList.add("on");
+  tp.style.left = Math.min((ev.clientX - box.left) / k + 14, 600) + "px"; tp.style.top = Math.max(4, (ev.clientY - box.top) / k - 40) + "px";
+}
+
+/* ---------- readouts ---------- */
+function buildCells() {
+  const host = $("cells"); host.textContent = "";
+  CELLS.forEach(([key, col, label, unit]) => {
+    const c = el("button", "cell"); c.type = "button"; c.id = "c-" + key; c.setAttribute("aria-pressed", "false");
+    const l = el("div", "l"); l.append(label);
+    const kind = vv(col).kind; if (kind) l.append(el("span", "badge", kind));
+    if (key === "hr") l.append(el("i", "beat"));
+    const v = el("div", "v num"); const n = el("span"); n.id = "v-" + key; v.append(n, el("small", null, unit)); if (key === "faint") { const wd = el("small"); wd.id = "v-faintw"; v.append(wd); }
+    const f = el("div", "f"); f.id = "f-" + key;
+    c.append(l, v, f); host.append(c);
+    c.addEventListener("click", () => setTrace(col));
+    c.addEventListener("mousemove", ev => tip(ev, `${vv(col).label || label}. ${vv(col).rule_text || ""} Click to draw it on the timeline.`));
+    c.addEventListener("mouseleave", () => $("tip").classList.remove("on"));
+  });
+}
+const flagState = {};
+function updateCells(w, i) {
+  const c = w.c;
+  CELLS.forEach(([key, col]) => {
+    $("v-" + key).textContent = fmt(col, c[col][i]);
+    const fl = w.F[key][i];
+    if (flagState[key] !== fl) {
+      flagState[key] = fl;
+      const cell = $("c-" + key); cell.classList.toggle("watch", fl === 1); cell.classList.toggle("alarm", fl === 2);
+      const f = $("f-" + key); f.textContent = "";
+      if (fl) { f.appendChild(icon(fl === 2 ? IC.emergency : IC.caution)); const lab = (fl === 2 ? "Alarm: " : "Caution: ") + (w.WHY[key] || ""); cell.setAttribute("aria-label", `${vv(col).label}. ${lab}`); } else cell.removeAttribute("aria-label");
+    }
+  });
+  const fr = c.faint_risk_pct[i]; $("v-faintw").textContent = fr >= 20 ? " high" : fr >= 10 ? " raised" : " low";
+  document.documentElement.style.setProperty("--beat", (60 / Math.max(40, c.hr_bpm[i])).toFixed(2) + "s");
+}
+
+/* ---------- the unit ---------- */
+let stateShown = null;
+function updateUnit(w, i) {
+  const c = w.c, ph = c.phase[i], outside = !Number.isNaN(c.stay_min[i]), stt = outside ? c.state[i] : "inside";
+  $("clock").textContent = hms(i);
+  const lh = START_H + i / 3600;
+  $("soltime").textContent = `Sol ${w.sc.sol} · ${Math.floor(lh)}:${String(Math.floor(lh % 1 * 60)).padStart(2, "0")} local · ${SimDB.meta.landing_site}`;
+  if (stateShown !== stt) {
+    stateShown = stt;
+    const s = $("state"); s.className = "state " + stt; s.textContent = ""; s.append(icon(STATE[stt][1]), STATE[stt][0]);
+    $("kAck").classList.toggle("primary", stt !== "return" && stt !== "emergency"); $("kHome").classList.toggle("primary", stt === "return" || stt === "emergency");
+  }
+  const big = $("heroV"), why = $("heroWhy"); why.textContent = "";
+  if (outside) {
+    const lim = c.limiter[i], ret = stt === "return" || stt === "emergency";
+    $("heroQ").textContent = ret ? "Margin after the walk back" : "You can stay"; $("heroU").textContent = "h:min";
+    big.textContent = hm(c.stay_min[i]); big.classList.remove("tight");
+    if (lim === "Storm rule") { why.append("Storm rule: indoors in "); why.append(el("b", null, hm(c.left_event_min[i]))); }
+    else if (lim === "CO₂ limit") { why.append("20 mmHg reached in "); why.append(el("b", null, hm(c.left_event_min[i]))); }
+    else { why.append(ret ? "Limit: " : "Limited by "); why.append(el("b", null, String(lim).replace(/^[A-Z](?=[a-z])/, x => x.toLowerCase()))); if (lim === "Stamina") why.append(el("span", "badge", "MODEL")); }
+    $("homeV").textContent = `${Math.round(c.dist_m[i])} m · ${Math.round(c.walk_back_min[i])} min`; $("homeL").textContent = "walk back to the airlock";
+  } else {
+    const left = c.seg_left_s[i];
+    $("heroQ").textContent = c.task[i]; $("heroU").textContent = "min:s";
+    big.textContent = Number.isNaN(left) ? "–" : mss(left); big.classList.toggle("tight", big.textContent.length > 4);
+    const p = fmt("suit_p_kpa", c.suit_p_kpa[i]);
+    why.append({ airlock:"Checking the suit for leaks", prebreathe:"Oxygen washes nitrogen out of the blood", depress:`Suit ${p} kPa, going to 29.6`, ingress:"Hatch closed behind you",
+      repress:`Suit ${p} kPa, going to 56.5`, post:`Walk complete after ${hms(w.n - 1)}` }[ph] || "");
+    $("homeV").textContent = "In the airlock"; $("homeL").textContent = ph === "post" || ph === "repress" || ph === "ingress" ? "back inside" : "before the walk";
+  }
+  const nid = c.next_id[i], nx = $("next");
+  nx.className = "next" + (stt === "go" || stt === "inside" ? "" : " " + stt) + (acked === nid ? " acked" : "");
+  $("nextT").textContent = w.text[nid] || "";
+  $("rDist").textContent = outside ? `${Math.round(c.dist_m[i])} m · ${Math.round(c.walk_back_min[i])} min` : "0 m";
+  $("rNote").textContent = outside ? (stt === "return" ? "walk back now, easy pace" : "along the way you came") : "in the airlock";
+  $("mInfo").textContent = outside ? `${Math.round(c.dist_m[i])} m from the airlock` : "in the airlock";
+  updateRunway(w, i); updateCells(w, i); MAP.update(w, i); UMAP.update(w, i);
+}
+
+/* ---------- timeline ---------- */
+const TL = { H:118, padL:44, padR:16, trTop:8, trH:52, mkY:70, bandY:80, bandH:20, axY:114 };
+function traceSeries(w, key) {
+  if (w.traces[key + TL.W]) return w.traces[key + TL.W];
+  const a = w.c[key], nb = Math.max(50, Math.floor((TL.W - TL.padL - TL.padR) / 1.5)), out = new Float64Array(nb); let mn = Infinity, mx = -Infinity;
+  for (let b = 0; b < nb; b++) {
+    const i0 = Math.floor(b * w.n / nb), i1 = Math.max(i0 + 1, Math.floor((b + 1) * w.n / nb)); let s = 0, k = 0;
+    for (let i = i0; i < i1; i++) if (!Number.isNaN(a[i])) { s += a[i]; k++; }
+    out[b] = k ? s / k : NaN; if (k) { mn = Math.min(mn, out[b]); mx = Math.max(mx, out[b]); }
+  }
+  return (w.traces[key + TL.W] = { v: out, nb, mn, mx });
+}
+function drawTimeline() {
+  const s = $("tl"), w = cur; if (!w) return;
+  const Wd = Math.max(600, Math.round(s.getBoundingClientRect().width)); TL.W = Wd;
+  s.setAttribute("viewBox", `0 0 ${Wd} ${TL.H}`); s.textContent = "";
+  const x = tt => TL.padL + (Wd - TL.padL - TL.padR) * tt / (w.n - 1); TL.x = x;
+  s.setAttribute("aria-valuemax", w.n - 1);
+  /* trace of the selected value: faint for the whole walk, strong for the part already played */
+  const tr = traceSeries(w, traceKey), def = TRACE.find(d => d[0] === traceKey), thr = def && def[1] ? def[1](w) : null;
+  let lo = tr.mn, hi = tr.mx; if (thr !== null && thr > lo - (hi - lo) && thr < hi + (hi - lo) * 1.2) { lo = Math.min(lo, thr); hi = Math.max(hi, thr); }
+  if (hi - lo < 1e-9) { hi += 1; lo -= 1; } const pd = (hi - lo) * 0.1; lo -= pd; hi += pd;
+  const y = v => TL.trTop + TL.trH * (1 - (v - lo) / (hi - lo));
+  let d = "", pen = false;
+  for (let b = 0; b < tr.nb; b++) { const v = tr.v[b]; if (Number.isNaN(v)) { pen = false; continue; } const px = x((b + 0.5) * w.n / tr.nb); d += (pen ? "L" : "M") + px.toFixed(1) + " " + y(v).toFixed(1); pen = true; }
+  s.appendChild(svg("line", {x1:TL.padL, x2:Wd - TL.padR, y1:TL.trTop + TL.trH, y2:TL.trTop + TL.trH, stroke:"#2b2b2b"}));
+  if (thr !== null && thr >= lo && thr <= hi) {
+    s.appendChild(svg("line", {x1:TL.padL, x2:Wd - TL.padR, y1:y(thr), y2:y(thr), stroke:"#706e68", "stroke-dasharray":"3 4"}));
+    s.appendChild(svg("text", {x:Wd - TL.padR - 4, y:y(thr) - 4, "text-anchor":"end", class:"halo"}, "rule level " + fmt(traceKey, thr)));
+  }
+  s.appendChild(svg("path", {d, fill:"none", stroke:"#4d4c49", "stroke-width":1.5, "stroke-linejoin":"round"}));
+  const cp = svg("clipPath", {id:"tlclip"}); TL.clip = svg("rect", {x:0, y:0, width:0, height:TL.H}); cp.appendChild(TL.clip); s.appendChild(cp);
+  s.appendChild(svg("path", {d, fill:"none", stroke:"#e8e4d8", "stroke-width":2, "stroke-linejoin":"round", "clip-path":"url(#tlclip)"}));
+  s.appendChild(svg("text", {x:TL.padL - 6, y:TL.trTop + 9, "text-anchor":"end", class:"ax"}, fmt(traceKey, tr.mx)));
+  s.appendChild(svg("text", {x:TL.padL - 6, y:TL.trTop + TL.trH, "text-anchor":"end", class:"ax"}, fmt(traceKey, tr.mn)));
+  /* phases of the walk */
+  w.spans.forEach(sp => {
+    const x0 = x(sp.t0), x1 = x(sp.t1 + 1), wd = Math.max(1, x1 - x0 - 2);
+    s.appendChild(svg("rect", {x:x0, y:TL.bandY, width:wd, height:TL.bandH, rx:3, fill: sp.task.startsWith("Rest ordered") ? "#232220" : BANDFILL[sp.phase] || "#232220"}));
+    const name = sp.task.startsWith("Rest ordered") ? "Rest" : sp.phase === "work" ? (sp.task.startsWith("Setting") ? "Instruments" : sp.task.split(" ")[0]) : SHORT[sp.phase] || sp.phase;
+    if (wd > name.length * 6.3 + 10) s.appendChild(svg("text", {x:x0 + 6, y:TL.bandY + 14, class:"bl"}, name));
+  });
+  for (let m = 0; m * 60 < w.n; m += 30) { s.appendChild(svg("text", {x:x(m * 60), y:TL.axY, "text-anchor": m ? "middle" : "start", class:"ax"}, hm(m))); if (m) s.appendChild(svg("line", {x1:x(m * 60), x2:x(m * 60), y1:TL.bandY + TL.bandH + 1, y2:TL.bandY + TL.bandH + 4, stroke:"#4d4c49"})); }
+  /* progress, markers, handle */
+  TL.prog = svg("rect", {x:TL.padL, y:TL.bandY + TL.bandH + 1, width:0, height:2, fill:"#e8e4d8"}); s.appendChild(TL.prog);
+  const kx = x(w.sc.snapshot_t_s);
+  s.appendChild(svg("path", {d:`M${kx} ${TL.mkY - 7}l5 6-5 6-5-6z`, fill:"#060606", stroke:"#e8e4d8", "stroke-width":1.5}));
+  w.marks.forEach(e => {
+    const mx = x(e.t_s), al = e.kind === "alarm";
+    s.appendChild(al ? svg("path", {d:`M${mx - 3} ${TL.mkY - 7}h6l4 4v6l-4 4h-6l-4-4v-6z`, fill:"#e5522c", stroke:"#060606", "stroke-width":1.5})
+      : svg("path", {d:`M${mx} ${TL.mkY - 8}l7 13h-14z`, fill:"#f2c14e", stroke:"#060606", "stroke-width":1.5, "stroke-linejoin":"round"}));
+    s.appendChild(svg("path", {d: al ? `M${mx} ${TL.mkY - 3}v4M${mx} ${TL.mkY + 3.5}v.3` : `M${mx} ${TL.mkY - 3}v4M${mx} ${TL.mkY + 3}v.3`, stroke:"#060606", "stroke-width":1.6, "stroke-linecap":"round", fill:"none"}));
+  });
+  TL.cursor = svg("line", {y1:TL.trTop - 4, y2:TL.bandY + TL.bandH + 4, stroke:"#e8e4d8", "stroke-width":1}); s.appendChild(TL.cursor);
+  TL.knob = svg("circle", {cy:TL.bandY + TL.bandH / 2, r:8, fill:"#e8e4d8", stroke:"#060606", "stroke-width":2}); s.appendChild(TL.knob);
+  updateTimeline();
+}
+function updateTimeline() {
+  if (!TL.x) return; const px = TL.x(t);
+  TL.clip.setAttribute("width", px); TL.prog.setAttribute("width", Math.max(0, px - TL.padL));
+  TL.cursor.setAttribute("x1", px); TL.cursor.setAttribute("x2", px); TL.knob.setAttribute("cx", px);
+}
+function timeAt(ev, snap) {
+  const r = $("tl").getBoundingClientRect(), px = (ev.clientX - r.left) * TL.W / r.width;
+  if (snap) {
+    const cand = cur.marks.map(e => e.t_s).concat([cur.sc.snapshot_t_s]); let best = null, bd = 7;
+    cand.forEach(tt => { const dx = Math.abs(TL.x(tt) - px); if (dx < bd) { bd = dx; best = tt; } });
+    if (best !== null) return best;
+  }
+  return clamp((px - TL.padL) / (TL.W - TL.padL - TL.padR) * (cur.n - 1), 0, cur.n - 1);
+}
+function hoverTip(ev) {
+  const tt = Math.floor(timeAt(ev, false)), near = cur.marks.find(e => Math.abs(TL.x(e.t_s) - (ev.clientX - $("tl").getBoundingClientRect().left)) < 7);
+  const ft = $("ftip"); ft.textContent = "";
+  ft.append(el("b", null, hms(near ? near.t_s : tt)), " ");
+  if (near) ft.append((near.kind === "alarm" ? "Return: " : "Caution: ") + near.text);
+  else if (Math.abs(TL.x(cur.sc.snapshot_t_s) - (ev.clientX - $("tl").getBoundingClientRect().left)) < 7) ft.append("Key moment of this walk");
+  else ft.append(`${cur.c.task[tt]} · ${vv(traceKey).label || traceKey} ${fmt(traceKey, cur.c[traceKey][tt])} ${vv(traceKey).unit || ""}`);
+  ft.classList.add("on");
+  const wdt = ft.offsetWidth; ft.style.left = clamp(ev.clientX - wdt / 2, 8, innerWidth - wdt - 8) + "px"; ft.style.top = ($("tl").getBoundingClientRect().top - ft.offsetHeight - 6) + "px";
+}
+
+/* ---------- log, caption ---------- */
+function buildLog(w) {
+  const host = $("log"); host.textContent = "";
+  w.events.forEach(e => {
+    const li = el("li", e.kind); li.dataset.t = e.t_s;
+    const kd = el("span", "kd"); if (e.kind === "caution" || e.kind === "alarm") kd.appendChild(icon(e.kind === "alarm" ? IC.return : IC.caution));
+    kd.append({ phase:"Step", caution:"Caution", alarm:"Return", action:"Action", info:"Note" }[e.kind] || e.kind);
+    li.append(el("span", "tm num", hms(e.t_s)), kd, el("span", "tx", e.text));
+    li.addEventListener("click", () => { seek(e.t_s); scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" }); });
+    host.append(li);
+  });
+}
+let logIdx = -2;
+function updateLog(w, i) {
+  let k = -1; for (let j = 0; j < w.events.length; j++) if (w.events[j].t_s <= i) k = j; else break;
+  if (k === logIdx) return; logIdx = k;
+  [...$("log").children].forEach((li, j) => { li.classList.toggle("future", j > k); li.classList.toggle("now", j === k); });
+  const cap = $("cap"); cap.textContent = "";
+  let last = null; for (let j = k; j >= 0; j--) if (w.events[j].kind !== "phase") { last = w.events[j]; break; }
+  if (last) cap.append(el("b", null, `${hms(last.t_s)} ${({ caution:"Caution", alarm:"Return", action:"Action", info:"Note" })[last.kind]}: `), last.text);
+  else cap.append("No caution or alarm so far.");
+}
+
+/* ---------- player ---------- */
+function render(force) {
+  const w = cur; if (!w) return;
+  const i = clamp(Math.floor(t), 0, w.n - 1);
+  updateTimeline();
+  if (i === lastI && !force) return; lastI = i;
+  updateUnit(w, i); updateLog(w, i); soundAt(w, i);
+  $("tNow").textContent = hms(i);
+  $("trVal").textContent = `${fmt(traceKey, w.c[traceKey][i])} ${vv(traceKey).unit || ""}`;
+  const s = $("tl"); s.setAttribute("aria-valuenow", i); s.setAttribute("aria-valuetext", `${hms(i)}, ${w.c.task[i]}`);
+  $("ctxLink").href = `context.html?scenario=${w.sid}&t=${i}`;
+}
+function frame(ts) {
+  if (!playing) return;
+  const dt = Math.min(0.25, (ts - lastTs) / 1000); lastTs = ts; t += dt * speed;
+  if (t >= cur.n - 1) { t = cur.n - 1; render(); setPlaying(false); return; }
+  render(); requestAnimationFrame(frame);
+}
+function setPlaying(p) {
+  playing = p; document.body.classList.toggle("playing", p);
+  const b = $("bPlay"); b.textContent = ""; b.appendChild(icon(p ? IC.pause : IC.play, true)); b.setAttribute("aria-label", p ? "Pause" : "Play");
+  if (p) { hideAnswer(); if (t >= cur.n - 1) t = 0; lastTs = performance.now(); requestAnimationFrame(frame); } else syncUrl();
+}
+function seek(tt, keepAnswer) { t = clamp(tt, 0, cur.n - 1); if (!keepAnswer) hideAnswer(); render(); if (!playing) syncUrl(); }
+function syncUrl() { if (AUD) return; clearTimeout(urlTimer); urlTimer = setTimeout(() => { if (cur) history.replaceState(null, "", `?${PRES ? "presenter=1&" : ""}scenario=${cur.sid}&t=${Math.floor(t)}`); }, 250); }
+function setAck(nid) { acked = (nid === undefined ? null : nid); $("ackT").textContent = ""; if (acked !== null) $("ackT").append(icon(IC.check), "acknowledged"); render(true); }
+function setView(v) { view = v === "route" ? "route" : "read"; $("vRead").hidden = view !== "read"; $("vRoute").hidden = view !== "route"; $("kHome").setAttribute("aria-pressed", String(view === "route")); }
+function setSpeed(s) { speed = s; [...$("speeds").children].forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.s === s))); }
+function setTrace(key) {
+  traceKey = key; $("trace").value = key; CELLS.forEach(([k, col]) => $("c-" + k).setAttribute("aria-pressed", String(col === key)));
+  drawTimeline(); render(true);
+}
+function pick(sid, at) {
+  const w = loadWalk(sid); cur = w; hist = []; acked = null; stateShown = null; logIdx = -2; lastI = -1; for (const k in flagState) delete flagState[k];
+  [...$("scns").children].forEach(b => b.setAttribute("aria-pressed", String(b.dataset.s === sid)));
+  const d = new Date(w.sc.date_utc + "T12:00:00Z").toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
+  $("sTitle").textContent = w.sc.title; $("sMeta").textContent = `Sol ${w.sc.sol} · day ${w.sc.day} · ${d}`;
+  const oc = w.sc.outcome, tg = $("sTag"); tg.textContent = "";
+  tg.className = "tag " + (oc === "nominal" ? "ok" : oc.startsWith("shortened") ? "watch" : "warning");
+  tg.append(icon(oc === "nominal" ? IC.go : oc.startsWith("shortened") ? IC.caution : IC.return), oc === "nominal" ? "Completed as planned" : oc.startsWith("shortened") ? "Shortened by the rules" : "Ended early by the rules");
+  $("sSum").textContent = w.sc.summary; $("sSum").scrollTop = 0;
+  requestAnimationFrame(() => $("sSum").classList.toggle("more", $("sSum").scrollHeight > $("sSum").clientHeight + 4));
+  const mo = $("sMorning"); mo.textContent = "";
+  [["Readiness that morning", Math.round(w.ctx.readiness), ""], ["Sleep", Number(w.ctx.sleep_h).toFixed(1), "h"], ["Sleep debt", Math.round(w.ctx.sleep_debt), "h"]].forEach(([l, v, u]) => {
+    const dv = el("div"), vx = el("div", "v num", String(v)); vx.append(el("small", null, u)); dv.append(el("div", "l", l), vx); mo.append(dv);
+  });
+  $("sLink").href = `habitat.html?day=${w.sc.day}`; $("sLink").textContent = `Mission day ${w.sc.day} in the Habitat App`;
+  $("evaNo").textContent = "EVA " + String(w.ctx.eva_number).padStart(2, "0"); $("callsign").textContent = w.ctx.call_sign;
+  $("tDur").textContent = hms(w.n - 1);
+  buildRunway(w); buildLog(w); MAP.setWalk(w); UMAP.setWalk(w);
+  t = clamp(at == null ? w.sc.snapshot_t_s : at, 0, w.n - 1);
+  setTrace(DEFAULT_TRACE[sid] || "hr_bpm");
+  hideAnswer(); syncUrl();
+}
+
+/* ---------- assistant ---------- */
+function showAnswer(qs, ans, note) { $("ansQ").textContent = "You asked: " + qs; $("ansA").textContent = String(ans).replace(/C O 2/g, "CO₂"); $("ansN").textContent = note || ""; if ($("ans").hidden && ans !== "…") Snd.play("answer"); $("ans").hidden = false; }
+function hideAnswer() { $("ans").hidden = true; Assistant.stopSpeaking(); }
+async function ask(qs) {
+  qs = String(qs || "").trim(); if (!qs || !cur) return;
+  if (playing) setPlaying(false);
+  const i = Math.floor(t), ctx = Assistant.contextForEva(cur.sid, i);
+  /* The conversation belongs to one moment of one walk. Asked at another second (time played, the timeline moved), the
+     earlier questions and answers are not sent: the answer uses only the values of this moment. */
+  const at = cur.sid + ":" + i; if (histAt !== at) { hist = []; histAt = at; }
+  showAnswer(qs, "…", `Reading the values of ${hms(i)}.`);
+  /* One turn, the same as in the Habitat App (Assistant.askAloud): shown while written, spoken from the first sentence on. */
+  const r = await Assistant.askAloud(qs, ctx, hist, "voice", { speak: !muted, onText: a => { if (a) showAnswer(qs, a, `Reading the values of ${hms(i)}.`); } });
+  if (r.aborted) { if ($("ansA").textContent === "…") $("ans").hidden = true; return; }
+  hist.push({ role:"user", content:qs }, { role:"assistant", content:r.answer });
+  showAnswer(qs, r.answer, r.offline ? "No AI model connected: this is the briefing the unit builds from its rules." : `AI answer from the values of ${hms(i)}. The rules decide; the assistant explains.`);
+  const kn = Assistant.noteEl(r); if (kn) $("ansN").replaceChildren(kn);          // public site: why the rules answered (a key), with a link to the key dialog
+}
+function toggleListen() {
+  const k = $("kAsk");
+  if (stopListen) { stopListen(); return; }
+  if (!Assistant.canListen()) { showAnswer("", "This browser has no speech recognition. Type the question in the field beside the cuff.", ""); $("ansQ").textContent = "Voice"; $("askQ").focus(); return; }
+  if (playing) setPlaying(false);
+  k.setAttribute("aria-pressed", "true"); showAnswer("…", "Listening. Press Ask again when you are done.", "");
+  let failed = false;
+  stopListen = Assistant.listen({
+    onText: txt => { $("ansQ").textContent = "You asked: " + txt; },
+    onError: msg => { failed = true; showAnswer("", msg + " You can type the question in the field beside the cuff.", ""); $("ansQ").textContent = "Voice"; },
+    onEnd: fin => {
+      stopListen = null; k.setAttribute("aria-pressed", "false");
+      if (fin) ask(fin); else if (!failed) { showAnswer("", "Nothing heard. Press Ask and speak, or type the question beside the cuff.", ""); $("ansQ").textContent = "Voice"; }
+    }
+  });
+}
+
+/* ---------- beeps ---------- */
+/* The unit beeps like a device: on a new state, on a new step, as a reminder while a return is not acknowledged.
+   Only while time runs forward; jumping on the timeline is silent. Off until someone switches it on (browsers need a tap). */
+const Snd = (() => {
+  let ac = null, on = false;
+  const P = {
+    go: [[660, .12, 0]], caution: [[880, .14, 0], [880, .14, .25]],
+    return: [[988, .18, 0], [784, .18, .22], [659, .26, .44], [988, .18, .9], [784, .18, 1.12], [659, .26, 1.34]],
+    emergency: [[1047, .16, 0], [784, .16, .2], [1047, .16, .4], [784, .16, .6], [1047, .16, .8], [784, .16, 1.0]],
+    remind: [[784, .12, 0], [659, .16, .16]], phase: [[440, .06, 0]], ack: [[523, .07, 0]], answer: [[587, .09, 0], [784, .12, .11]], hello: [[523, .08, 0], [659, .08, .1], [784, .14, .2]]
+  };
+  function play(name) {
+    if (!on || !ac || !P[name]) return;
+    const t0 = ac.currentTime + 0.03, soft = name === "phase" || name === "ack", loud = name === "return" || name === "emergency";
+    P[name].forEach(([f, d, at]) => {
+      const o = ac.createOscillator(), g = ac.createGain(); o.type = soft ? "sine" : "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0 + at); g.gain.exponentialRampToValueAtTime(soft ? 0.06 : loud ? 0.24 : 0.15, t0 + at + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + d);
+      o.connect(g); g.connect(ac.destination); o.start(t0 + at); o.stop(t0 + at + d + 0.03);
+    });
+  }
+  function set(v) {
+    on = !!v;
+    if (on) { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) { on = false; } }
+    return on;
+  }
+  return { get on() { return on; }, set, play };
+})();
+let sndPrev = { i: -1, st: null, ph: null, sid: null }, lastRemind = 0;
+function soundAt(w, i) {
+  const c = w.c, st = Number.isNaN(c.stay_min[i]) ? "inside" : c.state[i], ph = c.phase[i], p = sndPrev, now = performance.now();
+  const flowing = p.sid === w.sid && i > p.i && i - p.i <= Math.max(3, speed * 0.6);
+  if (flowing && Snd.on) {
+    if (st !== p.st) { Snd.play(st === "inside" ? "phase" : st); lastRemind = now; }
+    else if (ph !== p.ph) Snd.play("phase");
+    else if ((st === "return" || st === "emergency") && acked !== c.next_id[i] && now - lastRemind > 7000) { Snd.play("remind"); lastRemind = now; }
+  }
+  if (!flowing) lastRemind = now;
+  sndPrev = { i, st, ph, sid: w.sid };
+}
+function initSound() {
+  const b = $("bSnd");
+  const draw = () => { b.textContent = ""; b.append(icon(IC.speaker), "Beeps"); b.setAttribute("aria-pressed", String(Snd.on)); b.title = Snd.on ? "The unit beeps on cautions, returns and new steps. Press to silence." : "Let the unit beep on cautions, returns and new steps."; };
+  b.addEventListener("click", () => { if (Snd.set(!Snd.on)) Snd.play("hello"); draw(); });
+  draw();
+}
+
+/* ---------- live stream: shared clock ---------- */
+const Live = { on: false, key: null, off: 0, last: null, lastSig: "", lastSent: 0, timer: 0, viewers: 0, err: "", url: "" };
+async function syncClock() {                          // server time minus this device's time, from the fastest of three round trips
+  let best = null;
+  for (let k = 0; k < 3; k++) {
+    try { const t0 = Date.now(), j = await (await fetch("api/live/time", { cache: "no-store" })).json(), t1 = Date.now(); if (!best || t1 - t0 < best.rtt) best = { rtt: t1 - t0, off: j.now - (t0 + t1) / 2 }; } catch (e) {}
+  }
+  if (best) Live.off = best.off;
+  return !!best;
+}
+
+/* ---------- presenter: the switch that puts this unit on the audience's phones ---------- */
+async function presenterKey() {
+  const h = new URLSearchParams(location.hash.slice(1)).get("key");
+  if (h) { sessionStorage.setItem("presenterKey", h); history.replaceState(null, "", location.pathname + location.search); }
+  let k = sessionStorage.getItem("presenterKey");
+  if (!k) { try { const r = await fetch("api/live/key", { cache: "no-store" }); if (r.ok) { k = (await r.json()).key; sessionStorage.setItem("presenterKey", k); } } catch (e) {} }
+  return k;
+}
+function liveState() {
+  const a = $("ans");
+  return { on: true, sid: cur.sid, t: Math.round(t * 100) / 100, playing, speed, view, trace: traceKey, acked,
+    ans: a.hidden ? null : { q: $("ansQ").textContent, a: $("ansA").textContent, n: $("ansN").textContent }, at: Date.now() + Live.off };
+}
+const liveSig = s => JSON.stringify([s.sid, s.playing, s.speed, s.view, s.trace, s.acked, s.ans, s.playing ? 0 : Math.floor(s.t)]);
+async function livePost(s) {
+  Live.last = s; Live.lastSig = liveSig(s); Live.lastSent = performance.now();
+  try { sessionStorage.setItem("hs.liveState", JSON.stringify(s)); sessionStorage.setItem("hs.liveOn", "1"); } catch (e) {}     // other tabs keep the stream alive (assets/present.js)
+  try {
+    const r = await fetch("api/live/publish", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json", "X-Presenter-Key": Live.key }, body: JSON.stringify(s) });
+    const j = await r.json();
+    if (r.ok) { Live.viewers = j.viewers; Live.err = ""; }
+    else { Live.err = r.status === 403 ? "The server refused the presenter key." : (j.error || "refused"); if (r.status === 403) setLive(false, true); }
+  } catch (e) { Live.err = "No connection to the server."; }
+  drawLive();
+}
+function liveTick() {
+  if (!Live.on || !cur) return;
+  const s = liveState(), L = Live.last;
+  const exp = L ? (L.playing ? L.t + L.speed * (s.at - L.at) / 1000 : L.t) : 0;
+  const jump = L && L.playing && s.playing && Math.abs(s.t - exp) > Math.max(1.5, 0.25 * s.speed);       // a seek while playing
+  if (!L || liveSig(s) !== Live.lastSig || jump || performance.now() - Live.lastSent > (s.playing ? 1000 : 3000)) livePost(s);
+}
+async function setLive(v, quiet) {
+  clearInterval(Live.timer);
+  if (v) {
+    Live.key = Live.key || await presenterKey();
+    if (!Live.key) { Live.err = "No presenter key: open the presenter link the server printed."; drawLive(); return; }
+    await syncClock();
+    Live.on = true; Live.last = null; Live.err = "";
+    Live.timer = setInterval(liveTick, 100); liveTick();
+  } else {
+    Live.on = false;
+    try { sessionStorage.removeItem("hs.liveOn"); sessionStorage.removeItem("hs.liveState"); } catch (e) {}
+    if (Live.key && !quiet) fetch("api/live/publish", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json", "X-Presenter-Key": Live.key }, body: JSON.stringify({ on: false }) }).catch(() => {});
+  }
+  drawLive();
+}
+function drawLive() {
+  $("bLive").setAttribute("aria-pressed", String(Live.on)); $("bLiveT").textContent = Live.on ? "Live" : "Go live";
+  $("bLive").title = Live.on ? "The audience sees this unit now. Press to stop." : "Show this unit on the audience's phones, exactly as it is here.";
+  document.dispatchEvent(new CustomEvent("hs-live"));
+  const n = Live.err || (Live.on ? `${Live.viewers} following` : "");
+  ["liveN", "qrSt"].forEach(id => { $(id).textContent = id === "qrSt" && !Live.err ? (Live.on ? "The live view is on." : "The live view is off.") : n; $(id).classList.toggle("err", !!Live.err); });
+  $("qrN").textContent = Live.viewers; $("qrNL").textContent = Live.viewers === 1 ? "phone following" : "phones following";
+  $("qrLive").textContent = Live.on ? "Stop the live view" : "Start the live view"; $("qrLive").classList.toggle("go", !Live.on);
+}
+function drawQR(url) {
+  const tile = $("qrTile"); tile.textContent = "";
+  if (typeof qrcode !== "function") return;
+  const q = qrcode(0, "M"); q.addData(url); q.make();
+  const n = q.getModuleCount(), m = 2, S = n + 2 * m; let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + m} ${r + m}h1v1h-1z`;
+  const g = svg("svg", { viewBox: `0 0 ${S} ${S}`, role: "img", "aria-label": "QR code for " + url, "shape-rendering": "crispEdges" });
+  g.append(svg("path", { d, fill: "#0e0e0e" })); tile.append(g);
+}
+let qrPoll = 0;
+async function openQR() {
+  if (typeof qrcode !== "function") await new Promise(res => { const sc = document.createElement("script"); sc.src = "vendor/qrcode/qrcode.js"; sc.onload = sc.onerror = res; document.head.append(sc); });
+  let info = {}; try { info = await (await fetch("api/live/info", { cache: "no-store" })).json(); } catch (e) {}
+  const setUrl = u => {
+    Live.url = u; $("qrUrl").textContent = u.replace(/^https?:\/\//, ""); drawQR(u);
+    const local = /\/\/(127\.0\.0\.1|localhost)([:/]|$)/.test(u); $("qrNote").hidden = !local;
+    $("qrNote").textContent = local ? "This address works on this computer only. For phones, start a tunnel (for example: ngrok http 8037) and restart the server with --public-url, or paste the public address above." : "";
+  };
+  const u0 = localStorage.getItem("liveUrl") || ((info.public_url || location.origin) + "/live");
+  $("qrIn").value = u0; setUrl(u0);
+  $("qrOv").classList.add("on"); $("qrClose").focus();
+  clearInterval(qrPoll);
+  qrPoll = setInterval(async () => { try { const j = await (await fetch("api/live/info", { cache: "no-store" })).json(); Live.viewers = j.viewers; drawLive(); } catch (e) {} }, 2000);
+  $("qrIn").oninput = () => { const v = $("qrIn").value.trim(); if (/^https?:\/\/\S+$/.test(v)) { localStorage.setItem("liveUrl", v); setUrl(v); } };
+}
+function closeQR() { $("qrOv").classList.remove("on"); clearInterval(qrPoll); }
+function initPresenter() {
+  document.body.classList.add("presenter");
+  $("bLive").addEventListener("click", () => setLive(!Live.on));
+  $("bQR").addEventListener("click", openQR);
+  $("qrLive").addEventListener("click", () => setLive(!Live.on));
+  $("qrClose").addEventListener("click", closeQR);
+  addEventListener("keydown", e => { if (e.key === "Escape" && $("qrOv").classList.contains("on")) closeQR(); });
+  /* Leaving for another tab of the site keeps the stream on: the phones run on from the last state, and the stream resumes here on return. */
+  addEventListener("pagehide", () => { if (Live.on && !document.body.classList.contains("hs-presenting")) setLive(false); });
+  window.ArmLive = { set: v => setLive(v), on: () => Live.on, viewers: () => Live.viewers, qr: openQR };
+  presenterKey().then(k => { Live.key = k; drawLive(); });
+  setInterval(() => { if (Live.on) syncClock(); }, 60000);
+  drawLive();
+  const p = new URLSearchParams(location.search);
+  if (p.get("qr") === "1") openQR();                       // deep links for rehearsal: ?presenter=1&qr=1, ?presenter=1&live=1
+  let resume = false; try { resume = sessionStorage.getItem("hs.liveOn") === "1"; } catch (e) {}
+  if (p.get("live") === "1" || resume) setLive(true);
+}
+
+/* ---------- audience: this page on a phone. It follows the presenter's unit and offers nothing to press. ---------- */
+const Aud = { st: null, started: false, loading: null, lastMsg: 0, es: null };
+function fitLive() {
+  const W = innerWidth, H = innerHeight, portrait = H > W, vw = portrait ? H : W, vh = portrait ? W : H, land = $("liveLand"), k = Math.min(vw / 920, vh / 570);
+  land.style.width = vw + "px"; land.style.height = vh + "px";
+  land.style.transform = portrait ? `translate(${W}px,0) rotate(90deg)` : "none";            // held upright: turn the picture, so it is landscape either way
+  $("liveStage").style.transform = `translate(${(vw - 920 * k) / 2}px,${(vh - 570 * k) / 2}px) scale(${k})`;
+}
+function audOverlay() {
+  const s = Aud.st, live = !!(s && s.on), ready = live && cur && cur.sid === s.sid, ov = $("liveOv");
+  $("liveBadge").classList.toggle("on", live && Date.now() - Aud.lastMsg < 8000);
+  $("liveBadgeT").textContent = !live ? "Waiting" : Date.now() - Aud.lastMsg < 8000 ? "Live" : "Reconnecting";
+  if (!Aud.started) {
+    ov.hidden = false; $("loB").hidden = false; $("loT").textContent = "Arm Unit, live";
+    $("loP").textContent = "This phone shows exactly what the presenter's Arm Unit shows, second by second. There is nothing to press: it follows the demo.";
+    $("loS").textContent = live ? "The presenter is live now." : "The presenter has not started yet. You can follow already.";
+  } else if (!ready) {
+    ov.hidden = false; $("loB").hidden = true;
+    $("loT").textContent = live ? "Loading the walk" : s && s.seq ? "The live view is paused" : "Waiting for the presenter";
+    $("loP").textContent = live ? "One moment." : "Keep this page open. The unit appears here as soon as the presenter switches the live view on.";
+    $("loS").textContent = "";
+  } else ov.hidden = true;
+}
+async function audPack(sid) {
+  if (WALKS[sid] || Aud.loading === sid) return;
+  Aud.loading = sid;
+  try {
+    const p = await (await fetch("api/live/pack?scenario=" + encodeURIComponent(sid))).json();
+    SimDB.vars = p.vars; SimDB.meta = p.meta;
+    if (!$("cells").children.length) buildCells();
+    WALKS[sid] = buildWalk(sid, walkFromPack(p));
+  } catch (e) { setTimeout(() => { Aud.loading = null; if (Aud.st) audState(Aud.st); }, 2000); return; }
+  Aud.loading = null;
+  if (Aud.st) audState(Aud.st);
+}
+function audState(s) {
+  Aud.st = s; Aud.lastMsg = Date.now();
+  if (s.on && s.sid) {
+    if (!WALKS[s.sid]) audPack(s.sid);
+    else {
+      if (!cur || cur.sid !== s.sid) { pick(s.sid, s.t); sndPrev = { i: -1, st: null, ph: null, sid: null }; }
+      playing = !!s.playing; speed = s.speed || 1; document.body.classList.toggle("playing", playing);
+      if (view !== s.view) setView(s.view);
+      if (s.trace && s.trace !== traceKey && TRACE.some(d => d[0] === s.trace)) setTrace(s.trace);
+      if (acked !== (s.acked === undefined ? null : s.acked)) setAck(s.acked);
+      const a = $("ans");
+      if (s.ans) { if (a.hidden && s.ans.a !== "…") Snd.play("answer"); $("ansQ").textContent = s.ans.q; $("ansA").textContent = s.ans.a; $("ansN").textContent = s.ans.n; a.hidden = false; } else a.hidden = true;
+    }
+  }
+  audOverlay();
+}
+function audFrame() {
+  requestAnimationFrame(audFrame);
+  const s = Aud.st;
+  if (!s || !s.on || !cur || cur.sid !== s.sid) return;
+  const tt = s.playing ? s.t + s.speed * (Date.now() + Live.off - s.at) / 1000 : s.t;      // where the presenter is now, on the shared clock
+  t = clamp(tt, 0, cur.n - 1); render();
+}
+function audConnect() {
+  const poll = new URLSearchParams(location.search).get("poll") === "1";     // ?poll=1: ask once a second instead of holding a stream open
+  if (!poll) { try { Aud.es = new EventSource("api/live/events"); Aud.es.onmessage = e => { try { audState(JSON.parse(e.data)); } catch (x) {} }; } catch (e) {} }
+  let seq = -1;
+  setInterval(async () => {                                // also the safety net when the event stream is blocked or stalls
+    if (poll || Date.now() - Aud.lastMsg > 6000) {
+      try { const s = await (await fetch("api/live/state", { cache: "no-store" })).json(); if (s.seq !== seq || !poll) { seq = s.seq; audState(s); } else Aud.lastMsg = Date.now(); } catch (e) {}
+    }
+    audOverlay();
+  }, poll ? 800 : 3000);
+}
+async function audStart(withSound) {
+  Aud.started = true;
+  if (withSound && Snd.set(true)) Snd.play("hello");
+  try { const d = document.documentElement; if (d.requestFullscreen) await d.requestFullscreen({ navigationUI: "hide" }); else if (d.webkitRequestFullscreen) d.webkitRequestFullscreen(); } catch (e) {}
+  try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape"); } catch (e) {}
+  try { if (navigator.wakeLock) { Aud.wake = await navigator.wakeLock.request("screen"); document.addEventListener("visibilitychange", async () => { if (document.visibilityState === "visible") { try { Aud.wake = await navigator.wakeLock.request("screen"); } catch (e) {} } }); } } catch (e) {}
+  fitLive(); audOverlay();
+}
+function initAudience() {
+  document.body.classList.add("audience");
+  $("liveStage").append(document.querySelector(".device"));
+  document.querySelector(".device").setAttribute("inert", "");
+  $("heroQ").textContent = ""; $("nextT").textContent = "";
+  $("kAsk").append(icon(IC.mic), "Ask");
+  $("loGo").addEventListener("click", () => audStart(true));
+  $("loMute").addEventListener("click", () => audStart(false));
+  ["resize", "orientationchange"].forEach(ev => addEventListener(ev, () => setTimeout(fitLive, 60)));
+  if (window.visualViewport) visualViewport.addEventListener("resize", fitLive);
+  document.addEventListener("fullscreenchange", fitLive);
+  ["contextmenu", "gesturestart", "dblclick"].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
+  if (new URLSearchParams(location.search).get("start") === "1") Aud.started = true;      // second screen or rehearsal: no tap, no sound
+  fitLive(); audOverlay();
+  syncClock().then(audConnect); setInterval(syncClock, 45000);
+  requestAnimationFrame(audFrame);
+}
+
+/* ---------- start ---------- */
+function fit() {
+  const dockH = $("dock").offsetHeight, navH = 44;
+  const k = Math.min(1, (innerWidth - 32) / 1392, Math.max(0.7, (innerHeight - navH - dockH - 6) / 760));
+  $("page").style.zoom = k < 1 ? k : "";
+  drawTimeline();
+}
+function init() {
+  const p = new URLSearchParams(location.search);
+  SimDB.q("select scenario_id, title from eva_scenario order by sort").forEach(s => {
+    const b = el("button", null, s.title); b.type = "button"; b.dataset.s = s.scenario_id; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => { setPlaying(false); pick(s.scenario_id); }); $("scns").append(b);
+  });
+  SPEEDS.forEach(([s, label, long]) => { const b = el("button", null, label); b.type = "button"; b.dataset.s = s; b.title = long; b.setAttribute("aria-label", long); b.addEventListener("click", () => setSpeed(s)); $("speeds").append(b); });
+  TRACE.forEach(([key]) => { const o = el("option", null, `${vv(key).label || key}${vv(key).unit ? " (" + vv(key).unit + ")" : ""}`); o.value = key; $("trace").append(o); });
+  $("trace").addEventListener("change", e => setTrace(e.target.value));
+  $("heroV").addEventListener("click", () => setTrace("stay_min"));
+  $("bStart").append(icon(IC.start, true), "From the airlock"); $("bStart").addEventListener("click", () => seek(0));
+  $("bKey").append(icon(IC.key), "Key moment"); $("bKey").addEventListener("click", () => { setPlaying(false); seek(cur.sc.snapshot_t_s); });
+  $("bPlay").addEventListener("click", () => setPlaying(!playing));
+  $("kAsk").append(icon(IC.mic), "Ask"); $("kAsk").addEventListener("click", toggleListen);
+  $("kAck").addEventListener("click", () => { setAck(cur.c.next_id[Math.floor(t)]); Snd.play("ack"); });
+  $("kHome").addEventListener("click", () => setView(view === "read" ? "route" : "read"));
+  $("ansX").addEventListener("click", hideAnswer);
+  $("askForm").addEventListener("submit", e => { e.preventDefault(); const v = $("askQ").value; $("askQ").value = ""; ask(v); });
+  QUESTIONS.forEach(qs => { const b = el("button", null, qs); b.type = "button"; b.addEventListener("click", () => ask(qs)); $("chips").append(b); });
+  const mu = $("bMute"); const drawMute = () => { mu.textContent = ""; mu.append(icon(IC.speaker)); mu.setAttribute("aria-pressed", String(!muted)); mu.setAttribute("aria-label", muted ? "Answers are shown only. Press to have them spoken." : "Answers are spoken aloud. Press to mute."); mu.title = muted ? "Answers are shown only" : "Answers are also spoken"; };
+  try { muted = localStorage.getItem("hs.voiceOff") === "1"; } catch (e) {}       // one switch for both apps
+  mu.addEventListener("click", () => { muted = !muted; try { muted ? localStorage.setItem("hs.voiceOff", "1") : localStorage.removeItem("hs.voiceOff"); } catch (e) {} if (muted) Assistant.stopSpeaking(); drawMute(); }); drawMute();
+  buildCells();
+  const tl = $("tl");
+  tl.addEventListener("pointerdown", e => { drag = true; try { tl.setPointerCapture(e.pointerId); } catch (x) {} seek(timeAt(e, true)); });
+  tl.addEventListener("pointermove", e => { if (drag) seek(timeAt(e, false)); hoverTip(e); });
+  tl.addEventListener("pointerup", () => { drag = false; });
+  tl.addEventListener("pointercancel", () => { drag = false; });
+  tl.addEventListener("pointerleave", () => $("ftip").classList.remove("on"));
+  addEventListener("keydown", e => {
+    if (!cur || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.metaKey || e.ctrlKey) return;
+    if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); setPlaying(!playing); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); seek(Math.floor(t) + (e.shiftKey ? 60 : 1)); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); seek(Math.floor(t) - (e.shiftKey ? 60 : 1)); }
+    else if (e.key === "Home") { e.preventDefault(); seek(0); }
+    else if (e.key === "End") { e.preventDefault(); seek(cur.n - 1); }
+  });
+  setSpeed(SPEEDS.some(s => s[0] === +p.get("speed")) ? +p.get("speed") : 60);
+  const sid = WALKS[p.get("scenario")] || SimDB.one("select 1 x from eva_scenario where scenario_id=?", [p.get("scenario") || ""]) ? p.get("scenario") : "nominal";
+  setPlaying(false);
+  let back = null;                                         // the presenter returns from another tab while the stream is on: continue where the phones are
+  if (PRES && p.get("scenario") === null) { try { if (sessionStorage.getItem("hs.liveOn") === "1") back = JSON.parse(sessionStorage.getItem("hs.liveState")); } catch (e) {} }
+  if (back && back.sid && (WALKS[back.sid] || SimDB.one("select 1 x from eva_scenario where scenario_id=?", [back.sid]))) {
+    if (SPEEDS.some(s => s[0] === back.speed)) setSpeed(back.speed);
+    pick(back.sid, back.playing ? back.t + back.speed * (Date.now() - back.at) / 1000 : back.t);
+    if (back.playing) setPlaying(true);
+  } else pick(sid, p.get("t") !== null && p.get("t") !== "" ? +p.get("t") : null);
+  if (p.get("trace") && TRACE.some(d => d[0] === p.get("trace"))) setTrace(p.get("trace"));
+  if (p.get("view") === "route") $("kHome").click();
+  initSound(); if (PRES) initPresenter();
+  window.HS_APP = { mic: toggleListen, play: () => setPlaying(!playing) };       // the presenter's remote (assets/present.js)
+  addEventListener("resize", fit); fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawTimeline);
+  if (p.get("play") === "1") setPlaying(true);
+  if (p.get("ask")) ask(p.get("ask"));                      // deep link for demos: ?ask=How long can I stay?
+  Assistant.onStatus(h => { $("aiSt").textContent = Assistant.aiStatus(h, true) || (h.ai ? `AI connected: ${String(h.model).split("/").pop()}` : "No AI connected: the rule-built briefing answers"); }, $("aiSt"));
+}
+if (AUD) initAudience(); else SimDB.ready.then(init).catch(() => { $("heroQ").textContent = "No data"; $("nextT").textContent = "The simulated mission could not be loaded. Start the preview server."; });
+</script>
+</body>
+</html>
